@@ -158,9 +158,9 @@ async def play_game(num_players: int) -> None:
         max_rank = max(hand_ranks)
         winner_idx = hand_ranks.index(max_rank)
         print(f"Player {winner_idx + 1} wins with a {', '.join(str(card) for card in game_state.players[winner_idx])}!")
-        play_again = input("Do you want to play another round? (yes/no): ")
-        if play_again.lower() != 'yes':
-            break
+        # play_again = input("Do you want to play another round? (yes/no): ")
+        # if play_again.lower() != 'yes':
+        #    break
 
 if __name__ == "__main__":
     while True:
