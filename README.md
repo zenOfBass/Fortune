@@ -101,3 +101,21 @@ Unless otherwise explained, the term “players” refers to anyone who still ha
 - 11: _Justice_ (Cause and effect, clarity, truth) – A player may call for any value they want to put forward as a bet, even if is lower. Any exceeding value goes back to the players who bet extra, which prevents bluffing.
 
 - 12: _The Hanged Man_ (Sacrifice, martyrdom) – Any player who goes for an all-in can
+
+- 13: _Death_ (End of a cycle, metamorphosis) – When drawn, _Death_ ends the turn. Hands are compared immediately.
+
+- 14: _Temperance_ (The middle road, patience, find meaning) – Players each discard one card from their hand. 3 cards are turned face–up to act as flops. Each player may choose one (and only one) of them to complete their hand.
+
+- 15: _The Devil_ (Excess, materialism) – If players want to raise a bet, it must be raised to at least double the original value.
+
+- 16: _The Tower_ (Sudden upheaval, disaster) – Half of the pot, rounded up, is lost. This money doesn’t go to any player.
+
+- 17: _The Star_ (Hope, faith, healing) – Each player, in turn order, may change one card from their hand, with a card from the top of the playing deck.
+
+- 18: _The Moon_ (Illusion, intuitions) – Each player, in turn order, draws a card from the deck and cannot turn it face up or look at it. Before comparing hands, the players may exchange one of their cards for the face-down card.
+
+- 19: _The Sun_ (Joy, success, celebration) – When drawn, the _Sun_ ends the turn. The pot will be equally divided. If there’s money left in the pot, it is lost.
+
+- 20: _Judgement_ (awakening, renewal) – Every player who has folded may pay a new ante to draw five new cards and re-enter that round.
+
+- 21: _The World_ (Fulfillment, completion, wholeness) – When drawn, the _World_ announces the last round of the game.
