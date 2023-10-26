@@ -40,7 +40,6 @@ class GameState:
     deck: List[Card]
     players: List[List[Card]]
 
-
 def CreateDeck() -> List[Card]:
     return [Card(suit, rank) for suit in Suit for rank in Rank]
 
