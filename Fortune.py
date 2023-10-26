@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Tuple
 
+
 class Suit(Enum):
     SWORDS = " of Swords"
     CUPS = " of Cups"
