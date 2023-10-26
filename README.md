@@ -62,7 +62,7 @@ Card and hand ranking works the same as in normal poker, with one addition being
 
 **_The Page_**
 
-- As it represents the beginning of a personal journey, the _Page_ is a “0” value card, standing behind the 2 of each suit.
+- As it represents the beginning of a personal journey, the _Page_ is a “0” value card, standing behind the 2 of each suit. On a straight however, it would come before the ace; as page/0, ace, 2, 3 and 4.
 
 - _The Page_ will also change the game in two more ways:
 

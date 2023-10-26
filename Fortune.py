@@ -62,21 +62,17 @@ async def DealCards(gameState: GameState, numCards: int) -> List[Card]:
         newCards.append(card)
     return newCards
 
-
 def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
     ranks = [card.rank.value for card in hand]
-    
     if set(ranks) == {0, 10, 11, 12, 13}:                 # Convert placeholder back to 0 for Page
         ranks.remove(0)
         ranks.append(-1)                                  # Add a placeholder for Page (to be converted to 0 later)
     ranks.sort(reverse=True)                              # Sort ranks in descending order
     ranks = [rank if rank != -1 else 0 for rank in ranks] # Convert placeholder back to 0 for Page
-
     suits = [card.suit for card in hand]
     rankCounts = Counter(ranks)
     isFlush = len(set(suits)) == 1
     isStraight = len(set(ranks)) == 5 and max(ranks) - min(ranks) == 4
-
     if isFlush and isStraight:
         if max(ranks) == 14:
             return (10, ranks) # Royal Flush
@@ -167,7 +163,6 @@ if __name__ == "__main__":
             print("Invalid input. Please enter a valid number between 2 and 4.")
             numPlayers = input("Enter the number of players (2-4): ")
         asyncio.run(PlayGame(int(numPlayers)))
-
         replay = input("Do you want to play another game? (yes/no): ")
         if replay.lower() != 'yes':
             break
