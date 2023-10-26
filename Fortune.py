@@ -40,12 +40,6 @@ class GameState:
     deck: List[Card]
     players: List[List[Card]]
 
-# @dataclass
-# class GamePhase(Enum):
-#     ANTE = auto()
-#     BETTING = auto()
-#     DRAW = auto()
-#     SHOWDOWN = auto()
 
 def CreateDeck() -> List[Card]:
     return [Card(suit, rank) for suit in Suit for rank in Rank]
@@ -126,7 +120,6 @@ async def AIPlayer(gameState: GameState, playerIdx: int) -> None:
 
 async def PlayGame(numPlayers: int) -> None:
     while True:
-        # current_phase = GamePhase.ANTE
         deck = await ShuffleDeck(CreateDeck())
         gameState = GameState(deck=deck, players=[[] for _ in range(numPlayers)])
         for i in range(numPlayers):
