@@ -47,7 +47,7 @@ class GameState:
 #     DRAW = auto()
 #     SHOWDOWN = auto()
 
-def create_deck() -> List[Card]:
+def CreateDeck() -> List[Card]:
     return [Card(suit, rank) for suit in Suit for rank in Rank]
 
 async def ShuffleDeck(deck: List[Card]) -> List[Card]:
@@ -55,14 +55,14 @@ async def ShuffleDeck(deck: List[Card]) -> List[Card]:
     random.shuffle(deck)
     return deck
 
-async def deal_cards(game_state: GameState, num_cards: int) -> List[Card]:
-    new_cards = []
-    for _ in range(num_cards):
-        card = game_state.deck.pop()
-        new_cards.append(card)
-    return new_cards
+async def DealCards(gameState: GameState, numCards: int) -> List[Card]:
+    newCards = []
+    for _ in range(numCards):
+        card = gameState.deck.pop()
+        newCards.append(card)
+    return newCards
 
-def rank_hand(hand: List[Card]) -> Tuple[int, List[int]]:
+def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
     ranks = [card.rank.value for card in hand]
     
     if set(ranks) == {0, 10, 11, 12, 13}:                 # Convert placeholder back to 0 for Page
@@ -72,11 +72,11 @@ def rank_hand(hand: List[Card]) -> Tuple[int, List[int]]:
     ranks = [rank if rank != -1 else 0 for rank in ranks] # Convert placeholder back to 0 for Page
 
     suits = [card.suit for card in hand]
-    rank_counts = Counter(ranks)
-    is_flush = len(set(suits)) == 1
-    is_straight = len(set(ranks)) == 5 and max(ranks) - min(ranks) == 4
+    rankCounts = Counter(ranks)
+    isFlush = len(set(suits)) == 1
+    isStraight = len(set(ranks)) == 5 and max(ranks) - min(ranks) == 4
 
-    if is_flush and is_straight:
+    if isFlush and isStraight:
         if max(ranks) == 14:
             return (10, ranks) # Royal Flush
         else:
@@ -98,14 +98,14 @@ def rank_hand(hand: List[Card]) -> Tuple[int, List[int]]:
     else:
         return (1, ranks)  # High Card
 
-async def draw_cards(game_state: GameState, player_idx: int, discard_indices: List[int]) -> None:
-    player_hand = game_state.players[player_idx]
-    for index in sorted(discard_indices, reverse=True):
-        del player_hand[index]
-    new_cards = await deal_cards(game_state, len(discard_indices))
-    game_state.players[player_idx] = player_hand + new_cards
+async def DrawCards(gameState: GameState, playerIdx: int, discardIndices: List[int]) -> None:
+    playerHand = gameState.players[playerIdx]
+    for index in sorted(discardIndices, reverse=True):
+        del playerHand[index]
+    newCards = await DealCards(gameState, len(discardIndices))
+    gameState.players[playerIdx] = playerHand + newCards
 
-def ai_discard_strategy(hand: List[Card]) -> List[int]: # Define a basic AI strategy for discarding cards
+def AIDiscardStrategy(hand: List[Card]) -> List[int]: # Define a basic AI strategy for discarding cards
     ranks = [card.rank.value for card in hand]
     rankCounts = Counter(ranks)
     for rank, count in rankCounts.items(): # If there are four cards of the same rank, keep them all
@@ -129,7 +129,6 @@ async def PlayGame(numPlayers: int) -> None:
         # current_phase = GamePhase.ANTE
         deck = await ShuffleDeck(CreateDeck())
         gameState = GameState(deck=deck, players=[[] for _ in range(numPlayers)])
-
         for i in range(numPlayers):
             gameState.players[i] = await DealCards(gameState, 5)
         for i, playerHand in enumerate(gameState.players):
@@ -154,9 +153,9 @@ async def PlayGame(numPlayers: int) -> None:
 
         for i, playerHand in enumerate(gameState.players):
             print(f"Player {i + 1}'s final hand: {', '.join(str(card) for card in playerHand)}")
-        hand_ranks = [RankHand(hand) for hand in gameState.players]
-        max_rank = max(hand_ranks)
-        winnerIdx = hand_ranks.index(max_rank)
+        handRanks = [RankHand(hand) for hand in gameState.players]
+        maxRank = max(handRanks)
+        winnerIdx = handRanks.index(maxRank)
         print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in gameState.players[winnerIdx])}!")
         playAgain = input("Do you want to play another round? (yes/no): ")
         if playAgain.lower() != 'yes':
