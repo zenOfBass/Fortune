@@ -52,7 +52,7 @@ def CreateDeck() -> List[Card]:
     return [Card(suit, rank) for suit in Suit for rank in Rank]
 
 async def ShuffleDeck(deck: List[Card]) -> List[Card]:
-    await asyncio.sleep(0)  # simulating asynchronous behavior
+    await asyncio.sleep(0) # Simulating asynchronous behavior
     random.shuffle(deck)
     return deck
 
@@ -83,25 +83,25 @@ def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
         else:
             return (9, ranks)  # Straight Flush
     elif max(rankCounts.values()) == 4:
-        return (8, ranks)  # Four of a Kind
+        return (8, ranks) # Four of a Kind
     elif max(rankCounts.values()) == 3 and len(rankCounts) == 2:
-        return (7, ranks)  # Full House
+        return (7, ranks) # Full House
     elif isFlush:
-        return (6, ranks)  # Flush
+        return (6, ranks) # Flush
     elif isStraight:
-        return (5, ranks)  # Straight
+        return (5, ranks) # Straight
     elif max(rankCounts.values()) == 3:
-        return (4, ranks)  # Three of a Kind
+        return (4, ranks) # Three of a Kind
     elif list(rankCounts.values()).count(2) == 2:
-        return (3, ranks)  # Two Pair
+        return (3, ranks) # Two Pair
     elif list(rankCounts.values()).count(2) == 1:
-        return (2, ranks)  # One Pair
+        return (2, ranks) # One Pair
     else:
-        return (1, ranks)  # High Card
+        return (1, ranks) # High Card
 
 async def DrawCards(gameState: GameState, playerIdx: int, discardIndices: List[int]) -> None:
     playerHand = gameState.players[playerIdx]
-    for index in sorted(discardIndices, reverse=True):
+    for index in sorted(discardIndices, reverse = True):
         del playerHand[index]
     newCards = await DealCards(gameState, len(discardIndices))
     gameState.players[playerIdx] = playerHand + newCards
