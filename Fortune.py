@@ -36,29 +36,47 @@ class Card:
         return f"{self.rank.name.capitalize()}{self.suit.value}" # It returns a formatted string, e.g., "Ace of Swords".
 
 @dataclass
+class GamePhase(Enum):
+    ANTE = auto()
+    DEALING = auto()
+    BETTING = auto()
+    FOLDING = auto()
+    DRAW = auto()
+    SHOWDOWN = auto()
+
+@dataclass
 class GameState:
     deck: List[Card]          # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
     players: List[List[Card]] # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
+    gamePhase: GamePhase
 
 def CreateDeck() -> List[Card]:                                 # 4 suits * 14 cards = a deck of 56 cards
+    print("Opening a new deck!")
     return [Card(suit, rank) for suit in Suit for rank in Rank] # Returns a list of Card objects, one for each combination of Suit and Rank.
 
 async def ShuffleDeck(deck: List[Card]) -> List[Card]:
     await asyncio.sleep(0) # Simulating asynchronous behavior
     random.shuffle(deck)
+    print("Shuffling up!")
     return deck
+
+async def ShuffleAllToDeck(gameState: GameState) -> List[Card]:
+    gameState.deck.extend(card for playerHand in gameState.players for card in playerHand)
+    return await ShuffleDeck(gameState.deck)
 
 async def DealCards(gameState: GameState, numCards: int) -> List[Card]:
     newCards = []
     for _ in range(numCards): # Draws 'numCards' from the 'gameState.deck' and adds them to the 'newCards' list.
         card = gameState.deck.pop()
         newCards.append(card)
+    print("Dealing!")
     return newCards
 
 async def DrawCards(gameState: GameState, playerIdx: int, discardIndices: List[int]) -> None:
     playerHand = gameState.players[playerIdx]                  # Retrieve the hand of the player with index 'playerIdx'.
     for index in sorted(discardIndices, reverse=True):         # Iterate through 'discardIndices' in reverse order.
         del playerHand[index]                                  # Remove the card at index 'index' from the player's hand.
+    print("Drawing cards . . .")
     newCards = await DealCards(gameState, len(discardIndices)) # Draw new cards equal to the number of cards discarded.
     gameState.players[playerIdx] = playerHand + newCards       # Update the player's hand with the newly drawn cards.
 
@@ -115,8 +133,10 @@ def AIDiscardStrategy(hand: List[Card]) -> List[int]: # Define a basic AI strate
     return discardIndices
 
 async def PlayGame(numPlayers: int) -> None:
-    deck = await ShuffleDeck(CreateDeck())                                    # Shuffle and create the deck
-    gameState = GameState(deck=deck, players=[[] for _ in range(numPlayers)]) # Create a game state
+    newDeck = await ShuffleDeck(CreateDeck())
+    gameState = GameState(deck=newDeck,                                       # Create a game state with a new deck
+                        players=[[] for _ in range(numPlayers)],
+                        gamePhase=GamePhase.ANTE) 
     while True:
         for i in range(numPlayers):                                           # Deal cards to each player
             gameState.players[i] = await DealCards(gameState, 5)
@@ -146,7 +166,7 @@ async def PlayGame(numPlayers: int) -> None:
         print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in gameState.players[winnerIdx])}!")
         playAgain = input("Do you want to play another round? (yes/no): ")
         if playAgain.lower() != 'yes':
-            deck = await ShuffleDeck(deck)
+            ShuffleAllToDeck(gameState.deck, gameState) # Put all cards back into the deck and shuffle
 
 def main():
     numPlayers = input("Enter the number of players (2-4): ")          # Get the number of players from user input
