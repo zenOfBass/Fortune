@@ -1,39 +1,11 @@
 import asyncio
 import random
+import sys
+from Card import Card, Suit, Rank
 from collections import Counter
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Tuple
-
-
-class Suit(Enum):
-    SWORDS = " of Swords"
-    CUPS = " of Cups"
-    PENTACLES = " of Pentacles"
-    WANDS = " of Wands"
-
-class Rank(Enum):
-    PAGE = 0
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
-    SIX = 6
-    SEVEN = 7
-    EIGHT = 8
-    NINE = 9
-    TEN = 10
-    KNIGHT = 11
-    QUEEN = 12
-    KING = 13
-    ACE = 14
-
-@dataclass # Marks this class as a data class, which provides special methods like __init__ and __repr__ automatically.
-class Card:
-    suit: Suit                                                   # Defines a property 'suit' of type Suit. This will store the suit of the card.
-    rank: Rank                                                   # Defines a property 'rank' of type Rank. This will store the rank of the card.
-    def __str__(self):                                           # This method defines how the card will be converted to a string when using str(card).
-        return f"{self.rank.name.capitalize()}{self.suit.value}" # It returns a formatted string, e.g., "Ace of Swords".
 
 @dataclass
 class GamePhase(Enum):
@@ -49,6 +21,7 @@ class GameState:
     deck: List[Card]          # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
     players: List[List[Card]] # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
     gamePhase: GamePhase
+    pot: int                  # Integer value representing the total chips in the pot
 
 def CreateDeck() -> List[Card]:                                 # 4 suits * 14 cards = a deck of 56 cards
     print("Opening a new deck!")
@@ -132,19 +105,20 @@ def AIDiscardStrategy(hand: List[Card]) -> List[int]: # Define a basic AI strate
     discardIndices = [index for index, rank in enumerate(ranks) if rank != max(ranks)] # Otherwise, discard all but the highest card
     return discardIndices
 
-async def PlayGame(numPlayers: int) -> None:
+async def PlayFortune(numPlayers: int) -> None:
     newDeck = await ShuffleDeck(CreateDeck())
-    gameState = GameState(deck=newDeck,                                       # Create a game state with a new deck
-                        players=[[] for _ in range(numPlayers)],
-                        gamePhase=GamePhase.ANTE) 
+    gameState = GameState(deck = newDeck,                          # Create a game state with a new deck
+                        players = [[] for _ in range(numPlayers)], # Set number of players
+                        gamePhase = GamePhase.ANTE,                # Set the game phase
+                        pot = 0)                                   # Initial value for the betting pot
     while True:
-        for i in range(numPlayers):                                           # Deal cards to each player
+        for i in range(numPlayers):                              # Deal cards to each player
             gameState.players[i] = await DealCards(gameState, 5)
-        for i, playerHand in enumerate(gameState.players):                    # Display initial hands for each player
+        for i, playerHand in enumerate(gameState.players):       # Display initial hands for each player
             print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in playerHand)}")
-        for i in range(numPlayers):                                           # Player turns and AI dealer's turn
+        for i in range(numPlayers):                              # Player turns and AI dealer's turn
             if i == numPlayers - 1:
-                await AIPlayer(gameState, i)                                  # AI dealer's turn
+                await AIPlayer(gameState, i)                     # AI dealer's turn
             else:
                 while True:
                     discardIndices = input(f"Player {i + 1}, enter the indices of the cards to discard (0-4, separated by spaces): ")
@@ -165,18 +139,22 @@ async def PlayGame(numPlayers: int) -> None:
         winnerIdx = handRanks.index(maxRank)
         print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in gameState.players[winnerIdx])}!")
         playAgain = input("Do you want to play another round? (yes/no): ")
-        if playAgain.lower() != 'yes':
-            ShuffleAllToDeck(gameState.deck, gameState) # Put all cards back into the deck and shuffle
+        if playAgain.lower() == 'yes':
+            await ShuffleAllToDeck(gameState) # Put all cards back into the deck and shuffle
+        elif playAgain.lower() == 'no':
+            return                            # Exit to "menu" (lol)
 
 def main():
     numPlayers = input("Enter the number of players (2-4): ")          # Get the number of players from user input
     while not numPlayers.isdigit() or not (2 <= int(numPlayers) <= 4): # Validate the user input
         print("Invalid input. Please enter a valid number between 2 and 4.")
         numPlayers = input("Enter the number of players (2-4): ")
-    asyncio.run(PlayGame(int(numPlayers)))                             # Start the game with the specified number of players
+    asyncio.run(PlayFortune(int(numPlayers)))                          # Start the game with the specified number of players
     replay = input("Do you want to play another game? (yes/no): ")     # Ask if the user wants to play another game
-    if replay.lower() != 'yes':
+    if replay.lower() == 'yes':
         main()
+    elif replay.lower() == 'no':
+        sys.exit()
 
 if __name__ == "__main__":
     main()
