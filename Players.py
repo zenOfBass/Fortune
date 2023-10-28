@@ -17,13 +17,13 @@ class Player:
         return amount
 
 class AIPlayer(Player):
-    def __init__(self, hand, stack):
+    def __init__(self, hand=None, stack=None):
         super().__init__(hand, stack)
 
     def Bet(self, currentBet):
-        strongThreshold = 0.8                  # Define a threshold for different hand strengths (for testing purposes)
+        strongThreshold = 0.8                  # Define a threshold for different hand strengths
         moderateThreshold = 0.5
-        handStrength = random.random()         # Simulate AI's assessment of hand strength (for testing purposes)
+        handStrength = random.random()         # Simulate AI's assessment of hand strength
         if handStrength > strongThreshold:
             betAmount = self.stack             # All-in with a very strong hand
         elif handStrength > moderateThreshold:
