@@ -8,7 +8,7 @@ and this project adheres to *[Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 - Added ShuffleAllToDeck(), Player class, changelog.md, changelogtemplate.md / Nathan 2023-10-27
-- Change file structure to split Card.py with card related classes / Nathan 2023-10-27
+- Change file structure to split Card.py and Players.py with related classes / Nathan 2023-10-27
 - Added game phases / Nathan 2023-10-26
 - Changed flow of game loop / Nathan 2023-10-26
 
