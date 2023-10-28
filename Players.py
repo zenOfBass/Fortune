@@ -1,4 +1,4 @@
-from ast import List
+from typing import List
 from Card import Card
 from collections import Counter
 from dataclasses import dataclass
