@@ -8,10 +8,11 @@ from Players import Player
 
 @dataclass
 class GameState:
-    deck: List[Card]      # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
-    players: List[Player] # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
-    pot: int              # Integer value representing the total chips in the pot
+    deck: List[Card]         # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
+    players: List[Player]    # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
+    pot: int                 # Integer value representing the total chips in the pot
     numPlayers: int
+    activePlayers: List[int] # List of integers representing the indices of active players
 
     def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
         ranks = [card.rank.value for card in hand]

@@ -52,7 +52,8 @@ class AIDealer(AIPlayer):
         gameState = GameState(deck = deck,
                             players = players,
                             pot = 0,
-                            numPlayers = numPlayers)
+                            numPlayers = numPlayers,
+                            activePlayers=[0, 1, 2, 3])
 
         while True:
             await self.ANTE(gameState)
@@ -93,7 +94,7 @@ class AIDealer(AIPlayer):
 
     async def BETTING(self, gameState: GameState) -> None:
         currentBet = 1  # Set the initial bet to the ante amount
-        activePlayers = list(range(gameState.numPlayers))  # Track active players
+        gameState.activePlayers = list(range(gameState.numPlayers))  # Track active players
 
         for i in range(gameState.numPlayers):
             if i == gameState.numPlayers - 1:  # AI Player
@@ -104,39 +105,17 @@ class AIDealer(AIPlayer):
                 betAmount = int(input(f"Player {i + 1}, current bet is {currentBet}. Enter your bet (0 to check, -1 to fold): "))
                 if betAmount == -1:
                     print(f"Player {i + 1} folds!")
-                    activePlayers.remove(i)
+                    gameState.activePlayers.remove(i)
                     continue
                 elif betAmount < currentBet:
                     print(f"Invalid bet. Must be at least {currentBet}. Try again.")
                     i -= 1
                     continue
-
-            if betAmount > currentBet:
-                currentBet = betAmount
-
-        # Match previous bets, raise, or fold
-        for i in activePlayers:
-            if i == gameState.numPlayers - 1:  # AI Player
-                # Implement AI betting logic
-                betAmount = self.AIBettingStrategy(currentBet)
-            else:
-                # Human player input
-                betAmount = int(input(
-                    f"Player {i + 1}, current bet is {currentBet}. Enter your bet (0 to check, -1 to fold): "))
-                if betAmount == -1:
-                    print(f"Player {i + 1} folds!")
-                    activePlayers.remove(i)
-                    continue
-                elif betAmount < currentBet:
-                    print(f"Invalid bet. Must be at least {currentBet}. Try again.")
-                    i -= 1
-                    continue
-
             if betAmount > currentBet:
                 currentBet = betAmount
 
     async def DRAW(self, gameState: GameState) -> None:
-        for i in range(gameState.numPlayers):
+        for i in gameState.activePlayers:
             if i == gameState.numPlayers - 1:
                 aiPlayer = gameState.players[i]
                 discardIndices = self.AIDiscardStrategy(aiPlayer.hand)
@@ -157,15 +136,17 @@ class AIDealer(AIPlayer):
                 await self.DrawCards(gameState, i, discardIndices)
 
     async def SHOWDOWN(self, gameState: GameState) -> None:
-        for i, player in enumerate(gameState.players):
+        for i in gameState.activePlayers:
+            player = gameState.players[i]
             if isinstance(player, AIPlayer):
                 playerType = "AI Player"
             else:
                 playerType = "Player"
             print(f"{playerType} {i + 1}'s final hand: {', '.join(str(card) for card in player.hand)}")
-        handRanks = [GameState.RankHand(player.hand) for player in gameState.players]
+
+        handRanks = [GameState.RankHand(gameState.players[i].hand) for i in gameState.activePlayers]
         maxRank = max(handRanks)
         winnerIdx = handRanks.index(maxRank)
-        winner = gameState.players[winnerIdx]
-        print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in winner.hand)}!")
+        winner = gameState.players[gameState.activePlayers[winnerIdx]]
+        print(f"Player {gameState.activePlayers[winnerIdx] + 1} wins with a {', '.join(str(card) for card in winner.hand)}!")
         winner.stack += gameState.pot
