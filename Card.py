@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
+
 class Suit(Enum):
     SWORDS = " of Swords"
     CUPS = " of Cups"

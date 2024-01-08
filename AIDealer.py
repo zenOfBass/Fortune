@@ -7,7 +7,7 @@ from Players import AIPlayer, Player
 
 class AIDealer(AIPlayer):
     def __init__(self):
-        super().__init__(hand=[], stack=100)  # Provide default values for hand and stack
+        super().__init__(hand = [], stack = 100)  # Provide default values for hand and stack
 
     async def CreateDeck(self):
         print("Opening a new deck!")
@@ -48,12 +48,12 @@ class AIDealer(AIPlayer):
 
     async def PlayFortune(self, numPlayers):
         deck = await self.CreateDeck()
-        players = [Player(hand=[], stack=100) for _ in range(numPlayers)]
+        players = [Player(hand = [], stack = 100) for _ in range(numPlayers)]
         gameState = GameState(deck = deck,
                             players = players,
                             pot = 0,
                             numPlayers = numPlayers,
-                            activePlayers=[0, 1, 2, 3])
+                            activePlayers = [0, 1, 2, 3])
 
         while True:
             await self.ANTE(gameState)
