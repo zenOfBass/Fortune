@@ -158,11 +158,11 @@ class AIDealer(AIPlayer):
 
     async def SHOWDOWN(self, gameState: GameState) -> None:
         for i, player in enumerate(gameState.players):
-            if isinstance(player, self):
-                player_type = "AI Player"
+            if isinstance(player, AIPlayer):
+                playerType = "AI Player"
             else:
-                player_type = "Player"
-            print(f"{player_type} {i + 1}'s final hand: {', '.join(str(card) for card in player.hand)}")
+                playerType = "Player"
+            print(f"{playerType} {i + 1}'s final hand: {', '.join(str(card) for card in player.hand)}")
         handRanks = [GameState.RankHand(player.hand) for player in gameState.players]
         maxRank = max(handRanks)
         winnerIdx = handRanks.index(maxRank)

@@ -9,7 +9,7 @@ def main():
         print("Invalid input. Please enter a valid number between 2 and 5.")
         numPlayers = input("Enter the number of players (2-5): ")
     asyncio.run(AIDealer().PlayFortune(int(numPlayers)))               # Start the game with the specified number of players
-    replay = input("Do you want to play another game? (yes/no): ")     # Ask if the user wants to play another game
+    replay = input("Do you want to start a new game? (yes/no): ")     # Ask if the user wants to play another game
     if replay.lower() == 'yes':
         main()
     elif replay.lower() == 'no':
