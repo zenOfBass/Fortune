@@ -20,17 +20,19 @@ class AIPlayer(Player):
     def __init__(self, hand=None, stack=None):
         super().__init__(hand, stack)
 
-    def Bet(self, currentBet):
-        strongThreshold = 0.8                  # Define a threshold for different hand strengths
+    def AIBettingStrategy(self, currentBet):
+        # Define a threshold for different hand strengths
+        strongThreshold = 0.8
         moderateThreshold = 0.5
         handStrength = random.random()         # Simulate AI's assessment of hand strength
         if handStrength > strongThreshold:
             betAmount = self.stack             # All-in with a very strong hand
         elif handStrength > moderateThreshold:
-            betAmount = currentBet * 2         # Moderate bet with a strong hand
+            # Moderate bet with a strong hand
+            betAmount = min(currentBet * 2, self.stack)
         else:
-            betAmount = currentBet             # Call or check with a weak hand
-        betAmount = min(betAmount, self.stack) # Ensure the AI doesn't bet more than it has
+            # Call or check with a weak hand
+            betAmount = min(currentBet, self.stack)
         self.stack -= betAmount
         return betAmount
 

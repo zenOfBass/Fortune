@@ -1,7 +1,7 @@
 import asyncio
 import random
 from Card import Card, Rank, Suit
-from GameState import GamePhase, GameState
+from GameState import GameState
 from Players import AIPlayer, Player
 
 
@@ -29,7 +29,6 @@ class AIDealer(AIPlayer):
         newCards = []
         if numCards > len(gameState.deck):
             await self.ShuffleAllToDeck(gameState)
-        print("Dealing!")
         for _ in range(numCards):
             card = gameState.deck.pop()
             newCards.append(card)
@@ -48,47 +47,125 @@ class AIDealer(AIPlayer):
         print(f"Drew {len(discardIndices)} new card(s) for player {playerIdx + 1}.")
 
     async def PlayFortune(self, numPlayers):
-        newDeck = await self.CreateDeck()
+        deck = await self.CreateDeck()
         players = [Player(hand=[], stack=100) for _ in range(numPlayers)]
-        gameState = GameState(deck=newDeck,
-                            players=players,
-                            gamePhase=GamePhase.ANTE,
-                            pot=0)
+        gameState = GameState(deck = deck,
+                            players = players,
+                            pot = 0,
+                            numPlayers = numPlayers)
+
         while True:
-            for i in range(numPlayers):
-                gameState.players[i].hand = await self.DealCards(gameState, 5)
-            for i, player in enumerate(gameState.players):
-                print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
-            for i in range(numPlayers):
-                if i == numPlayers - 1:
-                    aiPlayer = gameState.players[i]
-                    discardIndices = self.AIDiscardStrategy(aiPlayer.hand)
-                    await self.DrawCards(gameState, i, discardIndices)
-                else:
-                    while True:
-                        discardIndices = input(f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
-                        discardIndices = discardIndices.split()
-                        try:
-                            discardIndices = [int(index) - 1 for index in discardIndices]
-                            if all(0 <= index <= 4 for index in discardIndices):
-                                break
-                            else:
-                                print("Invalid input. Please enter numbers between 1 and 5.")
-                        except ValueError:
-                            print("Invalid input. Please enter valid numbers separated by spaces.")
-                    await self.DrawCards(gameState, i, discardIndices)
-            for i, player in enumerate(gameState.players):
-                if isinstance(player, AIPlayer):
-                    player_type = "AI Player"
-                else:
-                    player_type = "Player"
-                print(f"{player_type} {i + 1}'s final hand: {', '.join(str(card) for card in player.hand)}")
-            handRanks = [GameState.RankHand(player.hand) for player in gameState.players]
-            maxRank = max(handRanks)
-            winnerIdx = handRanks.index(maxRank)
-            print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in gameState.players[winnerIdx].hand)}!")
+            await self.ANTE(gameState)
+            await self.DEALING(gameState)
+            await self.BETTING(gameState)
+            await self.DRAW(gameState)
+            await self.BETTING(gameState)
+            await self.SHOWDOWN(gameState)
+            
             playAgain = input("Do you want to play another round? (yes/no): ")
             if playAgain.lower() == 'yes':
                 await self.ShuffleAllToDeck(gameState)
             elif playAgain.lower() == 'no':
                 return # Exit to "main menu" (lol)
+
+    async def ANTE(self, gameState: GameState) -> None:
+        anteAmount = 1
+        gameState.pot = 0  # Initialize the pot
+        anteQueue = asyncio.Queue()  # Use an asynchronous queue to handle the ante contributions
+
+        # Function to simulate a player's contribution
+        async def antePlayer(player):
+            await anteQueue.put(anteAmount)  # Add the ante amount to the pot
+
+        tasks = [antePlayer(player) for player in gameState.players]
+        await asyncio.gather(*tasks)  # Wait for all players to contribute to the pot
+        print("Gathering ante into pot!")
+
+        for _ in range(len(gameState.players)):
+            gameState.pot += await anteQueue.get()
+
+    async def DEALING(self, gameState: GameState) -> None:
+        print(f"Dealing!")
+        for i in range(gameState.numPlayers):
+            gameState.players[i].hand = await self.DealCards(gameState, 5)
+        for i, player in enumerate(gameState.players):
+                print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
+
+    async def BETTING(self, gameState: GameState) -> None:
+        currentBet = 1  # Set the initial bet to the ante amount
+        activePlayers = list(range(gameState.numPlayers))  # Track active players
+
+        for i in range(gameState.numPlayers):
+            if i == gameState.numPlayers - 1:  # AI Player
+                # Implement AI betting logic
+                betAmount = self.AIBettingStrategy(currentBet)
+            else:
+                # Human player input
+                betAmount = int(input(f"Player {i + 1}, current bet is {currentBet}. Enter your bet (0 to check, -1 to fold): "))
+                if betAmount == -1:
+                    print(f"Player {i + 1} folds!")
+                    activePlayers.remove(i)
+                    continue
+                elif betAmount < currentBet:
+                    print(f"Invalid bet. Must be at least {currentBet}. Try again.")
+                    i -= 1
+                    continue
+
+            if betAmount > currentBet:
+                currentBet = betAmount
+
+        # Match previous bets, raise, or fold
+        for i in activePlayers:
+            if i == gameState.numPlayers - 1:  # AI Player
+                # Implement AI betting logic
+                betAmount = self.AIBettingStrategy(currentBet)
+            else:
+                # Human player input
+                betAmount = int(input(
+                    f"Player {i + 1}, current bet is {currentBet}. Enter your bet (0 to check, -1 to fold): "))
+                if betAmount == -1:
+                    print(f"Player {i + 1} folds!")
+                    activePlayers.remove(i)
+                    continue
+                elif betAmount < currentBet:
+                    print(f"Invalid bet. Must be at least {currentBet}. Try again.")
+                    i -= 1
+                    continue
+
+            if betAmount > currentBet:
+                currentBet = betAmount
+
+    async def DRAW(self, gameState: GameState) -> None:
+        for i in range(gameState.numPlayers):
+            if i == gameState.numPlayers - 1:
+                aiPlayer = gameState.players[i]
+                discardIndices = self.AIDiscardStrategy(aiPlayer.hand)
+                await self.DrawCards(gameState, i, discardIndices)
+            else:
+                while True:
+                    discardIndices = input(f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
+                    discardIndices = discardIndices.split()
+                    try:
+                        discardIndices = [
+                            int(index) - 1 for index in discardIndices]
+                        if all(0 <= index <= 4 for index in discardIndices):
+                            break
+                        else:
+                            print("Invalid input. Please enter numbers between 1 and 5.")
+                    except ValueError:
+                        print("Invalid input. Please enter valid numbers separated by spaces.")
+                await self.DrawCards(gameState, i, discardIndices)
+
+    async def SHOWDOWN(self, gameState: GameState) -> None:
+        for i, player in enumerate(gameState.players):
+            if isinstance(player, self):
+                player_type = "AI Player"
+            else:
+                player_type = "Player"
+            print(f"{player_type} {i + 1}'s final hand: {', '.join(str(card) for card in player.hand)}")
+        handRanks = [GameState.RankHand(player.hand) for player in gameState.players]
+        maxRank = max(handRanks)
+        winnerIdx = handRanks.index(maxRank)
+        winner = gameState.players[winnerIdx]
+        print(f"Player {winnerIdx + 1} wins with a {', '.join(str(card) for card in winner.hand)}!")
+        winner.stack += gameState.pot

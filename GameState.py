@@ -7,20 +7,11 @@ from Players import Player
 
 
 @dataclass
-class GamePhase(Enum):
-    ANTE = auto()
-    DEALING = auto()
-    BETTING = auto()
-    FOLDING = auto()
-    DRAW = auto()
-    SHOWDOWN = auto()
-
-@dataclass
 class GameState:
     deck: List[Card]      # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
     players: List[Player] # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
-    gamePhase: GamePhase
     pot: int              # Integer value representing the total chips in the pot
+    numPlayers: int
 
     def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
         ranks = [card.rank.value for card in hand]
