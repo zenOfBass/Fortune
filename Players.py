@@ -25,16 +25,25 @@ class AIPlayer(Player):
         strongThreshold = 0.8
         moderateThreshold = 0.5
         handStrength = random.random()         # Simulate AI's assessment of hand strength
+
         if handStrength > strongThreshold:
             betAmount = self.stack             # All-in with a very strong hand
+            print(f"AI Player goes all-in with a very strong hand!")
         elif handStrength > moderateThreshold:
             # Moderate bet with a strong hand
             betAmount = min(currentBet * 2, self.stack)
+            print(f"AI Player makes a moderate bet with a strong hand: {betAmount}")
         else:
             # Call or check with a weak hand
             betAmount = min(currentBet, self.stack)
+            if betAmount == currentBet:
+                print(f"AI Player calls with a weak hand: {betAmount}")
+            else:
+                print(f"AI Player checks with a weak hand: {betAmount}")
+
         self.stack -= betAmount
         return betAmount
+
 
     @staticmethod
     def AIDiscardStrategy(hand: List[Card]) -> List[int]:

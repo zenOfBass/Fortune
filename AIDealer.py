@@ -107,7 +107,7 @@ class AIDealer(AIPlayer):
                     print(f"Player {i + 1} folds!")
                     gameState.activePlayers.remove(i)
                     continue
-                elif betAmount < currentBet:
+                elif betAmount < currentBet and betAmount != 0:
                     print(f"Invalid bet. Must be at least {currentBet}. Try again.")
                     i -= 1
                     continue
