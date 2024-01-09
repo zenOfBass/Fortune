@@ -100,7 +100,7 @@ Unless otherwise explained, the term “players” refers to anyone who still ha
 
 - 11: _Justice_ (Cause and effect, clarity, truth) – A player may call for any value they want to put forward as a bet, even if is lower. Any exceeding value goes back to the players who bet extra, which prevents bluffing.
 
-- 12: _The Hanged Man_ (Sacrifice, martyrdom) – Any player who goes for an all-in can draw an extra card from the playing cards deck to their hand.
+- 12: _The Hanged Man_ (Sacrifice, martyrdom) – Any player who goes for an all-in can draw an extra card from the deck to their hand.
 
 - 13: _Death_ (End of a cycle, metamorphosis) – When drawn, _Death_ ends the turn. Hands are compared immediately.
 
