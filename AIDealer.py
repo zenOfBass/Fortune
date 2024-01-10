@@ -1,13 +1,28 @@
 import asyncio
 import random
+from typing import List
 from Card import Card, Rank, Suit
 from GameState import GameState
 from Players import AIPlayer, Player
+from Observer import Observer, Subject
 
 
-class AIDealer(AIPlayer):
+class AIDealer(AIPlayer, Subject):
+    observers: List[Observer] = []
+
     def __init__(self):
         super().__init__(hand = [], stack = 100)  # Provide default values for hand and stack
+
+    def Attach(self, observer: Observer) -> None:
+        self.observers.append(observer)
+
+    def Detach(self, observer: Observer) -> None:
+        self.Notify("NULL")
+        self.observers.remove(observer)
+
+    def Notify(self, newPhase: str) -> None:
+        for observer in self.observers:
+            observer.Update(self, newPhase)
 
     async def CreateDeck(self):
         print("Opening a new deck!")
@@ -52,8 +67,10 @@ class AIDealer(AIPlayer):
         gameState = GameState(deck = deck,
                             players = players,
                             pot = 0,
+                            gamePhase = "NULL",
                             numPlayers = numPlayers,
                             activePlayers = [0, 1, 2, 3])
+        self.Attach(gameState)
 
         while True:
             await self.ANTE(gameState)
@@ -67,9 +84,11 @@ class AIDealer(AIPlayer):
             if playAgain.lower() == 'yes':
                 await self.ShuffleAllToDeck(gameState)
             elif playAgain.lower() == 'no':
+                self.Detach(gameState)
                 return # Exit to "main menu" (lol)
 
     async def ANTE(self, gameState: GameState) -> None:
+        self.Notify("ANTE")
         anteAmount = 1
         gameState.pot = 0  # Initialize the pot
         anteQueue = asyncio.Queue()  # Use an asynchronous queue to handle the ante contributions
@@ -86,6 +105,7 @@ class AIDealer(AIPlayer):
             gameState.pot += await anteQueue.get()
 
     async def DEALING(self, gameState: GameState) -> None:
+        self.Notify("DEALING")
         print(f"Dealing!")
         for i in range(gameState.numPlayers):
             gameState.players[i].hand = await self.DealCards(gameState, 5)
@@ -93,6 +113,7 @@ class AIDealer(AIPlayer):
                 print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
 
     async def BETTING(self, gameState: GameState) -> None:
+        self.Notify("BETTING")
         currentBet = 1  # Set the initial bet to the ante amount
         gameState.activePlayers = list(range(gameState.numPlayers))  # Track active players
 
@@ -115,6 +136,7 @@ class AIDealer(AIPlayer):
                 currentBet = betAmount
 
     async def DRAW(self, gameState: GameState) -> None:
+        self.Notify("DRAW")
         for i in gameState.activePlayers:
             if i == gameState.numPlayers - 1:
                 aiPlayer = gameState.players[i]
@@ -136,6 +158,7 @@ class AIDealer(AIPlayer):
                 await self.DrawCards(gameState, i, discardIndices)
 
     async def SHOWDOWN(self, gameState: GameState) -> None:
+        self.Notify("SHOWDOWN")
         for i in gameState.activePlayers:
             player = gameState.players[i]
             if isinstance(player, AIPlayer):

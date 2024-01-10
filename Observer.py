@@ -4,18 +4,18 @@ from abc import ABC, abstractmethod
 
 class Subject(ABC):
     @abstractmethod
-    def attach(self, observer: Observer) -> None:
+    def Attach(self, observer: Observer) -> None:
         pass
 
     @abstractmethod
-    def detach(self, observer: Observer) -> None:
+    def Detach(self, observer: Observer) -> None:
         pass
 
     @abstractmethod
-    def notify(self) -> None:
+    def Notify(self) -> None:
         pass
 
 class Observer(ABC):
     @abstractmethod
-    def update(self, game_phase: str) -> None:
+    def Update(self, gamePhase: str) -> None:
         pass

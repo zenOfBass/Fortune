@@ -2,16 +2,23 @@ from dataclasses import dataclass
 from typing import List, Tuple
 from collections import Counter
 from Card import Card
+from GamePhase import GamePhase
+from Observer import Observer, Subject
 from Players import Player
 
 
 @dataclass
-class GameState:
+class GameState(Observer):
     deck: List[Card]         # Defines a property 'deck' of type List[Card]. This will store the deck of cards in the game.
     players: List[Player]    # Defines a property 'players' of type List[List[Card]]. This will store the hands of all players.
     pot: int                 # Integer value representing the total chips in the pot
+    gamePhase: GamePhase
     numPlayers: int
     activePlayers: List[int] # List of integers representing the indices of active players
+
+    def Update(self, subject: Subject, newPhase: str) -> None:
+        self.gamePhase = newPhase
+        return
 
     def RankHand(hand: List[Card]) -> Tuple[int, List[int]]:
         ranks = [card.rank.value for card in hand]
