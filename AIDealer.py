@@ -106,14 +106,18 @@ class AIDealer(AIPlayer, Subject):
 
     async def DEALING(self, gameState: GameState) -> None:
         self.Notify("DEALING")
+
         print(f"Dealing!")
+
         for i in range(gameState.numPlayers):
             gameState.players[i].hand = await self.DealCards(gameState, 5)
-        for i, player in enumerate(gameState.players):
-                print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
 
     async def BETTING(self, gameState: GameState) -> None:
         self.Notify("BETTING")
+
+        for i, player in enumerate(gameState.players):
+            print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
+
         currentBet = 1  # Set the initial bet to the ante amount
         gameState.activePlayers = list(range(gameState.numPlayers))  # Track active players
 
@@ -123,20 +127,44 @@ class AIDealer(AIPlayer, Subject):
                 betAmount = self.AIBettingStrategy(currentBet)
             else:
                 # Human player input
-                betAmount = int(input(f"Player {i + 1}, current bet is {currentBet}. Enter your bet (0 to check, -1 to fold): "))
-                if betAmount == -1:
+                valid_actions = ["check", "fold"]
+                if currentBet > 0:
+                    valid_actions.append("call")
+                    if gameState.players[i].stack > currentBet:
+                        valid_actions.append("raise")
+
+                action = input(
+                    f"Player {i + 1}, current bet is {currentBet}. Choose action ({'/'.join(valid_actions)}): ").lower()
+
+                if action == "fold":
                     print(f"Player {i + 1} folds!")
                     gameState.activePlayers.remove(i)
                     continue
-                elif betAmount < currentBet and betAmount != 0:
-                    print(f"Invalid bet. Must be at least {currentBet}. Try again.")
-                    i -= 1
-                    continue
+                elif action == "call":
+                    betAmount = currentBet
+                    print(f"Player {i + 1} calls with {betAmount}.")
+                elif action == "raise":
+                    while True:
+                        try:
+                            betAmount = int(input(f"Enter your raise amount (minimum {currentBet * 2}): "))
+                            if betAmount < currentBet * 2:
+                                print(
+                                    f"Invalid raise. Must be at least {currentBet * 2}. Try again.")
+                            else:
+                                print(f"Player {i + 1} raises by {betAmount - currentBet}.")
+                                break
+                        except ValueError:
+                            print("Invalid input. Please enter a valid number.")
+                else:  # "check"
+                    betAmount = 0
+                    print(f"Player {i + 1} checks.")
+
             if betAmount > currentBet:
                 currentBet = betAmount
 
     async def DRAW(self, gameState: GameState) -> None:
         self.Notify("DRAW")
+
         for i in gameState.activePlayers:
             if i == gameState.numPlayers - 1:
                 aiPlayer = gameState.players[i]
@@ -159,6 +187,7 @@ class AIDealer(AIPlayer, Subject):
 
     async def SHOWDOWN(self, gameState: GameState) -> None:
         self.Notify("SHOWDOWN")
+
         for i in gameState.activePlayers:
             player = gameState.players[i]
             if isinstance(player, AIPlayer):

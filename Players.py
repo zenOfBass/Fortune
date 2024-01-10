@@ -24,10 +24,10 @@ class AIPlayer(Player):
         # Define a threshold for different hand strengths
         strongThreshold = 0.8
         moderateThreshold = 0.5
-        handStrength = random.random()         # Simulate AI's assessment of hand strength
+        handStrength = random.random()  # Simulate AI's assessment of hand strength
 
         if handStrength > strongThreshold:
-            betAmount = self.stack             # All-in with a very strong hand
+            betAmount = self.stack  # All-in with a very strong hand
             print(f"AI Player goes all-in with a very strong hand!")
         elif handStrength > moderateThreshold:
             # Moderate bet with a strong hand
