@@ -63,13 +63,22 @@ class AIDealer(AIPlayer, Subject):
 
     async def PlayFortune(self, numPlayers):
         deck = await self.CreateDeck()
-        players = [Player(hand = [], stack = 100) for _ in range(numPlayers)]
-        gameState = GameState(deck = deck,
-                            players = players,
-                            pot = 0,
-                            gamePhase = "NULL",
-                            numPlayers = numPlayers,
-                            activePlayers = [0, 1, 2, 3])
+
+        # Create one human player (player 1)
+        humanPlayer = Player(hand=[], stack=100)
+        players = [humanPlayer]
+
+        # Create the rest of the players as AI players
+        for _ in range(numPlayers - 1):
+            aiPlayer = AIPlayer(hand=[], stack=100)
+            players.append(aiPlayer)
+
+        gameState = GameState(deck=deck,
+                            players=players,
+                            pot=0,
+                            gamePhase="NULL",
+                            numPlayers=numPlayers,
+                            activePlayers=list(range(numPlayers)))
         self.Attach(gameState)
 
         while True:
@@ -79,13 +88,13 @@ class AIDealer(AIPlayer, Subject):
             await self.DRAW(gameState)
             await self.BETTING(gameState)
             await self.SHOWDOWN(gameState)
-            
+
             playAgain = input("Do you want to play another round? (yes/no): ")
             if playAgain.lower() == 'yes':
                 await self.ShuffleAllToDeck(gameState)
             elif playAgain.lower() == 'no':
                 self.Detach(gameState)
-                return # Exit to "main menu" (lol)
+                return  # Exit to "main menu" (lol)
 
     async def ANTE(self, gameState: GameState) -> None:
         self.Notify("ANTE")
@@ -116,48 +125,49 @@ class AIDealer(AIPlayer, Subject):
         self.Notify("BETTING")
 
         for i, player in enumerate(gameState.players):
-            print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
+            print(
+                f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
 
         currentBet = 1  # Set the initial bet to the ante amount
-        gameState.activePlayers = list(range(gameState.numPlayers))  # Track active players
+        gameState.activePlayers = list(
+            range(gameState.numPlayers))  # Track active players
 
-        for i in range(gameState.numPlayers):
-            if i == gameState.numPlayers - 1:  # AI Player
+        for i, player in enumerate(gameState.players):
+            if i == 0:  # Human Player (player 1)
+                while True:
+                    action = input(
+                        f"Player {i + 1}, current bet is {currentBet}. Choose action (check/fold/call/raise): ").lower()
+                    if action == "check":
+                        # Do nothing, as checking is allowed only if no previous bets
+                        betAmount = currentBet
+                        break
+                    elif action == "fold":
+                        print(f"Player {i + 1} folds!")
+                        gameState.activePlayers.remove(i)
+                        break
+                    elif action == "call":
+                        betAmount = currentBet
+                        print(f"Player {i + 1} calls with {betAmount}.")
+                        break
+                    elif action == "raise":
+                        minRaise = currentBet * 2
+                        raiseAmount = int(
+                            input(f"Enter your raise amount (minimum {minRaise}): "))
+                        if raiseAmount < minRaise:
+                            print(
+                                f"Invalid raise amount. Must be at least {minRaise}. Try again.")
+                        else:
+                            betAmount = raiseAmount
+                            print(
+                                f"Player {i + 1} raises by {raiseAmount - currentBet}.")
+                            currentBet = raiseAmount
+                            break
+                    else:
+                        print(
+                            "Invalid action. Please choose check, fold, call, or raise.")
+            else:
                 # Implement AI betting logic
                 betAmount = self.AIBettingStrategy(currentBet)
-            else:
-                # Human player input
-                valid_actions = ["check", "fold"]
-                if currentBet > 0:
-                    valid_actions.append("call")
-                    if gameState.players[i].stack > currentBet:
-                        valid_actions.append("raise")
-
-                action = input(
-                    f"Player {i + 1}, current bet is {currentBet}. Choose action ({'/'.join(valid_actions)}): ").lower()
-
-                if action == "fold":
-                    print(f"Player {i + 1} folds!")
-                    gameState.activePlayers.remove(i)
-                    continue
-                elif action == "call":
-                    betAmount = currentBet
-                    print(f"Player {i + 1} calls with {betAmount}.")
-                elif action == "raise":
-                    while True:
-                        try:
-                            betAmount = int(input(f"Enter your raise amount (minimum {currentBet * 2}): "))
-                            if betAmount < currentBet * 2:
-                                print(
-                                    f"Invalid raise. Must be at least {currentBet * 2}. Try again.")
-                            else:
-                                print(f"Player {i + 1} raises by {betAmount - currentBet}.")
-                                break
-                        except ValueError:
-                            print("Invalid input. Please enter a valid number.")
-                else:  # "check"
-                    betAmount = 0
-                    print(f"Player {i + 1} checks.")
 
             if betAmount > currentBet:
                 currentBet = betAmount
@@ -166,13 +176,10 @@ class AIDealer(AIPlayer, Subject):
         self.Notify("DRAW")
 
         for i in gameState.activePlayers:
-            if i == gameState.numPlayers - 1:
-                aiPlayer = gameState.players[i]
-                discardIndices = self.AIDiscardStrategy(aiPlayer.hand)
-                await self.DrawCards(gameState, i, discardIndices)
-            else:
+            if i == 0:  # Human Player (player 1)
                 while True:
-                    discardIndices = input(f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
+                    discardIndices = input(
+                        f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
                     discardIndices = discardIndices.split()
                     try:
                         discardIndices = [
@@ -180,9 +187,15 @@ class AIDealer(AIPlayer, Subject):
                         if all(0 <= index <= 4 for index in discardIndices):
                             break
                         else:
-                            print("Invalid input. Please enter numbers between 1 and 5.")
+                            print(
+                                "Invalid input. Please enter numbers between 1 and 5.")
                     except ValueError:
-                        print("Invalid input. Please enter valid numbers separated by spaces.")
+                        print(
+                            "Invalid input. Please enter valid numbers separated by spaces.")
+                await self.DrawCards(gameState, i, discardIndices)
+            else:
+                aiPlayer = gameState.players[i]
+                discardIndices = self.AIDiscardStrategy(aiPlayer.hand)
                 await self.DrawCards(gameState, i, discardIndices)
 
     async def SHOWDOWN(self, gameState: GameState) -> None:

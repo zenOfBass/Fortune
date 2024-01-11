@@ -17,7 +17,7 @@ class Player:
         return amount
 
 class AIPlayer(Player):
-    def __init__(self, hand=None, stack=None):
+    def __init__(self, hand = None, stack = None):
         super().__init__(hand, stack)
 
     def AIBettingStrategy(self, currentBet):
