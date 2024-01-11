@@ -65,20 +65,20 @@ class AIDealer(AIPlayer, Subject):
         deck = await self.CreateDeck()
 
         # Create one human player (player 1)
-        humanPlayer = Player(hand=[], stack=100)
+        humanPlayer = Player(hand = [], stack = 100)
         players = [humanPlayer]
 
         # Create the rest of the players as AI players
         for _ in range(numPlayers - 1):
-            aiPlayer = AIPlayer(hand=[], stack=100)
+            aiPlayer = AIPlayer(hand = [], stack = 100)
             players.append(aiPlayer)
 
-        gameState = GameState(deck=deck,
-                            players=players,
-                            pot=0,
-                            gamePhase="NULL",
-                            numPlayers=numPlayers,
-                            activePlayers=list(range(numPlayers)))
+        gameState = GameState(deck = deck,
+                            players = players,
+                            pot = 0,
+                            gamePhase = "NULL",
+                            numPlayers = numPlayers,
+                            activePlayers = list(range(numPlayers)))
         self.Attach(gameState)
 
         while True:
@@ -103,10 +103,10 @@ class AIDealer(AIPlayer, Subject):
         anteQueue = asyncio.Queue()  # Use an asynchronous queue to handle the ante contributions
 
         # Function to simulate a player's contribution
-        async def antePlayer(player):
+        async def AntePlayer(player):
             await anteQueue.put(anteAmount)  # Add the ante amount to the pot
 
-        tasks = [antePlayer(player) for player in gameState.players]
+        tasks = [AntePlayer(player) for player in gameState.players]
         await asyncio.gather(*tasks)  # Wait for all players to contribute to the pot
         print("Gathering ante into pot!")
 
@@ -124,19 +124,19 @@ class AIDealer(AIPlayer, Subject):
     async def BETTING(self, gameState: GameState) -> None:
         self.Notify("BETTING")
 
-        for i, player in enumerate(gameState.players):
-            print(
-                f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
+        print(f"Player 1's hand: {', '.join(str(card) for card in gameState.players[0].hand)}")
+
+        # # This loop will print all players hands for debuging
+        # for i, player in enumerate(gameState.players):
+        #     print(f"Player {i + 1}'s hand: {', '.join(str(card) for card in player.hand)}")
 
         currentBet = 1  # Set the initial bet to the ante amount
-        gameState.activePlayers = list(
-            range(gameState.numPlayers))  # Track active players
+        gameState.activePlayers = list(range(gameState.numPlayers))  # Track active players
 
         for i, player in enumerate(gameState.players):
             if i == 0:  # Human Player (player 1)
                 while True:
-                    action = input(
-                        f"Player {i + 1}, current bet is {currentBet}. Choose action (check/fold/call/raise): ").lower()
+                    action = input(f"Player {i + 1}, current bet is {currentBet}. Choose action (check/fold/call/raise): ").lower()
                     if action == "check":
                         # Do nothing, as checking is allowed only if no previous bets
                         betAmount = currentBet
@@ -151,20 +151,16 @@ class AIDealer(AIPlayer, Subject):
                         break
                     elif action == "raise":
                         minRaise = currentBet * 2
-                        raiseAmount = int(
-                            input(f"Enter your raise amount (minimum {minRaise}): "))
+                        raiseAmount = int(input(f"Enter your raise amount (minimum {minRaise}): "))
                         if raiseAmount < minRaise:
-                            print(
-                                f"Invalid raise amount. Must be at least {minRaise}. Try again.")
+                            print(f"Invalid raise amount. Must be at least {minRaise}. Try again.")
                         else:
                             betAmount = raiseAmount
-                            print(
-                                f"Player {i + 1} raises by {raiseAmount - currentBet}.")
+                            print(f"Player {i + 1} raises by {raiseAmount - currentBet}.")
                             currentBet = raiseAmount
                             break
                     else:
-                        print(
-                            "Invalid action. Please choose check, fold, call, or raise.")
+                        print("Invalid action. Please choose check, fold, call, or raise.")
             else:
                 # Implement AI betting logic
                 betAmount = self.AIBettingStrategy(currentBet)
@@ -178,20 +174,16 @@ class AIDealer(AIPlayer, Subject):
         for i in gameState.activePlayers:
             if i == 0:  # Human Player (player 1)
                 while True:
-                    discardIndices = input(
-                        f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
+                    discardIndices = input(f"Player {i + 1}, enter the indices of the cards to discard (1-5, separated by spaces): ")
                     discardIndices = discardIndices.split()
                     try:
-                        discardIndices = [
-                            int(index) - 1 for index in discardIndices]
+                        discardIndices = [int(index) - 1 for index in discardIndices]
                         if all(0 <= index <= 4 for index in discardIndices):
                             break
                         else:
-                            print(
-                                "Invalid input. Please enter numbers between 1 and 5.")
+                            print("Invalid input. Please enter numbers between 1 and 5.")
                     except ValueError:
-                        print(
-                            "Invalid input. Please enter valid numbers separated by spaces.")
+                        print("Invalid input. Please enter valid numbers separated by spaces.")
                 await self.DrawCards(gameState, i, discardIndices)
             else:
                 aiPlayer = gameState.players[i]

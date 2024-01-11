@@ -25,7 +25,7 @@ class GameState(Observer):
         if set(ranks) == {0, 10, 11, 12, 13}:                 # Convert placeholder back to 0 for Page
             ranks.remove(0)
             ranks.append(-1)                                  # Add a placeholder for Page (to be converted to 0 later)
-        ranks.sort(reverse=True)                              # Sort ranks in descending order
+        ranks.sort(reverse = True)                              # Sort ranks in descending order
         ranks = [rank if rank != -1 else 0 for rank in ranks] # Convert placeholder back to 0 for Page
         suits = [card.suit for card in hand]
         rankCounts = Counter(ranks)
