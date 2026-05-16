@@ -40,6 +40,7 @@ extends Control
 @onready var draw_label: Label = $DrawPanel/DrawVBox/DrawLabel
 @onready var confirm_button: Button = $DrawPanel/DrawVBox/ConfirmButton
 @onready var arcana_panel: ArcanaPanel = $ArcanaPanel
+@onready var chariot_panel = $ChariotPanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -62,9 +63,11 @@ func _ready() -> void:
 	result_panel.visible = false
 	last_round_label.visible = false
 	arcana_panel.visible = false
+	chariot_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
+	chariot_panel.confirmed.connect(_on_chariot_confirmed)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -181,6 +184,7 @@ func _on_pot_changed(new_amount: int) -> void:
 func _hide_all_overlays() -> void:
 	arcana_panel.visible = false
 	result_panel.visible = false
+	chariot_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -205,9 +209,23 @@ func _on_discard_input_needed(_player_idx: int) -> void:
 	draw_panel.visible = true
 	player_hand.set_selectable(true)
 
-func _on_arcana_choice_needed(_player_idx: int, arcana_id: int) -> void:
+func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 	_hide_all_overlays()
-	arcana_panel.show_interactive(arcana_id)
+	if arcana_id == 7:
+		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		chariot_panel.show_for_player(pname)
+		player_hand.set_selectable(true)
+	else:
+		arcana_panel.show_interactive(arcana_id)
+
+func _on_chariot_confirmed() -> void:
+	var selected := player_hand.get_selected_indices()
+	if selected.is_empty():
+		return
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
+	chariot_panel.visible = false
+	GameManager.submit_arcana_choice(selected[0])
 
 func _on_confirm_discard() -> void:
 	var indices := player_hand.get_selected_indices()

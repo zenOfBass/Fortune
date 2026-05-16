@@ -45,6 +45,7 @@ var pot:            int = 0
 var ante_amount:    int = 1
 var last_round:     bool = false
 var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
+var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
 
 const HUMAN_IDX := 0  # player 0 is always the human
 
@@ -382,9 +383,33 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		1, 2, 7, 14, 17, 18, 20:  # Interactive — UI handles in Phase 4
-			arcana_choice_needed.emit(-1, id)   # -1 = notify all; UI drives per-player flow
+		1, 2, 14, 17, 18, 20:  # Interactive stubs — UI handles in Phase 4
+			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		7:  # The Chariot — each player passes one card to the left
+			var chosen: Dictionary = {}
+			for pidx in active_players:
+				if pidx == HUMAN_IDX:
+					arcana_choice_needed.emit(pidx, 7)
+					await _arcana_effect_done
+					chosen[pidx] = arcana_choice
+					game_log.emit("You pass a card left.")
+				else:
+					chosen[pidx] = randi() % players[pidx].hand.size()
+					game_log.emit("%s passes a card left." % _pname(pidx))
+			var passing: Dictionary = {}
+			for pidx in active_players:
+				passing[pidx] = players[pidx].hand[chosen[pidx]]
+			for pidx in active_players:
+				players[pidx].hand.erase(passing[pidx])
+			for i in active_players.size():
+				var from_pidx: int = active_players[i]
+				var to_pidx: int = active_players[(i + 1) % active_players.size()]
+				players[to_pidx].receive_cards([passing[from_pidx]])
+			for pidx in active_players:
+				player_hand_updated.emit(pidx, players[pidx].hand)
+			game_log.emit("The Chariot — cards passed left!")
 
 		3:  # The Empress — each player draws a 6th card
 			for pidx: int in active_players:
@@ -553,4 +578,8 @@ func submit_discard(indices: Array) -> void:
 	_discard_ready.emit(indices)
 
 func complete_arcana_effect() -> void:
+	_arcana_effect_done.emit()
+
+func submit_arcana_choice(choice: int) -> void:
+	arcana_choice = choice
 	_arcana_effect_done.emit()
