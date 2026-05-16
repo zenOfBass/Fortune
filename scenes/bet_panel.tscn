@@ -32,3 +32,6 @@ custom_minimum_size = Vector2(100, 0)
 
 [node name="RaiseButton" type="Button" parent="VBox/RaiseRow"]
 text = "Raise"
+
+[node name="AllInButton" type="Button" parent="VBox/RaiseRow"]
+text = "All In"
