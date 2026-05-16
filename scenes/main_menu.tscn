@@ -67,6 +67,14 @@ value = 1.0
 
 [node name="Separator2" type="HSeparator" parent="VBox"]
 
+[node name="ArcanaRow" type="HBoxContainer" parent="VBox"]
+
+[node name="ArcanaLabel" type="Label" parent="VBox/ArcanaRow"]
+text = "Force arcana:"
+size_flags_horizontal = 3
+
+[node name="ArcanaOption" type="OptionButton" parent="VBox/ArcanaRow"]
+
 [node name="StartButton" type="Button" parent="VBox"]
 text = "Start Game"
 size_flags_horizontal = 3

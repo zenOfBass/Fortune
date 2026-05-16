@@ -44,12 +44,14 @@ var dealer_idx:     int = 0
 var pot:            int = 0
 var ante_amount:    int = 1
 var last_round:     bool = false
+var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
 
 const HUMAN_IDX := 0  # player 0 is always the human
 
 # ---- Public API (called by the game setup scene) -----------------------------
 
-func setup_game(num_players: int, starting_chips: int, ante: int) -> void:
+func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int = -1) -> void:
+	debug_arcana_id = arcana_id
 	players.clear()
 	for i in num_players:
 		players.append(Player.new(starting_chips))
@@ -129,10 +131,12 @@ func _phase_deal() -> void:
 		player_hand_updated.emit(pidx, players[pidx].hand)
 	game_log.emit("Cards dealt.")
 
-	# If dealer has a Page and no arcana has been drawn yet, draw one.
-	if players[dealer_idx].has_page and not round_state.arcana_drawn:
-		game_log.emit("%s holds the Page — drawing arcana..." % _pname(dealer_idx))
-		await _draw_arcana()
+	if not round_state.arcana_drawn:
+		if debug_arcana_id >= 0:
+			await _draw_arcana()
+		elif players[dealer_idx].has_page:
+			game_log.emit("%s holds the Page — drawing arcana..." % _pname(dealer_idx))
+			await _draw_arcana()
 
 # ---- Phase: Bet --------------------------------------------------------------
 
@@ -332,6 +336,12 @@ func _phase_showdown() -> void:
 # ---- Arcana deck setup (per rules) ------------------------------------------
 
 func _setup_arcana_deck() -> void:
+	if debug_arcana_id >= 0:
+		arcana_deck = []
+		for i in 22:
+			arcana_deck.append(debug_arcana_id)
+		arcana_pos = 0
+		return
 	var non_world: Array[int] = []
 	for i in range(0, 21):  # 0–20, World (#21) excluded initially
 		non_world.append(i)
