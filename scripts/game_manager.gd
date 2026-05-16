@@ -110,7 +110,7 @@ func _run_round() -> void:
 			await _phase_moon_swap()
 		if round_state.judgement_active:
 			await _phase_judgement_reentry()
-		_phase_showdown()
+		await _phase_showdown()
 		return
 
 	await _phase_bet()
@@ -120,7 +120,7 @@ func _run_round() -> void:
 			await _phase_moon_swap()
 		if round_state.judgement_active:
 			await _phase_judgement_reentry()
-		_phase_showdown()
+		await _phase_showdown()
 		return
 
 	if not round_state.skip_draw:
@@ -132,7 +132,7 @@ func _run_round() -> void:
 		await _phase_moon_swap()
 	if round_state.judgement_active:
 		await _phase_judgement_reentry()
-	_phase_showdown()
+	await _phase_showdown()
 
 # ---- Phase: Ante -------------------------------------------------------------
 
@@ -193,6 +193,10 @@ func _phase_bet() -> void:
 		# Skip only if the player has already acted AND already matched the bet.
 		if acted.has(pidx) and contributed.get(pidx, 0) >= _current_bet:
 			continue
+		# All-in players have nothing left to commit — skip silently.
+		if players[pidx].chips == 0:
+			acted[pidx] = true
+			continue
 
 		var can_check  := _current_bet == 0
 		var min_raise  := 1 if round_state.no_forced_min_bet \
@@ -207,6 +211,7 @@ func _phase_bet() -> void:
 			var r = await _bet_ready
 			action = r[0]; amount = r[1]
 		else:
+			await _ai_think()
 			var r := _ai_bet(pidx, _current_bet, can_check)
 			action = r[0]; amount = r[1]
 
@@ -238,7 +243,8 @@ func _phase_bet() -> void:
 					var paid := players[pidx].bet(to_pay)
 					contributed[pidx] = contributed.get(pidx, 0) + paid
 					_add_to_pot(paid, pidx)
-				_current_bet = raise_to
+					raise_to = contributed[pidx]  # cap to what was actually paid
+				_current_bet = max(_current_bet, raise_to)
 				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
 				# Re-queue everyone who hasn't matched the new bet.
 				for other: int in active_players:
@@ -273,6 +279,7 @@ func _phase_draw() -> void:
 			var indices: Array = await _discard_ready
 			_do_discard(pidx, indices)
 		else:
+			await _ai_think()
 			_do_discard(pidx, _ai_discard(pidx))
 
 # ---- Phase: Moon swap --------------------------------------------------------
@@ -298,6 +305,7 @@ func _phase_moon_swap() -> void:
 				deck.add_cards([secret])
 				game_log.emit("You keep your hand, discarding your Moon secret.")
 		else:
+			await _ai_think()
 			if not players[pidx].hand.is_empty() and randi() % 2 == 0:
 				var idx := randi() % players[pidx].hand.size()
 				var old_card: Card = players[pidx].hand[idx]
@@ -333,6 +341,7 @@ func _phase_judgement_reentry() -> void:
 			else:
 				game_log.emit("You choose to stay folded.")
 		else:
+			await _ai_think()
 			_do_reenter(pidx)
 
 func _do_reenter(pidx: int) -> void:
@@ -379,6 +388,7 @@ func _phase_showdown() -> void:
 	for pidx in active_players:
 		var card_names := ", ".join(players[pidx].hand.map(func(c: Card): return c.display_name()))
 		game_log.emit("%s shows: %s (%s)" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx]), card_names])
+		await get_tree().create_timer(0.8).timeout
 
 	var sorted_players: Array = active_players.duplicate()
 	sorted_players.sort_custom(func(a, b): return scores[a] > scores[b])
@@ -475,6 +485,7 @@ func _draw_arcana() -> void:
 	arcana_revealed.emit(id, MajorArcana.arcana_name(id))
 	game_log.emit("Arcana: %s" % MajorArcana.arcana_name(id))
 	round_state.arcana_id = id
+	await get_tree().create_timer(1.5).timeout
 	await _apply_arcana(id)
 
 func _apply_arcana(id: int) -> void:
@@ -519,6 +530,7 @@ func _apply_arcana(id: int) -> void:
 						else:
 							game_log.emit("You skip Temperance.")
 					else:
+						await _ai_think()
 						var flop_pick := randi() % flop.size()
 						var hand_pick := randi() % players[pidx].hand.size()
 						var taken: Card = flop[flop_pick]
@@ -562,6 +574,7 @@ func _apply_arcana(id: int) -> void:
 						player_hand_updated.emit(pidx, players[pidx].hand)
 						game_log.emit("You reveal the %s." % players[pidx].hand[idx].display_name())
 				else:
+					await _ai_think()
 					var idx := randi() % players[pidx].hand.size()
 					round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
 					player_hand_updated.emit(pidx, players[pidx].hand)
@@ -585,6 +598,7 @@ func _apply_arcana(id: int) -> void:
 						deck.add_cards([drawn])
 						game_log.emit("Wrong — the card was the %s." % drawn.display_name())
 				else:
+					await _ai_think()
 					if randi() % 4 == (drawn.suit as int):
 						players[pidx].receive_cards([drawn])
 						player_hand_updated.emit(pidx, players[pidx].hand)
@@ -611,6 +625,7 @@ func _apply_arcana(id: int) -> void:
 					else:
 						game_log.emit("You pass.")
 				else:
+					await _ai_think()
 					if not deck.is_empty() and randi() % 2 == 0:
 						var idx := randi() % players[pidx].hand.size()
 						var new_card: Card = deck.deal_one()
@@ -632,6 +647,7 @@ func _apply_arcana(id: int) -> void:
 					chosen[pidx] = arcana_choice
 					game_log.emit("You pass a card left.")
 				else:
+					await _ai_think()
 					chosen[pidx] = randi() % players[pidx].hand.size()
 					game_log.emit("%s passes a card left." % _pname(pidx))
 			var passing: Dictionary = {}
@@ -721,6 +737,9 @@ func _apply_arcana(id: int) -> void:
 			game_log.emit("The World — this is the final round!")
 
 # ---- Helpers -----------------------------------------------------------------
+
+func _ai_think() -> void:
+	await get_tree().create_timer(randf_range(0.4, 0.9)).timeout
 
 func _pname(pidx: int) -> String:
 	return "You" if pidx == HUMAN_IDX else "AI %d" % pidx
