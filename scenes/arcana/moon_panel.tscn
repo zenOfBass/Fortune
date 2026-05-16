@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/arcana/moon_panel.gd" id="1_moon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mn"]
+bg_color = Color(0.08, 0.10, 0.18, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.45, 0.65, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MoonPanel" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_mn")
+script = ExtResource("1_moon")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+text = "The Moon"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="InfoLabel" type="Label" parent="VBox"]
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="CardThumb" type="TextureRect" parent="VBox"]
+custom_minimum_size = Vector2(60, 90)
+stretch_mode = 5
+expand_mode = 3
+size_flags_horizontal = 3
+
+[node name="OKButton" type="Button" parent="VBox"]
+text = "Got It"
+size_flags_horizontal = 3
+
+[node name="ButtonRow" type="HBoxContainer" parent="VBox"]
+visible = false
+
+[node name="SwapButton" type="Button" parent="VBox/ButtonRow"]
+text = "Swap Card"
+size_flags_horizontal = 3
+
+[node name="KeepButton" type="Button" parent="VBox/ButtonRow"]
+text = "Keep Hand"
+size_flags_horizontal = 3

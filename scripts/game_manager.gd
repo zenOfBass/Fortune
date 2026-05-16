@@ -96,12 +96,16 @@ func _run_round() -> void:
 	await _phase_deal()
 
 	if round_state.death_end or round_state.sun_end:
+		if not round_state.moon_secret.is_empty():
+			await _phase_moon_swap()
 		_phase_showdown()
 		return
 
 	await _phase_bet()
 
 	if round_state.death_end or round_state.sun_end or active_players.size() <= 1:
+		if not round_state.moon_secret.is_empty():
+			await _phase_moon_swap()
 		_phase_showdown()
 		return
 
@@ -110,6 +114,8 @@ func _run_round() -> void:
 
 	await _phase_bet()
 
+	if not round_state.moon_secret.is_empty():
+		await _phase_moon_swap()
 	_phase_showdown()
 
 # ---- Phase: Ante -------------------------------------------------------------
@@ -250,6 +256,41 @@ func _phase_draw() -> void:
 		else:
 			_do_discard(pidx, _ai_discard(pidx))
 
+# ---- Phase: Moon swap --------------------------------------------------------
+
+func _phase_moon_swap() -> void:
+	game_log.emit("--- The Moon — swap your secret card or keep your hand? ---")
+	for pidx in round_state.moon_secret.keys():
+		var secret: Card = round_state.moon_secret[pidx]
+		if not active_players.has(pidx):
+			deck.add_cards([secret])
+			continue
+		if pidx == HUMAN_IDX:
+			arcana_choice_needed.emit(pidx, 18)
+			await _arcana_effect_done
+			var choice := arcana_choice
+			if choice >= 0 and choice < players[pidx].hand.size():
+				var old_card: Card = players[pidx].hand[choice]
+				players[pidx].hand[choice] = secret
+				deck.add_cards([old_card])
+				player_hand_updated.emit(pidx, players[pidx].hand)
+				game_log.emit("You swap a hand card for your Moon secret.")
+			else:
+				deck.add_cards([secret])
+				game_log.emit("You keep your hand, discarding your Moon secret.")
+		else:
+			if not players[pidx].hand.is_empty() and randi() % 2 == 0:
+				var idx := randi() % players[pidx].hand.size()
+				var old_card: Card = players[pidx].hand[idx]
+				players[pidx].hand[idx] = secret
+				deck.add_cards([old_card])
+				player_hand_updated.emit(pidx, players[pidx].hand)
+				game_log.emit("%s swaps their Moon secret into hand." % _pname(pidx))
+			else:
+				deck.add_cards([secret])
+				game_log.emit("%s discards their Moon secret." % _pname(pidx))
+	round_state.moon_secret.clear()
+
 # ---- Phase: Showdown ---------------------------------------------------------
 
 func _phase_showdown() -> void:
@@ -383,9 +424,25 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		14, 18, 20:  # Interactive stubs — UI handles in Phase 4
+		14, 20:  # Interactive stubs — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		18:  # The Moon — each player draws a secret card; may swap before showdown
+			game_log.emit("The Moon — each player draws a secret card.")
+			for pidx in active_players:
+				if deck.is_empty():
+					game_log.emit("%s — deck empty, skipped." % _pname(pidx))
+					continue
+				var drawn: Card = deck.deal_one()
+				round_state.moon_secret[pidx] = drawn
+				if pidx == HUMAN_IDX:
+					arcana_choice_needed.emit(pidx, 18)
+					await _arcana_effect_done
+					round_state.moon_reveal_done = true
+					game_log.emit("You tuck a card away secretly.")
+				else:
+					game_log.emit("%s draws a secret card." % _pname(pidx))
 
 		2:  # The High Priestess — each player reveals one card face-up for the round
 			game_log.emit("The High Priestess — each player reveals one card.")
