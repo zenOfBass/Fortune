@@ -45,6 +45,7 @@ extends Control
 @onready var magician_panel = $MagicianPanel
 @onready var priestess_panel = $PriestessPanel
 @onready var moon_panel = $MoonPanel
+@onready var temperance_panel = $TemperancePanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -72,6 +73,7 @@ func _ready() -> void:
 	magician_panel.visible = false
 	priestess_panel.visible = false
 	moon_panel.visible = false
+	temperance_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
@@ -83,6 +85,7 @@ func _ready() -> void:
 	moon_panel.phase1_confirmed.connect(_on_moon_phase1_confirmed)
 	moon_panel.swap_chosen.connect(_on_moon_swap)
 	moon_panel.keep_chosen.connect(_on_moon_keep)
+	temperance_panel.confirmed.connect(_on_temperance_confirmed)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -212,6 +215,7 @@ func _hide_all_overlays() -> void:
 	magician_panel.visible = false
 	priestess_panel.visible = false
 	moon_panel.visible = false
+	temperance_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -253,6 +257,10 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		priestess_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
+	elif arcana_id == 14:
+		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		temperance_panel.show_for_player(pname, GameManager.round_state.temperance_flop)
+		player_hand.set_selectable(true, 1)
 	elif arcana_id == 18:
 		var secret: Card = GameManager.round_state.moon_secret.get(player_idx)
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
@@ -272,6 +280,15 @@ func _on_priestess_confirmed() -> void:
 	player_hand.clear_selection()
 	priestess_panel.visible = false
 	GameManager.submit_arcana_choice(selected[0])
+
+func _on_temperance_confirmed(flop_idx: int) -> void:
+	var hand_selected := player_hand.get_selected_indices()
+	if hand_selected.is_empty():
+		return
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
+	temperance_panel.visible = false
+	GameManager.submit_arcana_choice_pair(hand_selected[0], flop_idx)
 
 func _on_moon_phase1_confirmed() -> void:
 	moon_panel.visible = false

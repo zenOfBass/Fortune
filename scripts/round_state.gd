@@ -32,6 +32,7 @@ var hierophant_active := false
 var priestess_revealed: Dictionary = {}  # player_idx -> Card (face-up for the round)
 var moon_secret: Dictionary = {}         # player_idx -> Card (secret drawn card)
 var moon_reveal_done: bool = false       # true after human acknowledges phase-1 draw
+var temperance_flop: Array = []          # current face-up flop cards for Temperance (#14)
 
 # ---- Convenience ----
 

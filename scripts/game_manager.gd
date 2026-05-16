@@ -46,6 +46,7 @@ var ante_amount:    int = 1
 var last_round:     bool = false
 var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
 var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
+var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (Temperance)
 
 const HUMAN_IDX := 0  # player 0 is always the human
 
@@ -424,9 +425,54 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		14, 20:  # Interactive stubs — UI handles in Phase 4
+		20:  # Interactive stub — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		14:  # Temperance — discard one card, pick from a 3-card face-up flop
+			game_log.emit("Temperance — each player discards one card and picks from the flop.")
+			var flop: Array[Card] = []
+			for _i in 3:
+				if not deck.is_empty():
+					flop.append(deck.deal_one())
+			if flop.is_empty():
+				game_log.emit("Deck too empty for Temperance flop.")
+			else:
+				for pidx in active_players:
+					if flop.is_empty():
+						game_log.emit("%s — no flop cards left, skipped." % _pname(pidx))
+						continue
+					if pidx == HUMAN_IDX:
+						round_state.temperance_flop = flop
+						arcana_choice_needed.emit(pidx, 14)
+						await _arcana_effect_done
+						var discard_idx := arcana_choice
+						var flop_idx := arcana_choice2
+						if discard_idx >= 0 and discard_idx < players[pidx].hand.size() \
+								and flop_idx >= 0 and flop_idx < flop.size():
+							var taken: Card = flop[flop_idx]
+							var discarded: Card = players[pidx].hand[discard_idx]
+							players[pidx].hand.remove_at(discard_idx)
+							players[pidx].receive_cards([taken])
+							deck.add_cards([discarded])
+							flop.remove_at(flop_idx)
+							player_hand_updated.emit(pidx, players[pidx].hand)
+							game_log.emit("You discard and take from the flop.")
+						else:
+							game_log.emit("You skip Temperance.")
+					else:
+						var flop_pick := randi() % flop.size()
+						var hand_pick := randi() % players[pidx].hand.size()
+						var taken: Card = flop[flop_pick]
+						var discarded: Card = players[pidx].hand[hand_pick]
+						players[pidx].hand.remove_at(hand_pick)
+						players[pidx].receive_cards([taken])
+						deck.add_cards([discarded])
+						flop.remove_at(flop_pick)
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("%s discards and takes from the flop." % _pname(pidx))
+				if not flop.is_empty():
+					deck.add_cards(flop)
 
 		18:  # The Moon — each player draws a secret card; may swap before showdown
 			game_log.emit("The Moon — each player draws a secret card.")
@@ -714,4 +760,9 @@ func complete_arcana_effect() -> void:
 
 func submit_arcana_choice(choice: int) -> void:
 	arcana_choice = choice
+	_arcana_effect_done.emit()
+
+func submit_arcana_choice_pair(choice1: int, choice2: int) -> void:
+	arcana_choice = choice1
+	arcana_choice2 = choice2
 	_arcana_effect_done.emit()
