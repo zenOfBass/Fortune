@@ -10,7 +10,7 @@ var _selectable: bool = false
 func _ready() -> void:
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	expand_mode = TextureRect.EXPAND_KEEP_SIZE
-	custom_minimum_size = Vector2(56, 84)
+	custom_minimum_size = Vector2(80, 120)
 	mouse_filter = MOUSE_FILTER_PASS
 
 func set_card(card: Card, face_up: bool) -> void:
