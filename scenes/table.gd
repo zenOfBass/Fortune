@@ -1,5 +1,10 @@
 extends Control
 
+# ---- Audio -------------------------------------------------------------------
+
+var _flip_sfx: AudioStreamPlayer
+var _shuffle_sfx: AudioStreamPlayer
+
 # ---- Top bar -----------------------------------------------------------------
 
 @onready var phase_label: Label = $TopBar/PhaseLabel
@@ -59,6 +64,13 @@ extends Control
 var _game_over: bool = false
 
 func _ready() -> void:
+	_flip_sfx = AudioStreamPlayer.new()
+	_flip_sfx.stream = load("res://assets/audio/card_flip.mp3")
+	add_child(_flip_sfx)
+	_shuffle_sfx = AudioStreamPlayer.new()
+	_shuffle_sfx.stream = load("res://assets/audio/card_shuffle.mp3")
+	add_child(_shuffle_sfx)
+
 	var num_players := GameManager.players.size()
 	ai1_area.visible = false
 	ai2_area.visible = false
@@ -162,6 +174,8 @@ func _place_side(area: Control, vp: Vector2, is_left: bool) -> void:
 # ---- Signal handlers ---------------------------------------------------------
 
 func _on_phase_changed(phase_name: String) -> void:
+	if phase_name == "DEAL":
+		_shuffle_sfx.play()
 	phase_label.text = "Phase: " + phase_name
 	bet_panel.hide_betting()
 	draw_panel.visible = false
@@ -179,6 +193,7 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana_name.text = ""
 
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
+	_flip_sfx.play()
 	match player_idx:
 		0: player_hand.set_hand(hand, true)
 		1: _set_ai_hand(ai1_hand, player_idx, hand)
