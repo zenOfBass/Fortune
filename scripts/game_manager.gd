@@ -798,12 +798,19 @@ func _only_one_solvent() -> bool:
 # ---- AI ----------------------------------------------------------------------
 
 func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
-	var strength := randf()  # simulated hand assessment
-	if strength > 0.8:
+	var hand_score: int = HandEvaluator.score(
+		players[pidx].hand,
+		round_state.king_beats_ace,
+		round_state.inverted_values,
+		round_state.fool_active
+	)
+	var hand_type: float = hand_score / 1048576.0  # 1.0 (high card) to 10.0 (royal flush)
+	var effective: float = clamp(hand_type + randf_range(-1.0, 1.0), 0.0, 11.0)
+	if effective >= 4.5:
 		var raise_to := current_bet * 2 if round_state.raise_must_double else current_bet + 1
 		raise_to = int(min(raise_to, players[pidx].chips + current_bet))
 		return ["raise", raise_to]
-	elif strength > 0.4:
+	elif effective >= 1.5:
 		return ["check", 0] if can_check else ["call", 0]
 	elif can_check:
 		return ["check", 0]
@@ -813,24 +820,73 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 func _ai_discard(pidx: int) -> Array[int]:
 	var hand := players[pidx].hand
 	var rank_counts: Dictionary = {}
+	var suit_counts: Dictionary = {}
 	for c: Card in hand:
-		var v := c.rank as int
-		rank_counts[v] = rank_counts.get(v, 0) + 1
+		rank_counts[c.rank as int] = rank_counts.get(c.rank as int, 0) + 1
+		suit_counts[c.suit as int] = suit_counts.get(c.suit as int, 0) + 1
 
-	# Keep four-of-a-kind, three-of-a-kind, two-pair, full house.
 	var max_count: int = rank_counts.values().max() if not rank_counts.is_empty() else 0
-	if max_count >= 3:
-		return []
-	if rank_counts.values().count(2) == 2:
+
+	# Keep strong made hands: quads, full house, three of a kind, two pair.
+	if max_count >= 3 or rank_counts.values().count(2) == 2:
 		return []
 
-	# Otherwise discard everything except the highest-ranked card.
-	var max_rank: int = rank_counts.keys().max() if not rank_counts.is_empty() else 0
-	var indices: Array[int] = []
+	# 4-flush draw: discard the one off-suit card.
+	var max_suit: int = suit_counts.values().max() if not suit_counts.is_empty() else 0
+	if max_suit >= 4:
+		var flush_suit := -1
+		for s in suit_counts:
+			if suit_counts[s] == max_suit:
+				flush_suit = s
+				break
+		var flush_result: Array[int] = []
+		for i in range(hand.size()):
+			if (hand[i].suit as int) != flush_suit:
+				flush_result.append(i)
+		return flush_result
+
+	# 4-straight draw (5-card hands only): discard the card that doesn't fit.
+	if hand.size() == 5:
+		var skip_idx := _ai_four_straight_discard(hand)
+		if skip_idx >= 0:
+			return [skip_idx]
+
+	# One pair: keep the pair, discard the rest.
+	if max_count == 2:
+		var pair_rank := -1
+		for r in rank_counts:
+			if rank_counts[r] == 2:
+				pair_rank = r
+				break
+		var pair_result: Array[int] = []
+		for i in range(hand.size()):
+			if (hand[i].rank as int) != pair_rank:
+				pair_result.append(i)
+		return pair_result
+
+	# High card: keep only the highest-ranked card.
+	var max_rank: int = rank_counts.keys().max()
+	var result: Array[int] = []
 	for i in range(hand.size()):
 		if (hand[i].rank as int) != max_rank:
-			indices.append(i)
-	return indices
+			result.append(i)
+	return result
+
+func _ai_four_straight_discard(hand: Array) -> int:
+	var ranks: Array[int] = []
+	for c: Card in hand:
+		ranks.append(c.rank as int)
+	for skip in range(hand.size()):
+		var unique: Dictionary = {}
+		for i in range(hand.size()):
+			if i != skip:
+				unique[ranks[i]] = true
+		if unique.size() == 4:
+			var keys: Array = unique.keys()
+			keys.sort()
+			if keys[-1] - keys[0] == 3:
+				return skip
+	return -1
 
 # ---- Public API (UI calls these) ---------------------------------------------
 
