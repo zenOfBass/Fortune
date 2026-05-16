@@ -28,15 +28,6 @@ A digital implementation of Fortune, a tarot-themed 5-card draw poker variant, b
 - Bust/elimination announcements
 - Game-over screen with final standings
 
-## Digital-Specific Behavior
-
-A few things work slightly differently in the digital version:
-
-- **The Moon:** Because it's a screen-only game, you see your secret card immediately when you draw it. The choice to swap or keep happens before the showdown, as in the rules.
-- **Wheel of Fortune:** Only redeals to players still active in the round (non-folded). Folded players' cards are returned to the deck before the reshuffle.
-- **AI strategy:** AI opponents use a simplified random bet strategy and discard everything except pairs, trips, and strong made hands. They have no awareness of flush or straight draws.
-- **Justice:** Any excess bets above the final bet are refunded at the end of the betting round, rather than immediately on fold.
-
 ---
 
 ## Rules
