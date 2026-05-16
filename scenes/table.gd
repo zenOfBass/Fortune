@@ -8,15 +8,15 @@ extends Control
 
 # ---- AI areas ----------------------------------------------------------------
 
-@onready var ai1_area: Control = $AIRow/AI1Area
-@onready var ai1_chips: Label = $AIRow/AI1Area/ChipsLabel
-@onready var ai1_hand: HandDisplay = $AIRow/AI1Area/HandDisplay
-@onready var ai2_area: Control = $AIRow/AI2Area
-@onready var ai2_chips: Label = $AIRow/AI2Area/ChipsLabel
-@onready var ai2_hand: HandDisplay = $AIRow/AI2Area/HandDisplay
-@onready var ai3_area: Control = $AIRow/AI3Area
-@onready var ai3_chips: Label = $AIRow/AI3Area/ChipsLabel
-@onready var ai3_hand: HandDisplay = $AIRow/AI3Area/HandDisplay
+@onready var ai1_area: Control = $AIContainer/AI1Area
+@onready var ai1_chips: Label = $AIContainer/AI1Area/ChipsLabel
+@onready var ai1_hand: HandDisplay = $AIContainer/AI1Area/HandDisplay
+@onready var ai2_area: Control = $AIContainer/AI2Area
+@onready var ai2_chips: Label = $AIContainer/AI2Area/ChipsLabel
+@onready var ai2_hand: HandDisplay = $AIContainer/AI2Area/HandDisplay
+@onready var ai3_area: Control = $AIContainer/AI3Area
+@onready var ai3_chips: Label = $AIContainer/AI3Area/ChipsLabel
+@onready var ai3_hand: HandDisplay = $AIContainer/AI3Area/HandDisplay
 
 # ---- Player area -------------------------------------------------------------
 
@@ -42,11 +42,11 @@ extends Control
 var _game_over: bool = false
 
 func _ready() -> void:
-	# Show AI areas based on actual player count set up in the menu.
 	var num_players := GameManager.players.size()
-	ai1_area.visible = (num_players >= 2)
-	ai2_area.visible = (num_players >= 3)
-	ai3_area.visible = (num_players >= 4)
+	ai1_area.visible = false
+	ai2_area.visible = false
+	ai3_area.visible = false
+	_layout_ai_areas(num_players)
 
 	draw_panel.visible = false
 	result_panel.visible = false
@@ -73,6 +73,56 @@ func _ready() -> void:
 
 	GameManager.start_game()
 
+# ---- Layout ------------------------------------------------------------------
+
+func _layout_ai_areas(num_players: int) -> void:
+	var vp := get_viewport_rect().size
+	match num_players:
+		2:
+			ai1_area.visible = true
+			_anchor_area(ai1_area, 0.2, 0.06, 0.8, 0.36)
+		3:
+			ai1_area.visible = true
+			ai2_area.visible = true
+			_anchor_area(ai1_area, 0.02, 0.06, 0.5, 0.36)
+			_anchor_area(ai2_area, 0.5, 0.06, 0.98, 0.36)
+		4:
+			ai1_area.visible = true
+			ai2_area.visible = true
+			ai3_area.visible = true
+			_place_side(ai1_area, vp, true)
+			_anchor_area(ai2_area, 0.22, 0.06, 0.78, 0.36)
+			_place_side(ai3_area, vp, false)
+
+func _anchor_area(area: Control, al: float, at: float, ar: float, ab: float) -> void:
+	area.rotation = 0.0
+	area.anchor_left = al
+	area.anchor_top = at
+	area.anchor_right = ar
+	area.anchor_bottom = ab
+	area.offset_left = 0.0
+	area.offset_top = 0.0
+	area.offset_right = 0.0
+	area.offset_bottom = 0.0
+
+func _place_side(area: Control, vp: Vector2, is_left: bool) -> void:
+	var vis_w: float = vp.x * 0.14
+	var vis_h: float = vp.y * 0.70
+	var w: float = vis_h
+	var h: float = vis_w
+	var cx: float = vp.x * 0.07 if is_left else vp.x * 0.93
+	var cy: float = vp.y * 0.50
+	area.anchor_left = 0.0
+	area.anchor_top = 0.0
+	area.anchor_right = 0.0
+	area.anchor_bottom = 0.0
+	area.offset_left = cx - w / 2.0
+	area.offset_top = cy - h / 2.0
+	area.offset_right = cx + w / 2.0
+	area.offset_bottom = cy + h / 2.0
+	area.pivot_offset = Vector2(w / 2.0, h / 2.0)
+	area.rotation_degrees = 90.0 if is_left else -90.0
+
 # ---- Signal handlers ---------------------------------------------------------
 
 func _on_phase_changed(phase_name: String) -> void:
@@ -81,11 +131,9 @@ func _on_phase_changed(phase_name: String) -> void:
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
-	# Non-interactive arcana panel auto-dismisses at next phase.
 	if not arcana_panel.is_interactive():
 		arcana_panel.visible = false
 	if phase_name == "ANTE":
-		# New round — reset fold dimming.
 		player_hand.modulate = Color.WHITE
 		ai1_area.modulate = Color.WHITE
 		ai2_area.modulate = Color.WHITE
@@ -145,12 +193,19 @@ func _on_confirm_discard() -> void:
 	GameManager.submit_discard(indices)
 
 func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> void:
-	var msg := "Split pot!\n" if split else ""
-	for i in winner_indices.size():
-		var w: int = winner_indices[i]
-		var player_name := "You" if w == 0 else "AI %d" % w
-		var hand_name: String = hand_names[i] if i < hand_names.size() else ""
-		msg += "%s wins with %s\n" % [player_name, hand_name]
+	arcana_panel.visible = false
+	var msg := ""
+	if split and hand_names.is_empty():
+		msg = "Split pot! (equal share)"
+	else:
+		if split:
+			msg = "Split pot!\n"
+		for i in winner_indices.size():
+			var w: int = winner_indices[i]
+			var player_name := "You" if w == 0 else "AI %d" % w
+			var hand_name: String = hand_names[i] if i < hand_names.size() else ""
+			var verb := "win" if w == 0 else "wins"
+			msg += "%s %s with %s\n" % [player_name, verb, hand_name]
 	result_label.text = msg.strip_edges()
 	next_button.text = "Next Round"
 	_game_over = false

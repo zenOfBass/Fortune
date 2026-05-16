@@ -35,44 +35,37 @@ text = "— FINAL ROUND —"
 horizontal_alignment = 1
 visible = false
 
-[node name="AIRow" type="HBoxContainer" parent="."]
+[node name="AIContainer" type="Control" parent="."]
 anchor_right = 1.0
-offset_top = 44.0
-offset_bottom = 244.0
+anchor_bottom = 1.0
 
-[node name="AI1Area" type="VBoxContainer" parent="AIRow"]
-size_flags_horizontal = 3
+[node name="AI1Area" type="VBoxContainer" parent="AIContainer"]
 
-[node name="ChipsLabel" type="Label" parent="AIRow/AI1Area"]
+[node name="ChipsLabel" type="Label" parent="AIContainer/AI1Area"]
 text = "AI 1"
 horizontal_alignment = 1
-size_flags_horizontal = 3
 
-[node name="HandDisplay" parent="AIRow/AI1Area" instance=ExtResource("2_hd")]
+[node name="HandDisplay" parent="AIContainer/AI1Area" instance=ExtResource("2_hd")]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AI2Area" type="VBoxContainer" parent="AIRow"]
-size_flags_horizontal = 3
+[node name="AI2Area" type="VBoxContainer" parent="AIContainer"]
 
-[node name="ChipsLabel" type="Label" parent="AIRow/AI2Area"]
+[node name="ChipsLabel" type="Label" parent="AIContainer/AI2Area"]
 text = "AI 2"
 horizontal_alignment = 1
-size_flags_horizontal = 3
 
-[node name="HandDisplay" parent="AIRow/AI2Area" instance=ExtResource("2_hd")]
+[node name="HandDisplay" parent="AIContainer/AI2Area" instance=ExtResource("2_hd")]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AI3Area" type="VBoxContainer" parent="AIRow"]
-size_flags_horizontal = 3
+[node name="AI3Area" type="VBoxContainer" parent="AIContainer"]
 
-[node name="ChipsLabel" type="Label" parent="AIRow/AI3Area"]
+[node name="ChipsLabel" type="Label" parent="AIContainer/AI3Area"]
 text = "AI 3"
 horizontal_alignment = 1
-size_flags_horizontal = 3
 
-[node name="HandDisplay" parent="AIRow/AI3Area" instance=ExtResource("2_hd")]
+[node name="HandDisplay" parent="AIContainer/AI3Area" instance=ExtResource("2_hd")]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
