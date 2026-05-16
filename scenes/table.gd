@@ -219,11 +219,11 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 	if arcana_id == 7:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		chariot_panel.show_for_player(pname)
-		player_hand.set_selectable(true)
+		player_hand.set_selectable(true, 1)
 	elif arcana_id == 17:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		star_panel.show_for_player(pname)
-		player_hand.set_selectable(true)
+		player_hand.set_selectable(true, 1)
 	else:
 		arcana_panel.show_interactive(arcana_id)
 
