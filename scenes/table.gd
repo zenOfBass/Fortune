@@ -23,6 +23,12 @@ extends Control
 @onready var player_chips_label: Label = $PlayerArea/ChipsLabel
 @onready var player_hand: HandDisplay = $PlayerArea/HandDisplay
 
+# ---- Center arcana display ---------------------------------------------------
+
+@onready var current_arcana: Control = $CurrentArcana
+@onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaThumb
+@onready var current_arcana_name: Label = $CurrentArcana/ArcanaNameLabel
+
 # ---- Action panels -----------------------------------------------------------
 
 @onready var bet_panel: BetPanel = $BetPanel
@@ -138,6 +144,9 @@ func _on_phase_changed(phase_name: String) -> void:
 		ai1_area.modulate = Color.WHITE
 		ai2_area.modulate = Color.WHITE
 		ai3_area.modulate = Color.WHITE
+		current_arcana.visible = false
+		current_arcana_thumb.texture = null
+		current_arcana_name.text = ""
 
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	match player_idx:
@@ -164,8 +173,17 @@ func _on_player_folded(player_idx: int) -> void:
 func _on_pot_changed(new_amount: int) -> void:
 	pot_label.text = "Pot: %d" % new_amount
 
+func _hide_all_overlays() -> void:
+	arcana_panel.visible = false
+	result_panel.visible = false
+
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
+	_hide_all_overlays()
 	arcana_panel.show_arcana(arcana_id)
+	var tex_path := MajorArcana.texture_path(arcana_id)
+	current_arcana_thumb.texture = load(tex_path) if ResourceLoader.exists(tex_path) else null
+	current_arcana_name.text = MajorArcana.arcana_name(arcana_id)
+	current_arcana.visible = true
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:
 	phase_label.text = "Hierophant cancelled: " + MajorArcana.arcana_name(cancelled_id)
@@ -183,6 +201,7 @@ func _on_discard_input_needed(_player_idx: int) -> void:
 	player_hand.set_selectable(true)
 
 func _on_arcana_choice_needed(_player_idx: int, arcana_id: int) -> void:
+	_hide_all_overlays()
 	arcana_panel.show_interactive(arcana_id)
 
 func _on_confirm_discard() -> void:
@@ -193,7 +212,7 @@ func _on_confirm_discard() -> void:
 	GameManager.submit_discard(indices)
 
 func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> void:
-	arcana_panel.visible = false
+	_hide_all_overlays()
 	var msg := ""
 	if split and hand_names.is_empty():
 		msg = "Split pot! (equal share)"
@@ -216,6 +235,7 @@ func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
 	phase_label.text = "%s gets Page bonus: +%d per player!" % [player_name, bonus_per_player]
 
 func _on_game_ended(final_chips: Array) -> void:
+	_hide_all_overlays()
 	var msg := "Game Over!\n"
 	for i in final_chips.size():
 		var player_name := "You" if i == 0 else "AI %d" % i

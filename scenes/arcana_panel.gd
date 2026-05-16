@@ -37,6 +37,8 @@ func _load_arcana(arcana_id: int) -> void:
 	desc_label.text = MajorArcana.get_desc(arcana_id)
 
 func _on_ok() -> void:
+	var was_interactive := _is_interactive
+	_is_interactive = false
 	visible = false
-	if _is_interactive:
+	if was_interactive:
 		GameManager.complete_arcana_effect()
