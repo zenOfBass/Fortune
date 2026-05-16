@@ -4,6 +4,7 @@
 export_presets.cfg
 *.translation
 *.import
+*.uid
 
 # IDE
 .vs/

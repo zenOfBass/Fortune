@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bstarpanel01"]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/arcana/star_panel.gd" id="1_star"]
 

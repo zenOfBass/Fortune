@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cdlg5f3c2d4e" path="res://scenes/bet_panel.tscn" id="3_bp"]
 [ext_resource type="PackedScene" uid="uid://cdmh6g4d3e5f" path="res://scenes/arcana_panel.tscn" id="4_ap"]
 [ext_resource type="PackedScene" uid="uid://bchariotpan1" path="res://scenes/arcana/chariot_panel.tscn" id="5_chari"]
-[ext_resource type="PackedScene" uid="uid://bstarpanel01" path="res://scenes/arcana/star_panel.tscn" id="6_star"]
+[ext_resource type="PackedScene" path="res://scenes/arcana/star_panel.tscn" id="6_star"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panels"]
 bg_color = Color(0.08, 0.10, 0.18, 0.97)
