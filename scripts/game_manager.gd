@@ -383,9 +383,35 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		1, 2, 14, 18, 20:  # Interactive stubs — UI handles in Phase 4
+		2, 14, 18, 20:  # Interactive stubs — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		1:  # The Magician — each player draws one card; keep it if suit guess is correct
+			game_log.emit("The Magician — guess your drawn card's suit to keep it!")
+			for pidx in active_players:
+				if deck.is_empty():
+					game_log.emit("%s — deck empty, skipped." % _pname(pidx))
+					continue
+				var drawn: Card = deck.deal_one()
+				if pidx == HUMAN_IDX:
+					arcana_choice_needed.emit(pidx, 1)
+					await _arcana_effect_done
+					if arcana_choice == (drawn.suit as int):
+						players[pidx].receive_cards([drawn])
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("Correct! You drew the %s." % drawn.display_name())
+					else:
+						deck.add_cards([drawn])
+						game_log.emit("Wrong — the card was the %s." % drawn.display_name())
+				else:
+					if randi() % 4 == (drawn.suit as int):
+						players[pidx].receive_cards([drawn])
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("%s guesses correctly!" % _pname(pidx))
+					else:
+						deck.add_cards([drawn])
+						game_log.emit("%s guesses wrong." % _pname(pidx))
 
 		17:  # The Star — in turn order, may swap one card with top of deck
 			game_log.emit("The Star — each player may swap one card with the top of the deck.")

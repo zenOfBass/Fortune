@@ -42,6 +42,7 @@ extends Control
 @onready var arcana_panel: ArcanaPanel = $ArcanaPanel
 @onready var chariot_panel = $ChariotPanel
 @onready var star_panel = $StarPanel
+@onready var magician_panel = $MagicianPanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -66,12 +67,14 @@ func _ready() -> void:
 	arcana_panel.visible = false
 	chariot_panel.visible = false
 	star_panel.visible = false
+	magician_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
 	chariot_panel.confirmed.connect(_on_chariot_confirmed)
 	star_panel.swap_chosen.connect(_on_star_swap)
 	star_panel.pass_chosen.connect(_on_star_pass)
+	magician_panel.suit_chosen.connect(_on_magician_suit_chosen)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -190,6 +193,7 @@ func _hide_all_overlays() -> void:
 	result_panel.visible = false
 	chariot_panel.visible = false
 	star_panel.visible = false
+	magician_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -224,8 +228,15 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		star_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
+	elif arcana_id == 1:
+		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		magician_panel.show_for_player(pname)
 	else:
 		arcana_panel.show_interactive(arcana_id)
+
+func _on_magician_suit_chosen(suit_idx: int) -> void:
+	magician_panel.visible = false
+	GameManager.submit_arcana_choice(suit_idx)
 
 func _on_star_swap() -> void:
 	var selected := player_hand.get_selected_indices()
