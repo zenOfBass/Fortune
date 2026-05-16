@@ -92,6 +92,7 @@ func _run_round() -> void:
 
 	active_players.assign(range(players.size()).filter(func(i): return players[i].chips > 0))
 	for p in players:
+		deck.add_cards(p.hand)
 		p.clear_for_new_round()
 
 	if deck.size() < players.size() * 6:
