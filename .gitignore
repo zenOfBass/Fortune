@@ -3,6 +3,11 @@
 /android/
 export_presets.cfg
 *.translation
+*.import
 
 # IDE
 .vs/
+.vscode/
+
+# Claude Code project settings
+.claude/

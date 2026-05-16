@@ -33,8 +33,8 @@ extends Control
 
 @onready var bet_panel: BetPanel = $BetPanel
 @onready var draw_panel: Control = $DrawPanel
-@onready var draw_label: Label = $DrawPanel/DrawLabel
-@onready var confirm_button: Button = $DrawPanel/ConfirmButton
+@onready var draw_label: Label = $DrawPanel/DrawVBox/DrawLabel
+@onready var confirm_button: Button = $DrawPanel/DrawVBox/ConfirmButton
 @onready var arcana_panel: ArcanaPanel = $ArcanaPanel
 
 # ---- Result panel ------------------------------------------------------------
