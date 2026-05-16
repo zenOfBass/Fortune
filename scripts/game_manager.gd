@@ -54,6 +54,7 @@ const HUMAN_IDX := 0  # player 0 is always the human
 
 func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int = -1) -> void:
 	debug_arcana_id = arcana_id
+	last_round = false
 	players.clear()
 	for i in num_players:
 		players.append(Player.new(starting_chips))
