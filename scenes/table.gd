@@ -46,6 +46,7 @@ extends Control
 @onready var priestess_panel = $PriestessPanel
 @onready var moon_panel = $MoonPanel
 @onready var temperance_panel = $TemperancePanel
+@onready var judgement_panel = $JudgementPanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -74,6 +75,7 @@ func _ready() -> void:
 	priestess_panel.visible = false
 	moon_panel.visible = false
 	temperance_panel.visible = false
+	judgement_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
@@ -86,6 +88,8 @@ func _ready() -> void:
 	moon_panel.swap_chosen.connect(_on_moon_swap)
 	moon_panel.keep_chosen.connect(_on_moon_keep)
 	temperance_panel.confirmed.connect(_on_temperance_confirmed)
+	judgement_panel.reenter_chosen.connect(_on_judgement_reenter)
+	judgement_panel.pass_chosen.connect(_on_judgement_pass)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -216,6 +220,7 @@ func _hide_all_overlays() -> void:
 	priestess_panel.visible = false
 	moon_panel.visible = false
 	temperance_panel.visible = false
+	judgement_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -257,6 +262,8 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		priestess_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
+	elif arcana_id == 20:
+		judgement_panel.show_for_player("You", GameManager.ante_amount)
 	elif arcana_id == 14:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		temperance_panel.show_for_player(pname, GameManager.round_state.temperance_flop)
@@ -280,6 +287,14 @@ func _on_priestess_confirmed() -> void:
 	player_hand.clear_selection()
 	priestess_panel.visible = false
 	GameManager.submit_arcana_choice(selected[0])
+
+func _on_judgement_reenter() -> void:
+	judgement_panel.visible = false
+	GameManager.submit_arcana_choice(1)
+
+func _on_judgement_pass() -> void:
+	judgement_panel.visible = false
+	GameManager.submit_arcana_choice(0)
 
 func _on_temperance_confirmed(flop_idx: int) -> void:
 	var hand_selected := player_hand.get_selected_indices()

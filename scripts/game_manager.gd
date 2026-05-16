@@ -99,6 +99,8 @@ func _run_round() -> void:
 	if round_state.death_end or round_state.sun_end:
 		if not round_state.moon_secret.is_empty():
 			await _phase_moon_swap()
+		if round_state.judgement_active:
+			await _phase_judgement_reentry()
 		_phase_showdown()
 		return
 
@@ -107,6 +109,8 @@ func _run_round() -> void:
 	if round_state.death_end or round_state.sun_end or active_players.size() <= 1:
 		if not round_state.moon_secret.is_empty():
 			await _phase_moon_swap()
+		if round_state.judgement_active:
+			await _phase_judgement_reentry()
 		_phase_showdown()
 		return
 
@@ -117,6 +121,8 @@ func _run_round() -> void:
 
 	if not round_state.moon_secret.is_empty():
 		await _phase_moon_swap()
+	if round_state.judgement_active:
+		await _phase_judgement_reentry()
 	_phase_showdown()
 
 # ---- Phase: Ante -------------------------------------------------------------
@@ -292,6 +298,43 @@ func _phase_moon_swap() -> void:
 				game_log.emit("%s discards their Moon secret." % _pname(pidx))
 	round_state.moon_secret.clear()
 
+# ---- Phase: Judgement re-entry -----------------------------------------------
+
+func _phase_judgement_reentry() -> void:
+	game_log.emit("--- Judgement — last chance to re-enter ---")
+	var can_reenter: Array[int] = []
+	for pidx in range(players.size()):
+		if not active_players.has(pidx) and players[pidx].chips >= ante_amount:
+			can_reenter.append(pidx)
+	if can_reenter.is_empty():
+		game_log.emit("No folded players can afford to re-enter.")
+		return
+	if deck.size() < can_reenter.size() * 5:
+		deck.build()
+		deck.shuffle()
+	for pidx in can_reenter:
+		if pidx == HUMAN_IDX:
+			arcana_choice_needed.emit(pidx, 20)
+			await _arcana_effect_done
+			if arcana_choice == 1:
+				_do_reenter(pidx)
+			else:
+				game_log.emit("You choose to stay folded.")
+		else:
+			_do_reenter(pidx)
+
+func _do_reenter(pidx: int) -> void:
+	var paid := players[pidx].bet(ante_amount)
+	pot += paid
+	pot_changed.emit(pot)
+	player_chips_changed.emit(pidx, players[pidx].chips)
+	players[pidx].folded = false
+	active_players.append(pidx)
+	active_players.sort()
+	players[pidx].receive_cards(deck.deal_many(5))
+	player_hand_updated.emit(pidx, players[pidx].hand)
+	game_log.emit("%s pays %d and re-enters with a fresh hand!" % [_pname(pidx), ante_amount])
+
 # ---- Phase: Showdown ---------------------------------------------------------
 
 func _phase_showdown() -> void:
@@ -425,9 +468,9 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		20:  # Interactive stub — UI handles in Phase 4
-			arcana_choice_needed.emit(-1, id)
-			await _arcana_effect_done
+		20:  # Judgement — folded players may pay ante and re-enter before showdown
+			round_state.judgement_active = true
+			game_log.emit("Judgement — the dead may rise! Folded players may pay %d to re-enter." % ante_amount)
 
 		14:  # Temperance — discard one card, pick from a 3-card face-up flop
 			game_log.emit("Temperance — each player discards one card and picks from the flop.")
