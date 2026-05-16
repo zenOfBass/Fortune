@@ -485,7 +485,7 @@ func _draw_arcana() -> void:
 	arcana_revealed.emit(id, MajorArcana.arcana_name(id))
 	game_log.emit("Arcana: %s" % MajorArcana.arcana_name(id))
 	round_state.arcana_id = id
-	await get_tree().create_timer(1.5).timeout
+	await _arcana_effect_done
 	await _apply_arcana(id)
 
 func _apply_arcana(id: int) -> void:

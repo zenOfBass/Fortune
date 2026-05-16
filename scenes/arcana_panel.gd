@@ -14,8 +14,8 @@ func _ready() -> void:
 
 func show_arcana(arcana_id: int) -> void:
 	_load_arcana(arcana_id)
-	_is_interactive = false
-	ok_button.text = "OK"
+	_is_interactive = true
+	ok_button.text = "Continue"
 	visible = true
 
 func show_interactive(arcana_id: int) -> void:
@@ -37,8 +37,6 @@ func _load_arcana(arcana_id: int) -> void:
 	desc_label.text = MajorArcana.get_desc(arcana_id)
 
 func _on_ok() -> void:
-	var was_interactive := _is_interactive
 	_is_interactive = false
 	visible = false
-	if was_interactive:
-		GameManager.complete_arcana_effect()
+	GameManager.complete_arcana_effect()
