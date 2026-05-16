@@ -11,6 +11,8 @@ func _init(starting_chips: int) -> void:
 
 func receive_cards(new_cards: Array[Card]) -> void:
 	hand.append_array(new_cards)
+	hand.sort_custom(func(a: Card, b: Card) -> bool:
+		return a.suit < b.suit if a.suit != b.suit else a.rank < b.rank)
 	_refresh_has_page()
 
 func discard_at(indices: Array[int]) -> Array[Card]:
