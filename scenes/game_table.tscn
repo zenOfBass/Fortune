@@ -89,9 +89,11 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="GameLog" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 1.0
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 470.0
+offset_left = 5.0
 offset_right = -5.0
 offset_top = -90.0
 offset_bottom = -5.0
@@ -106,7 +108,7 @@ anchor_right = 0.85
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -200.0
-offset_bottom = -10.0
+offset_bottom = -92.0
 
 [node name="ChipsLabel" type="Label" parent="PlayerArea"]
 text = "You"
@@ -118,18 +120,20 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="BetPanel" parent="." instance=ExtResource("3_bp")]
+anchor_right = 0.5
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 5.0
-offset_right = 465.0
+offset_right = -5.0
 offset_top = -90.0
 offset_bottom = -5.0
 
 [node name="DrawPanel" type="PanelContainer" parent="."]
+anchor_right = 0.5
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 5.0
-offset_right = 465.0
+offset_right = -5.0
 offset_top = -90.0
 offset_bottom = -5.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panels")
