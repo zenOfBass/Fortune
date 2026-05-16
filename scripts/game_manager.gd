@@ -383,9 +383,39 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		1, 2, 14, 17, 18, 20:  # Interactive stubs — UI handles in Phase 4
+		1, 2, 14, 18, 20:  # Interactive stubs — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		17:  # The Star — in turn order, may swap one card with top of deck
+			game_log.emit("The Star — each player may swap one card with the top of the deck.")
+			for pidx in active_players:
+				if pidx == HUMAN_IDX:
+					arcana_choice_needed.emit(pidx, 17)
+					await _arcana_effect_done
+					var choice := arcana_choice
+					if choice >= 0 and not deck.is_empty():
+						var new_card: Card = deck.deal_one()
+						var old_card: Card = players[pidx].hand[choice]
+						players[pidx].hand.remove_at(choice)
+						deck.add_cards([old_card])
+						players[pidx].receive_cards([new_card])
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("You swap a card with the deck.")
+					else:
+						game_log.emit("You pass.")
+				else:
+					if not deck.is_empty() and randi() % 2 == 0:
+						var idx := randi() % players[pidx].hand.size()
+						var new_card: Card = deck.deal_one()
+						var old_card: Card = players[pidx].hand[idx]
+						players[pidx].hand.remove_at(idx)
+						deck.add_cards([old_card])
+						players[pidx].receive_cards([new_card])
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("%s swaps a card." % _pname(pidx))
+					else:
+						game_log.emit("%s passes." % _pname(pidx))
 
 		7:  # The Chariot — each player passes one card to the left
 			var chosen: Dictionary = {}

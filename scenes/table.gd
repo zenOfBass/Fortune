@@ -41,6 +41,7 @@ extends Control
 @onready var confirm_button: Button = $DrawPanel/DrawVBox/ConfirmButton
 @onready var arcana_panel: ArcanaPanel = $ArcanaPanel
 @onready var chariot_panel = $ChariotPanel
+@onready var star_panel = $StarPanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -64,10 +65,13 @@ func _ready() -> void:
 	last_round_label.visible = false
 	arcana_panel.visible = false
 	chariot_panel.visible = false
+	star_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
 	chariot_panel.confirmed.connect(_on_chariot_confirmed)
+	star_panel.swap_chosen.connect(_on_star_swap)
+	star_panel.pass_chosen.connect(_on_star_pass)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -185,6 +189,7 @@ func _hide_all_overlays() -> void:
 	arcana_panel.visible = false
 	result_panel.visible = false
 	chariot_panel.visible = false
+	star_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -215,8 +220,27 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		chariot_panel.show_for_player(pname)
 		player_hand.set_selectable(true)
+	elif arcana_id == 17:
+		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		star_panel.show_for_player(pname)
+		player_hand.set_selectable(true)
 	else:
 		arcana_panel.show_interactive(arcana_id)
+
+func _on_star_swap() -> void:
+	var selected := player_hand.get_selected_indices()
+	if selected.is_empty():
+		return
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
+	star_panel.visible = false
+	GameManager.submit_arcana_choice(selected[0])
+
+func _on_star_pass() -> void:
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
+	star_panel.visible = false
+	GameManager.submit_arcana_choice(-1)
 
 func _on_chariot_confirmed() -> void:
 	var selected := player_hand.get_selected_indices()
