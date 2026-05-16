@@ -44,6 +44,7 @@ var dealer_idx:     int = 0
 var pot:            int = 0
 var ante_amount:    int = 1
 var last_round:     bool = false
+var round_num:      int = 0
 var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
 var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
 var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (Temperance)
@@ -59,6 +60,7 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	for i in num_players:
 		players.append(Player.new(starting_chips))
 	ante_amount = ante
+	round_num = 0
 	deck = Deck.new()
 	deck.build()
 	deck.shuffle()
@@ -93,6 +95,7 @@ func _run_round() -> void:
 		deck.shuffle()
 
 	pot = 0
+	round_num += 1
 	dealer_idx = (dealer_idx + 1) % players.size()
 
 	_phase_ante()
@@ -131,7 +134,9 @@ func _run_round() -> void:
 
 func _phase_ante() -> void:
 	phase_changed.emit("ANTE")
-	game_log.emit("--- New round. Dealer: %s ---" % _pname(dealer_idx))
+	game_log.emit("--- Round %d. Dealer: %s ---" % [round_num, _pname(dealer_idx)])
+	var standings := " | ".join(range(players.size()).map(func(i): return "%s: %d" % [_pname(i), players[i].chips]))
+	game_log.emit("Chips — " + standings)
 	for pidx in active_players:
 		var paid := players[pidx].bet(ante_amount)
 		pot += paid
@@ -186,8 +191,8 @@ func _phase_bet() -> void:
 
 		var can_check  := _current_bet == 0
 		var min_raise  := 1 if round_state.no_forced_min_bet \
-						 else ((_current_bet * 2) if round_state.raise_must_double \
-						 else (_current_bet + 1))
+						else ((_current_bet * 2) if round_state.raise_must_double \
+						else (_current_bet + 1))
 
 		var action: String
 		var amount: int = 0
@@ -341,10 +346,10 @@ func _do_reenter(pidx: int) -> void:
 
 func _phase_showdown() -> void:
 	phase_changed.emit("SHOWDOWN")
-	game_log.emit("--- Showdown ---")
+	game_log.emit("--- Showdown (pot: %d) ---" % pot)
 
 	if active_players.size() == 1:
-		game_log.emit("%s wins the pot uncontested." % _pname(active_players[0]))
+		game_log.emit("%s wins %d uncontested." % [_pname(active_players[0]), pot])
 		_award_pot(active_players)
 		return
 
@@ -366,7 +371,8 @@ func _phase_showdown() -> void:
 		scores[pidx] = HandEvaluator.score(players[pidx].hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
 
 	for pidx in active_players:
-		game_log.emit("%s shows: %s" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx])])
+		var card_names := ", ".join(players[pidx].hand.map(func(c: Card): return c.display_name()))
+		game_log.emit("%s shows: %s (%s)" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx]), card_names])
 
 	var sorted_players: Array = active_players.duplicate()
 	sorted_players.sort_custom(func(a, b): return scores[a] > scores[b])
@@ -396,14 +402,16 @@ func _phase_showdown() -> void:
 		# Standard: highest score wins; ties split equally.
 		var top_score: int = scores[sorted_players[0]]
 		winners = sorted_players.filter(func(p): return scores[p] == top_score)
+		var final_pot := pot
 		_award_pot(winners)
 		for w in winners:
 			hand_names.append(HandEvaluator.hand_type_name(scores[w]))
 		if winners.size() == 1:
-			game_log.emit("%s wins with %s!" % [_pname(winners[0]), hand_names[0]])
+			game_log.emit("%s wins %d with %s!" % [_pname(winners[0]), final_pot, hand_names[0]])
 		else:
 			var names := ", ".join(winners.map(func(w): return _pname(w)))
-			game_log.emit("Tie! %s split the pot (%s)." % [names, hand_names[0]])
+			@warning_ignore("integer_division")
+			game_log.emit("Tie! %s each win %d (%s)." % [names, final_pot / winners.size(), hand_names[0]])
 
 	round_ended.emit(winners, hand_names, split)
 
@@ -732,6 +740,12 @@ func _do_discard(pidx: int, indices: Array) -> void:
 	deck.add_cards(discarded)
 	players[pidx].receive_cards(deck.deal_many(discarded.size()))
 	player_hand_updated.emit(pidx, players[pidx].hand)
+	if pidx == HUMAN_IDX and not indices.is_empty():
+		var disc_names := ", ".join(discarded.map(func(c: Card): return c.display_name()))
+		var drawn := players[pidx].hand.slice(players[pidx].hand.size() - discarded.size())
+		var drawn_names := ", ".join(drawn.map(func(c: Card): return c.display_name()))
+		game_log.emit("Discarded: %s" % disc_names)
+		game_log.emit("Drew: %s" % drawn_names)
 
 func _award_pot(winners: Array) -> void:
 	if winners.is_empty():
