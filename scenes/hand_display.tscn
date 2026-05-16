@@ -4,3 +4,4 @@
 
 [node name="HandDisplay" type="HBoxContainer"]
 script = ExtResource("1_hd")
+alignment = 1
