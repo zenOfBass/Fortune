@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cdmh6g4d3e5f"]
+
+[ext_resource type="Script" path="res://scenes/arcana_panel.gd" id="1_ap"]
+
+[node name="ArcanaPanel" type="PanelContainer"]
+script = ExtResource("1_ap")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+
+[node name="ArcanaImage" type="TextureRect" parent="VBox"]
+custom_minimum_size = Vector2(100, 150)
+stretch_mode = 5
+expand_mode = 3
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="Label" parent="VBox"]
+text = "Arcana Name"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="DescLabel" type="Label" parent="VBox"]
+text = "Arcana description."
+horizontal_alignment = 1
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="OkButton" type="Button" parent="VBox"]
+text = "OK"
+size_flags_horizontal = 3

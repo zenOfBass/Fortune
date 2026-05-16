@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cdjf3d1a0b2c"]
+
+[ext_resource type="Script" path="res://scenes/card_display.gd" id="1_cd"]
+
+[node name="CardDisplay" type="TextureRect"]
+script = ExtResource("1_cd")
+custom_minimum_size = Vector2(72, 108)
+stretch_mode = 5
+expand_mode = 1

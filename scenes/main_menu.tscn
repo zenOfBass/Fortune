@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://cdni7h5e4f6g"]
+
+[ext_resource type="Script" path="res://scenes/main_menu.gd" id="1_mm"]
+
+[node name="MainMenu" type="Control"]
+script = ExtResource("1_mm")
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="."]
+color = Color(0.1, 0.1, 0.16, 1)
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchor_left = 0.25
+anchor_top = 0.15
+anchor_right = 0.75
+anchor_bottom = 0.85
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+text = "FORTUNE"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+
+[node name="SubtitleLabel" type="Label" parent="VBox"]
+text = "Tarot Poker"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+
+[node name="Separator" type="HSeparator" parent="VBox"]
+
+[node name="PlayerCountRow" type="HBoxContainer" parent="VBox"]
+
+[node name="PlayerCountLabel" type="Label" parent="VBox/PlayerCountRow"]
+text = "Players (2–4):"
+size_flags_horizontal = 3
+
+[node name="PlayerCountSpin" type="SpinBox" parent="VBox/PlayerCountRow"]
+min_value = 2.0
+max_value = 4.0
+value = 4.0
+
+[node name="ChipsRow" type="HBoxContainer" parent="VBox"]
+
+[node name="ChipsLabel" type="Label" parent="VBox/ChipsRow"]
+text = "Starting chips:"
+size_flags_horizontal = 3
+
+[node name="ChipsSpin" type="SpinBox" parent="VBox/ChipsRow"]
+min_value = 10.0
+max_value = 10000.0
+value = 100.0
+step = 10.0
+
+[node name="AnteRow" type="HBoxContainer" parent="VBox"]
+
+[node name="AnteLabel" type="Label" parent="VBox/AnteRow"]
+text = "Ante:"
+size_flags_horizontal = 3
+
+[node name="AnteSpin" type="SpinBox" parent="VBox/AnteRow"]
+min_value = 1.0
+max_value = 100.0
+value = 1.0
+
+[node name="Separator2" type="HSeparator" parent="VBox"]
+
+[node name="StartButton" type="Button" parent="VBox"]
+text = "Start Game"
+size_flags_horizontal = 3

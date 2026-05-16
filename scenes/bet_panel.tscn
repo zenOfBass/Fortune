@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://cdlg5f3c2d4e"]
+
+[ext_resource type="Script" path="res://scenes/bet_panel.gd" id="1_bp"]
+
+[node name="BetPanel" type="PanelContainer"]
+script = ExtResource("1_bp")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+
+[node name="InfoLabel" type="Label" parent="VBox"]
+text = "Current bet: 0"
+size_flags_horizontal = 3
+
+[node name="ButtonRow" type="HBoxContainer" parent="VBox"]
+
+[node name="CheckButton" type="Button" parent="VBox/ButtonRow"]
+text = "Check"
+
+[node name="CallButton" type="Button" parent="VBox/ButtonRow"]
+text = "Call"
+
+[node name="FoldButton" type="Button" parent="VBox/ButtonRow"]
+text = "Fold"
+
+[node name="RaiseRow" type="HBoxContainer" parent="VBox"]
+
+[node name="RaiseSpin" type="SpinBox" parent="VBox/RaiseRow"]
+min_value = 1.0
+max_value = 9999.0
+value = 1.0
+custom_minimum_size = Vector2(100, 0)
+
+[node name="RaiseButton" type="Button" parent="VBox/RaiseRow"]
+text = "Raise"
