@@ -199,8 +199,8 @@ func _phase_bet() -> void:
 			continue
 
 		var can_check  := _current_bet == 0
-		var min_raise  := 1 if round_state.no_forced_min_bet \
-						else ((_current_bet * 2) if round_state.raise_must_double \
+		var min_raise: int = 1 if round_state.no_forced_min_bet \
+						else (max(1, _current_bet * 2) if round_state.raise_must_double \
 						else (_current_bet + 1))
 
 		var action: String
@@ -807,7 +807,7 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 	var hand_type: float = hand_score / 1048576.0  # 1.0 (high card) to 10.0 (royal flush)
 	var effective: float = clamp(hand_type + randf_range(-1.0, 1.0), 0.0, 11.0)
 	if effective >= 4.5:
-		var raise_to := current_bet * 2 if round_state.raise_must_double else current_bet + 1
+		var raise_to: int = max(1, current_bet * 2) if round_state.raise_must_double else current_bet + 1
 		raise_to = int(min(raise_to, players[pidx].chips + current_bet))
 		return ["raise", raise_to]
 	elif effective >= 1.5:
