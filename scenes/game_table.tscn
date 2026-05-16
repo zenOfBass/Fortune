@@ -165,52 +165,52 @@ horizontal_alignment = 1
 size_flags_horizontal = 3
 
 [node name="ArcanaPanel" parent="." instance=ExtResource("4_ap")]
-anchor_left = 0.25
-anchor_right = 0.75
-anchor_top = 0.12
-anchor_bottom = 0.92
+anchor_left = 0.30
+anchor_right = 0.70
+anchor_top = 0.15
+anchor_bottom = 0.82
 
 [node name="ChariotPanel" parent="." instance=ExtResource("5_chari")]
-anchor_left = 0.28
-anchor_right = 0.72
-anchor_top = 0.36
-anchor_bottom = 0.64
+anchor_left = 0.36
+anchor_right = 0.64
+anchor_top = 0.42
+anchor_bottom = 0.60
 
 [node name="StarPanel" parent="." instance=ExtResource("6_star")]
-anchor_left = 0.28
-anchor_right = 0.72
-anchor_top = 0.36
-anchor_bottom = 0.64
+anchor_left = 0.36
+anchor_right = 0.64
+anchor_top = 0.42
+anchor_bottom = 0.60
 
 [node name="MagicianPanel" parent="." instance=ExtResource("7_magi")]
-anchor_left = 0.20
-anchor_right = 0.80
-anchor_top = 0.38
+anchor_left = 0.28
+anchor_right = 0.72
+anchor_top = 0.40
 anchor_bottom = 0.62
 
 [node name="PriestessPanel" parent="." instance=ExtResource("8_prie")]
-anchor_left = 0.28
-anchor_right = 0.72
-anchor_top = 0.36
-anchor_bottom = 0.64
+anchor_left = 0.36
+anchor_right = 0.64
+anchor_top = 0.42
+anchor_bottom = 0.60
 
 [node name="MoonPanel" parent="." instance=ExtResource("9_moon")]
-anchor_left = 0.22
-anchor_right = 0.78
-anchor_top = 0.28
-anchor_bottom = 0.72
+anchor_left = 0.32
+anchor_right = 0.68
+anchor_top = 0.30
+anchor_bottom = 0.68
 
 [node name="TemperancePanel" parent="." instance=ExtResource("10_temp")]
-anchor_left = 0.15
-anchor_right = 0.85
-anchor_top = 0.30
-anchor_bottom = 0.70
+anchor_left = 0.18
+anchor_right = 0.82
+anchor_top = 0.33
+anchor_bottom = 0.67
 
 [node name="JudgementPanel" parent="." instance=ExtResource("11_judg")]
-anchor_left = 0.28
-anchor_right = 0.72
-anchor_top = 0.38
-anchor_bottom = 0.62
+anchor_left = 0.36
+anchor_right = 0.64
+anchor_top = 0.42
+anchor_bottom = 0.60
 
 [node name="ResultPanel" type="PanelContainer" parent="."]
 anchor_left = 0.2
