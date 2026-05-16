@@ -738,12 +738,12 @@ func _do_discard(pidx: int, indices: Array) -> void:
 		game_log.emit("%s discards %d card(s)." % [_pname(pidx), indices.size()])
 	var discarded := players[pidx].discard_at(indices)
 	deck.add_cards(discarded)
-	players[pidx].receive_cards(deck.deal_many(discarded.size()))
+	var new_cards := deck.deal_many(discarded.size())
+	players[pidx].receive_cards(new_cards)
 	player_hand_updated.emit(pidx, players[pidx].hand)
 	if pidx == HUMAN_IDX and not indices.is_empty():
 		var disc_names := ", ".join(discarded.map(func(c: Card): return c.display_name()))
-		var drawn := players[pidx].hand.slice(players[pidx].hand.size() - discarded.size())
-		var drawn_names := ", ".join(drawn.map(func(c: Card): return c.display_name()))
+		var drawn_names := ", ".join(new_cards.map(func(c: Card): return c.display_name()))
 		game_log.emit("Discarded: %s" % disc_names)
 		game_log.emit("Drew: %s" % drawn_names)
 
