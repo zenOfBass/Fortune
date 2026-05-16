@@ -396,11 +396,20 @@ func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
 
 func _on_game_ended(final_chips: Array) -> void:
 	_hide_all_overlays()
-	var msg := "Game Over!\n"
+	var max_chips: int = final_chips.max()
+	var winners: Array = []
 	for i in final_chips.size():
+		if final_chips[i] == max_chips:
+			winners.append("You" if i == 0 else "AI %d" % i)
+	var header := "%s wins!" % " & ".join(winners) if winners.size() < final_chips.size() \
+		else "It's a tie!"
+	var standings: Array = range(final_chips.size())
+	standings.sort_custom(func(a, b): return final_chips[a] > final_chips[b])
+	var lines := header + "\n\nFinal standings:\n"
+	for i in standings:
 		var player_name := "You" if i == 0 else "AI %d" % i
-		msg += "%s: %d chips\n" % [player_name, final_chips[i]]
-	result_label.text = msg.strip_edges()
+		lines += "%s: %d chips\n" % [player_name, final_chips[i]]
+	result_label.text = lines.strip_edges()
 	next_button.text = "Main Menu"
 	_game_over = true
 	result_panel.visible = true

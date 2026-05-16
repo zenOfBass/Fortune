@@ -86,6 +86,10 @@ func _run_round() -> void:
 	round_state = RoundState.new()
 	round_state.hierophant_active = hierophant_carry
 
+	for pidx in active_players:
+		if players[pidx].chips == 0:
+			game_log.emit("*** %s is eliminated! ***" % _pname(pidx))
+
 	active_players.assign(range(players.size()).filter(func(i): return players[i].chips > 0))
 	for p in players:
 		p.clear_for_new_round()
@@ -140,6 +144,7 @@ func _phase_ante() -> void:
 	for pidx in active_players:
 		var paid := players[pidx].bet(ante_amount)
 		pot += paid
+		player_chips_changed.emit(pidx, players[pidx].chips)
 		game_log.emit("%s pays ante: %d" % [_pname(pidx), paid])
 	pot_changed.emit(pot)
 
@@ -780,7 +785,7 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 		raise_to = int(min(raise_to, players[pidx].chips + current_bet))
 		return ["raise", raise_to]
 	elif strength > 0.4:
-		return ["call", 0]
+		return ["check", 0] if can_check else ["call", 0]
 	elif can_check:
 		return ["check", 0]
 	else:
