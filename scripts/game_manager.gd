@@ -338,6 +338,7 @@ func _do_reenter(pidx: int) -> void:
 	players[pidx].folded = false
 	active_players.append(pidx)
 	active_players.sort()
+	players[pidx].hand.clear()
 	players[pidx].receive_cards(deck.deal_many(5))
 	player_hand_updated.emit(pidx, players[pidx].hand)
 	game_log.emit("%s pays %d and re-enters with a fresh hand!" % [_pname(pidx), ante_amount])
