@@ -66,6 +66,7 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	round_state = RoundState.new()
 
 func start_game() -> void:
+	game_log.emit("=== Game start — ante: %d, players: %d ===" % [ante_amount, players.size()])
 	while true:
 		await _run_round()
 		if last_round or _only_one_solvent():
