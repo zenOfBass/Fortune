@@ -177,7 +177,6 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana.visible = false
 		current_arcana_thumb.texture = null
 		current_arcana_name.text = ""
-		_refresh_player_labels()
 
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	match player_idx:
@@ -195,25 +194,23 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 		display.set_hand_mixed(hand, [idx] if idx >= 0 else [])
 
 func _label_for(pidx: int, chips: int) -> String:
-	var pname := "You" if pidx == 0 else "AI %d" % pidx
 	var dealer := " (D)" if pidx == GameManager.dealer_idx else ""
-	return "%s%s: %d chips" % [pname, dealer, chips]
+	return "%s%s: %d chips" % [GameManager._pname(pidx), dealer, chips]
+
+func _set_player_label(pidx: int, chips: int) -> void:
+	var text := _label_for(pidx, chips)
+	match pidx:
+		0: player_chips_label.text = text
+		1: ai1_chips.text = text
+		2: ai2_chips.text = text
+		3: ai3_chips.text = text
 
 func _refresh_player_labels() -> void:
 	for i in GameManager.players.size():
-		var chips := GameManager.players[i].chips
-		match i:
-			0: player_chips_label.text = _label_for(0, chips)
-			1: ai1_chips.text = _label_for(1, chips)
-			2: ai2_chips.text = _label_for(2, chips)
-			3: ai3_chips.text = _label_for(3, chips)
+		_set_player_label(i, GameManager.players[i].chips)
 
 func _on_player_chips_changed(player_idx: int, chips: int) -> void:
-	match player_idx:
-		0: player_chips_label.text = _label_for(0, chips)
-		1: ai1_chips.text = _label_for(1, chips)
-		2: ai2_chips.text = _label_for(2, chips)
-		3: ai3_chips.text = _label_for(3, chips)
+	_set_player_label(player_idx, chips)
 
 func _on_player_folded(player_idx: int) -> void:
 	const DIM = Color(0.45, 0.45, 0.45)

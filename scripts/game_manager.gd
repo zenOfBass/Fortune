@@ -403,16 +403,15 @@ func _phase_showdown() -> void:
 		# Standard: highest score wins; ties split equally.
 		var top_score: int = scores[sorted_players[0]]
 		winners = sorted_players.filter(func(p): return scores[p] == top_score)
-		var final_pot := pot
-		_award_pot(winners)
+		var won := _award_pot(winners)
 		for w in winners:
 			hand_names.append(HandEvaluator.hand_type_name(scores[w]))
 		if winners.size() == 1:
-			game_log.emit("%s wins %d with %s!" % [_pname(winners[0]), final_pot, hand_names[0]])
+			game_log.emit("%s wins %d with %s!" % [_pname(winners[0]), won, hand_names[0]])
 		else:
 			var names := ", ".join(winners.map(func(w): return _pname(w)))
 			@warning_ignore("integer_division")
-			game_log.emit("Tie! %s each win %d (%s)." % [names, final_pot / winners.size(), hand_names[0]])
+			game_log.emit("Tie! %s each win %d (%s)." % [names, won / winners.size(), hand_names[0]])
 
 	round_ended.emit(winners, hand_names, split)
 
@@ -748,16 +747,18 @@ func _do_discard(pidx: int, indices: Array) -> void:
 		game_log.emit("Discarded: %s" % disc_names)
 		game_log.emit("Drew: %s" % drawn_names)
 
-func _award_pot(winners: Array) -> void:
+func _award_pot(winners: Array) -> int:
 	if winners.is_empty():
-		return
+		return 0
+	var total := pot
 	@warning_ignore("integer_division")
-	var share     := pot / winners.size()
+	var share := pot / winners.size()
 	for w: int in winners:
 		players[w].receive_chips(share)
 		player_chips_changed.emit(w, players[w].chips)
 	pot = 0
 	pot_changed.emit(pot)
+	return total
 
 func _act_order_from(dealer: int) -> Array[int]:
 	var order: Array[int] = []
