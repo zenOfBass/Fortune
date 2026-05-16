@@ -63,6 +63,7 @@ size_flags_horizontal = 3
 [node name="AnteSpin" type="SpinBox" parent="VBox/AnteRow"]
 min_value = 1.0
 max_value = 100.0
+step = 1.0
 value = 1.0
 
 [node name="Separator2" type="HSeparator" parent="VBox"]
