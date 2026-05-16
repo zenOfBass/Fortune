@@ -30,4 +30,4 @@ var hierophant_active := false
 # ---- Convenience ----
 
 func eval_options() -> Dictionary:
-	return {"king_beats_ace": king_beats_ace, "inverted_values": inverted_values}
+	return {"king_beats_ace": king_beats_ace, "inverted_values": inverted_values, "fool_active": fool_active}

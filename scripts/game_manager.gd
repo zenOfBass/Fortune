@@ -256,7 +256,7 @@ func _phase_showdown() -> void:
 	var opts  := round_state.eval_options()
 	var scores: Dictionary = {}
 	for pidx in active_players:
-		scores[pidx] = HandEvaluator.score(players[pidx].hand, opts["king_beats_ace"], opts["inverted_values"])
+		scores[pidx] = HandEvaluator.score(players[pidx].hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
 
 	var sorted_players: Array = active_players.duplicate()
 	sorted_players.sort_custom(func(a, b): return scores[a] > scores[b])

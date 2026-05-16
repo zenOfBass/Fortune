@@ -25,13 +25,18 @@ const _B := 16
 #
 # Hand structure (flush, straight, etc.) is always detected from raw ranks so
 # that arcana effects only change who wins, not what constitutes a valid hand.
-static func score(hand: Array, king_beats_ace: bool = false, inverted_values: bool = false) -> int:
+static func score(hand: Array, king_beats_ace: bool = false, inverted_values: bool = false, fool_active: bool = false) -> int:
 	var raw:   Array[int] = []
 	var suits: Array[int] = []
 	for c: Card in hand:
 		raw.append(c.rank as int)
 		suits.append(c.suit as int)
+	if fool_active:
+		return _best_wild_score(raw, suits, king_beats_ace, inverted_values)
+	return _score_raw(raw, suits, king_beats_ace, inverted_values)
 
+
+static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool, inverted_values: bool) -> int:
 	var cvals: Array[int] = _comparison_values(raw, king_beats_ace, inverted_values)
 
 	var is_flush    := _all_same(suits)
@@ -100,6 +105,23 @@ static func score(hand: Array, king_beats_ace: bool = false, inverted_values: bo
 
 	# ---- High Card ------------------------------------------------------------
 	return _pack(HIGH_CARD, sorted_cvals)
+
+
+# Tries every rank/suit substitution for each hand position and returns the best score.
+static func _best_wild_score(raw: Array[int], suits: Array[int], king_beats_ace: bool, inverted_values: bool) -> int:
+	var best: int = _score_raw(raw, suits, king_beats_ace, inverted_values)
+	var wild_ranks: Array[int] = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+	for i in range(raw.size()):
+		for r: int in wild_ranks:
+			for s in range(4):
+				var test_raw: Array[int] = raw.duplicate()
+				var test_suits: Array[int] = suits.duplicate()
+				test_raw[i] = r
+				test_suits[i] = s
+				var candidate: int = _score_raw(test_raw, test_suits, king_beats_ace, inverted_values)
+				if candidate > best:
+					best = candidate
+	return best
 
 
 # Returns the hand type name for display ("Royal Flush", "Two Pair", etc.)
