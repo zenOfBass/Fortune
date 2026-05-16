@@ -126,6 +126,18 @@ autowrap_mode = 3
 text = "Confirm Discard"
 size_flags_horizontal = 3
 
+[node name="GameLog" type="PanelContainer" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 470.0
+offset_right = -5.0
+offset_top = -160.0
+offset_bottom = -5.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panels")
+
+[node name="LogLabel" type="RichTextLabel" parent="GameLog"]
+scroll_active = true
+
 [node name="CurrentArcana" type="VBoxContainer" parent="."]
 anchor_left = 0.40
 anchor_right = 0.60

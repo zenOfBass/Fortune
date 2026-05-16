@@ -23,6 +23,8 @@ signal round_ended(winner_indices: Array, hand_names: Array, split: bool)
 signal page_bonus(winner_idx: int, bonus_per_player: int)
 signal game_ended(final_chips: Array)
 
+signal game_log(message: String)
+
 # ---- Internal signals (awaited inside coroutines) ----------------------------
 
 signal _bet_ready(action: String, amount: int)
@@ -111,9 +113,11 @@ func _run_round() -> void:
 
 func _phase_ante() -> void:
 	phase_changed.emit("ANTE")
+	game_log.emit("--- New round. Dealer: %s ---" % _pname(dealer_idx))
 	for pidx in active_players:
 		var paid := players[pidx].bet(ante_amount)
 		pot += paid
+		game_log.emit("%s pays ante: %d" % [_pname(pidx), paid])
 	pot_changed.emit(pot)
 
 # ---- Phase: Deal -------------------------------------------------------------
@@ -123,9 +127,11 @@ func _phase_deal() -> void:
 	for pidx in active_players:
 		players[pidx].receive_cards(deck.deal_many(5))
 		player_hand_updated.emit(pidx, players[pidx].hand)
+	game_log.emit("Cards dealt.")
 
 	# If dealer has a Page and no arcana has been drawn yet, draw one.
 	if players[dealer_idx].has_page and not round_state.arcana_drawn:
+		game_log.emit("%s holds the Page — drawing arcana..." % _pname(dealer_idx))
 		await _draw_arcana()
 
 # ---- Phase: Bet --------------------------------------------------------------
@@ -134,6 +140,8 @@ func _phase_bet() -> void:
 	phase_changed.emit("BET")
 	if active_players.size() <= 1:
 		return
+
+	game_log.emit("--- Betting ---")
 
 	var _current_bet := 0
 	# Track how much each player has committed in THIS betting round.
@@ -179,17 +187,19 @@ func _phase_bet() -> void:
 				players[pidx].fold()
 				active_players.erase(pidx)
 				player_folded.emit(pidx)
+				game_log.emit("%s folds." % _pname(pidx))
 				if active_players.size() == 1:
 					return
 
 			"check":
-				pass  # no chips move; contributed stays 0
+				game_log.emit("%s checks." % _pname(pidx))
 
 			"call":
 				var to_pay: int = _current_bet - contributed.get(pidx, 0)
 				var paid   := players[pidx].bet(to_pay)
 				contributed[pidx] = contributed.get(pidx, 0) + paid
 				_add_to_pot(paid, pidx)
+				game_log.emit("%s calls %d." % [_pname(pidx), paid])
 
 			"raise":
 				var raise_to: int = max(amount, min_raise)
@@ -199,6 +209,7 @@ func _phase_bet() -> void:
 					contributed[pidx] = contributed.get(pidx, 0) + paid
 					_add_to_pot(paid, pidx)
 				_current_bet = raise_to
+				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
 				# Re-queue everyone who hasn't matched the new bet.
 				for other: int in active_players:
 					if other != pidx and contributed.get(other, 0) < _current_bet:
@@ -216,6 +227,7 @@ func _phase_bet() -> void:
 				players[pidx].receive_chips(excess)
 				pot -= excess
 				player_chips_changed.emit(pidx, players[pidx].chips)
+				game_log.emit("%s refunded %d (Justice)." % [_pname(pidx), excess])
 				refunded = true
 		if refunded:
 			pot_changed.emit(pot)
@@ -224,6 +236,7 @@ func _phase_bet() -> void:
 
 func _phase_draw() -> void:
 	phase_changed.emit("DRAW")
+	game_log.emit("--- Draw phase ---")
 	for pidx in active_players:
 		if pidx == HUMAN_IDX:
 			discard_input_needed.emit(pidx)
@@ -236,13 +249,15 @@ func _phase_draw() -> void:
 
 func _phase_showdown() -> void:
 	phase_changed.emit("SHOWDOWN")
+	game_log.emit("--- Showdown ---")
 
 	if active_players.size() == 1:
+		game_log.emit("%s wins the pot uncontested." % _pname(active_players[0]))
 		_award_pot(active_players)
 		return
 
 	if round_state.sun_end:
-		# Sun: equal split, remainder lost.
+		game_log.emit("The Sun splits the pot equally.")
 		@warning_ignore("integer_division")
 		var share := pot / active_players.size()
 		for pidx in active_players:
@@ -257,6 +272,9 @@ func _phase_showdown() -> void:
 	var scores: Dictionary = {}
 	for pidx in active_players:
 		scores[pidx] = HandEvaluator.score(players[pidx].hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
+
+	for pidx in active_players:
+		game_log.emit("%s shows: %s" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx])])
 
 	var sorted_players: Array = active_players.duplicate()
 	sorted_players.sort_custom(func(a, b): return scores[a] > scores[b])
@@ -280,6 +298,8 @@ func _phase_showdown() -> void:
 		for w in winners:
 			player_chips_changed.emit(w, players[w].chips)
 			hand_names.append(HandEvaluator.hand_type_name(scores[w]))
+		game_log.emit("The Lovers split: %s (%s) & %s (%s)" % [
+			_pname(winners[0]), hand_names[0], _pname(winners[1]), hand_names[1]])
 	else:
 		# Standard: highest score wins; ties split equally.
 		var top_score: int = scores[sorted_players[0]]
@@ -287,6 +307,11 @@ func _phase_showdown() -> void:
 		_award_pot(winners)
 		for w in winners:
 			hand_names.append(HandEvaluator.hand_type_name(scores[w]))
+		if winners.size() == 1:
+			game_log.emit("%s wins with %s!" % [_pname(winners[0]), hand_names[0]])
+		else:
+			var names := ", ".join(winners.map(func(w): return _pname(w)))
+			game_log.emit("Tie! %s split the pot (%s)." % [names, hand_names[0]])
 
 	round_ended.emit(winners, hand_names, split)
 
@@ -302,6 +327,7 @@ func _phase_showdown() -> void:
 			players[w].receive_chips(bonus_total)
 			player_chips_changed.emit(w, players[w].chips)
 			page_bonus.emit(w, ante_amount)
+			game_log.emit("%s collects the Page bonus: +%d from each player!" % [_pname(w), ante_amount])
 
 # ---- Arcana deck setup (per rules) ------------------------------------------
 
@@ -332,16 +358,19 @@ func _draw_arcana() -> void:
 	if round_state.hierophant_active and id != 21:
 		round_state.hierophant_active = false
 		arcana_cancelled.emit(id)
+		game_log.emit("The Hierophant cancels %s!" % MajorArcana.arcana_name(id))
 		return
 
 	arcana_revealed.emit(id, MajorArcana.arcana_name(id))
+	game_log.emit("Arcana: %s" % MajorArcana.arcana_name(id))
 	round_state.arcana_id = id
 	await _apply_arcana(id)
 
 func _apply_arcana(id: int) -> void:
 	match id:
-		0:  # The Fool — wild-card flop (evaluation integrated in Phase 4)
+		0:  # The Fool — wild-card evaluation
 			round_state.fool_active = true
+			game_log.emit("The Fool is wild — best possible hand counts!")
 
 		1, 2, 7, 14, 17, 18, 20:  # Interactive — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)   # -1 = notify all; UI drives per-player flow
@@ -353,12 +382,27 @@ func _apply_arcana(id: int) -> void:
 					players[pidx].receive_cards([deck.deal_one()])
 					player_hand_updated.emit(pidx, players[pidx].hand)
 			round_state.six_card_hand = true
+			game_log.emit("The Empress grants a 6th card to each player.")
 
-		4:  round_state.king_beats_ace = true     # Emperor
-		5:  round_state.hierophant_active = true   # Hierophant — cancels next arcana
-		6:  round_state.split_pot_two_best = true  # The Lovers
-		8:  round_state.inverted_values = true     # Strength
-		9:  round_state.skip_draw = true           # The Hermit
+		4:
+			round_state.king_beats_ace = true
+			game_log.emit("The Emperor rules — Kings beat Aces this round.")
+
+		5:
+			round_state.hierophant_active = true
+			game_log.emit("The Hierophant will cancel the next arcana drawn.")
+
+		6:
+			round_state.split_pot_two_best = true
+			game_log.emit("The Lovers — the pot splits between the two best hands.")
+
+		8:
+			round_state.inverted_values = true
+			game_log.emit("Strength inverts the ranking — low cards win.")
+
+		9:
+			round_state.skip_draw = true
+			game_log.emit("The Hermit — no draw phase this round.")
 
 		10: # Wheel of Fortune — collect all cards, shuffle, redeal
 			var cards_each := 6 if round_state.six_card_hand else 5
@@ -371,29 +415,44 @@ func _apply_arcana(id: int) -> void:
 			for pidx: int in active_players:
 				players[pidx].receive_cards(deck.deal_many(cards_each))
 				player_hand_updated.emit(pidx, players[pidx].hand)
-			# New Pages after a Wheel redeal never trigger another arcana.
-			# arcana_drawn is already true, so _phase_deal's check won't fire again.
+			game_log.emit("The Wheel of Fortune spins — all hands redealt!")
 
-		11: round_state.no_forced_min_bet = true   # Justice
-		12: round_state.hanged_man_active = true   # The Hanged Man
+		11:
+			round_state.no_forced_min_bet = true
+			game_log.emit("Justice — no minimum raise required.")
 
-		13: round_state.death_end = true           # Death — showdown immediately
+		12:
+			round_state.hanged_man_active = true
+			game_log.emit("The Hanged Man — go all-in to draw an extra card.")
 
-		15: round_state.raise_must_double = true   # The Devil
+		13:
+			round_state.death_end = true
+			game_log.emit("Death arrives — immediate showdown!")
+
+		15:
+			round_state.raise_must_double = true
+			game_log.emit("The Devil — raises must at least double the current bet.")
 
 		16: # The Tower — half the pot (rounded up) evaporates
 			@warning_ignore("integer_division")
 			var lost := (pot + 1) / 2
 			pot = int(max(0, pot - lost))
 			pot_changed.emit(pot)
+			game_log.emit("The Tower strikes — %d chips lost to ruin!" % lost)
 
-		19: round_state.sun_end = true             # The Sun — equal split
+		19:
+			round_state.sun_end = true
+			game_log.emit("The Sun shines — equal split at showdown.")
 
 		21: # The World — this is the last round
 			last_round = true
 			last_round_announced.emit()
+			game_log.emit("The World — this is the final round!")
 
 # ---- Helpers -----------------------------------------------------------------
+
+func _pname(pidx: int) -> String:
+	return "You" if pidx == HUMAN_IDX else "AI %d" % pidx
 
 func _add_to_pot(amount: int, pidx: int) -> void:
 	pot += amount
@@ -404,8 +463,13 @@ func _add_to_pot(amount: int, pidx: int) -> void:
 		if not deck.is_empty():
 			players[pidx].receive_cards([deck.deal_one()])
 			player_hand_updated.emit(pidx, players[pidx].hand)
+			game_log.emit("%s goes all-in and draws an extra card!" % _pname(pidx))
 
 func _do_discard(pidx: int, indices: Array) -> void:
+	if indices.is_empty():
+		game_log.emit("%s keeps their hand." % _pname(pidx))
+	else:
+		game_log.emit("%s discards %d card(s)." % [_pname(pidx), indices.size()])
 	var discarded := players[pidx].discard_at(indices)
 	deck.add_cards(discarded)
 	players[pidx].receive_cards(deck.deal_many(discarded.size()))

@@ -23,6 +23,10 @@ extends Control
 @onready var player_chips_label: Label = $PlayerArea/ChipsLabel
 @onready var player_hand: HandDisplay = $PlayerArea/HandDisplay
 
+# ---- Game log ----------------------------------------------------------------
+
+@onready var log_label: RichTextLabel = $GameLog/LogLabel
+
 # ---- Center arcana display ---------------------------------------------------
 
 @onready var current_arcana: Control = $CurrentArcana
@@ -76,6 +80,7 @@ func _ready() -> void:
 	GameManager.round_ended.connect(_on_round_ended)
 	GameManager.page_bonus.connect(_on_page_bonus)
 	GameManager.game_ended.connect(_on_game_ended)
+	GameManager.game_log.connect(_on_game_log)
 
 	GameManager.start_game()
 
@@ -244,6 +249,11 @@ func _on_game_ended(final_chips: Array) -> void:
 	next_button.text = "Main Menu"
 	_game_over = true
 	result_panel.visible = true
+
+func _on_game_log(message: String) -> void:
+	print(message)
+	log_label.append_text(message + "\n")
+	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
 
 func _on_next_pressed() -> void:
 	result_panel.visible = false
