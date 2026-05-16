@@ -4,6 +4,6 @@
 
 [node name="CardDisplay" type="TextureRect"]
 script = ExtResource("1_cd")
-custom_minimum_size = Vector2(72, 108)
+custom_minimum_size = Vector2(56, 84)
 stretch_mode = 5
 expand_mode = 0
