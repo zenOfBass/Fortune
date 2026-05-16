@@ -43,6 +43,7 @@ extends Control
 @onready var chariot_panel = $ChariotPanel
 @onready var star_panel = $StarPanel
 @onready var magician_panel = $MagicianPanel
+@onready var priestess_panel = $PriestessPanel
 
 # ---- Result panel ------------------------------------------------------------
 
@@ -68,6 +69,7 @@ func _ready() -> void:
 	chariot_panel.visible = false
 	star_panel.visible = false
 	magician_panel.visible = false
+	priestess_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
@@ -75,6 +77,7 @@ func _ready() -> void:
 	star_panel.swap_chosen.connect(_on_star_swap)
 	star_panel.pass_chosen.connect(_on_star_pass)
 	magician_panel.suit_chosen.connect(_on_magician_suit_chosen)
+	priestess_panel.confirmed.connect(_on_priestess_confirmed)
 
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
@@ -166,9 +169,17 @@ func _on_phase_changed(phase_name: String) -> void:
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	match player_idx:
 		0: player_hand.set_hand(hand, true)
-		1: ai1_hand.set_back_count(hand.size())
-		2: ai2_hand.set_back_count(hand.size())
-		3: ai3_hand.set_back_count(hand.size())
+		1: _set_ai_hand(ai1_hand, player_idx, hand)
+		2: _set_ai_hand(ai2_hand, player_idx, hand)
+		3: _set_ai_hand(ai3_hand, player_idx, hand)
+
+func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
+	var revealed: Card = GameManager.round_state.priestess_revealed.get(pidx)
+	if revealed == null:
+		display.set_back_count(hand.size())
+	else:
+		var idx: int = hand.find(revealed)
+		display.set_hand_mixed(hand, [idx] if idx >= 0 else [])
 
 func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 	match player_idx:
@@ -194,6 +205,7 @@ func _hide_all_overlays() -> void:
 	chariot_panel.visible = false
 	star_panel.visible = false
 	magician_panel.visible = false
+	priestess_panel.visible = false
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
@@ -231,8 +243,21 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 	elif arcana_id == 1:
 		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
 		magician_panel.show_for_player(pname)
+	elif arcana_id == 2:
+		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		priestess_panel.show_for_player(pname)
+		player_hand.set_selectable(true, 1)
 	else:
 		arcana_panel.show_interactive(arcana_id)
+
+func _on_priestess_confirmed() -> void:
+	var selected := player_hand.get_selected_indices()
+	if selected.is_empty():
+		return
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
+	priestess_panel.visible = false
+	GameManager.submit_arcana_choice(selected[0])
 
 func _on_magician_suit_chosen(suit_idx: int) -> void:
 	magician_panel.visible = false

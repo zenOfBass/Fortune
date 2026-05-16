@@ -28,6 +28,18 @@ func set_selectable(selectable: bool, max_select: int = 0) -> void:
 		if child is CardDisplayGD:
 			child.set_selectable(selectable)
 
+func set_hand_mixed(hand: Array, face_up_indices: Array) -> void:
+	_clear()
+	for i in hand.size():
+		var display: CardDisplayGD = CardDisplayScene.instantiate()
+		add_child(display)
+		display.card_index = i
+		if i in face_up_indices:
+			display.set_card(hand[i] as Card, true)
+		else:
+			display.set_back()
+		display.card_toggled.connect(_on_child_toggled)
+
 func _on_child_toggled(index: int, selected: bool) -> void:
 	if _max_select <= 0 or not selected:
 		return

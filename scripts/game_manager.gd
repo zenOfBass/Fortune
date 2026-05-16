@@ -383,9 +383,28 @@ func _apply_arcana(id: int) -> void:
 			round_state.fool_active = true
 			game_log.emit("The Fool is wild — best possible hand counts!")
 
-		2, 14, 18, 20:  # Interactive stubs — UI handles in Phase 4
+		14, 18, 20:  # Interactive stubs — UI handles in Phase 4
 			arcana_choice_needed.emit(-1, id)
 			await _arcana_effect_done
+
+		2:  # The High Priestess — each player reveals one card face-up for the round
+			game_log.emit("The High Priestess — each player reveals one card.")
+			for pidx in active_players:
+				if players[pidx].hand.is_empty():
+					continue
+				if pidx == HUMAN_IDX:
+					arcana_choice_needed.emit(pidx, 2)
+					await _arcana_effect_done
+					var idx := arcana_choice
+					if idx >= 0 and idx < players[pidx].hand.size():
+						round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
+						player_hand_updated.emit(pidx, players[pidx].hand)
+						game_log.emit("You reveal the %s." % players[pidx].hand[idx].display_name())
+				else:
+					var idx := randi() % players[pidx].hand.size()
+					round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
+					player_hand_updated.emit(pidx, players[pidx].hand)
+					game_log.emit("%s reveals a card." % _pname(pidx))
 
 		1:  # The Magician — each player draws one card; keep it if suit guess is correct
 			game_log.emit("The Magician — guess your drawn card's suit to keep it!")

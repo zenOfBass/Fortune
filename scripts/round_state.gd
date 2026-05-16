@@ -27,6 +27,10 @@ var arcana_drawn := false  # only one arcana may be drawn per round
 # Stored here so the game_manager can read it between rounds.
 var hierophant_active := false
 
+# ---- Per-player arcana state ----
+
+var priestess_revealed: Dictionary = {}  # player_idx -> Card (face-up for the round)
+
 # ---- Convenience ----
 
 func eval_options() -> Dictionary:
