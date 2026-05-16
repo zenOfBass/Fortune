@@ -126,8 +126,8 @@ func _layout_ai_areas(num_players: int) -> void:
 			ai1_area.visible = true
 			ai2_area.visible = true
 			ai3_area.visible = true
-			_place_side(ai1_area, vp, true)
-			_anchor_area(ai2_area, 0.22, 0.06, 0.78, 0.36)
+			_place_side(ai2_area, vp, true)
+			_anchor_area(ai1_area, 0.22, 0.06, 0.78, 0.36)
 			_place_side(ai3_area, vp, false)
 
 func _anchor_area(area: Control, al: float, at: float, ar: float, ab: float) -> void:
@@ -177,6 +177,7 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana.visible = false
 		current_arcana_thumb.texture = null
 		current_arcana_name.text = ""
+		_refresh_player_labels()
 
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	match player_idx:
@@ -193,12 +194,26 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 		var idx: int = hand.find(revealed)
 		display.set_hand_mixed(hand, [idx] if idx >= 0 else [])
 
+func _label_for(pidx: int, chips: int) -> String:
+	var pname := "You" if pidx == 0 else "AI %d" % pidx
+	var dealer := " (D)" if pidx == GameManager.dealer_idx else ""
+	return "%s%s: %d chips" % [pname, dealer, chips]
+
+func _refresh_player_labels() -> void:
+	for i in GameManager.players.size():
+		var chips := GameManager.players[i].chips
+		match i:
+			0: player_chips_label.text = _label_for(0, chips)
+			1: ai1_chips.text = _label_for(1, chips)
+			2: ai2_chips.text = _label_for(2, chips)
+			3: ai3_chips.text = _label_for(3, chips)
+
 func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 	match player_idx:
-		0: player_chips_label.text = "You: %d chips" % chips
-		1: ai1_chips.text = "AI 1: %d chips" % chips
-		2: ai2_chips.text = "AI 2: %d chips" % chips
-		3: ai3_chips.text = "AI 3: %d chips" % chips
+		0: player_chips_label.text = _label_for(0, chips)
+		1: ai1_chips.text = _label_for(1, chips)
+		2: ai2_chips.text = _label_for(2, chips)
+		3: ai3_chips.text = _label_for(3, chips)
 
 func _on_player_folded(player_idx: int) -> void:
 	const DIM = Color(0.45, 0.45, 0.45)
