@@ -19,6 +19,7 @@ signal bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_
 signal discard_input_needed(player_idx: int)
 signal arcana_choice_needed(player_idx: int, arcana_id: int) # interactive arcana phase 4
 
+signal player_hand_revealed(player_idx: int, hand: Array)
 signal round_ended(winner_indices: Array, hand_names: Array, split: bool)
 signal page_bonus(winner_idx: int, bonus_per_player: int)
 signal game_ended(final_chips: Array)
@@ -308,10 +309,18 @@ func _phase_moon_swap() -> void:
 				game_log.emit("You keep your hand, discarding your Moon secret.")
 		else:
 			await _ai_think()
-			if not players[pidx].hand.is_empty() and randi() % 2 == 0:
-				var idx := randi() % players[pidx].hand.size()
-				var old_card: Card = players[pidx].hand[idx]
-				players[pidx].hand[idx] = secret
+			var best_swap_idx := -1
+			var best_score := _ai_score_hand(players[pidx].hand)
+			for i in players[pidx].hand.size():
+				var test_hand := players[pidx].hand.duplicate()
+				test_hand[i] = secret
+				var s := _ai_score_hand(test_hand)
+				if s > best_score:
+					best_score = s
+					best_swap_idx = i
+			if best_swap_idx >= 0:
+				var old_card: Card = players[pidx].hand[best_swap_idx]
+				players[pidx].hand[best_swap_idx] = secret
 				deck.add_cards([old_card])
 				player_hand_updated.emit(pidx, players[pidx].hand)
 				game_log.emit("%s swaps their Moon secret into hand." % _pname(pidx))
@@ -344,7 +353,12 @@ func _phase_judgement_reentry() -> void:
 				game_log.emit("You choose to stay folded.")
 		else:
 			await _ai_think()
-			_do_reenter(pidx)
+			var expected_share := float(pot) / float(active_players.size() + 1)
+			var threshold := float(ante_amount) * (1.5 if players[pidx].chips <= ante_amount * 2 else 1.1)
+			if expected_share >= threshold:
+				_do_reenter(pidx)
+			else:
+				game_log.emit("%s stays folded (not +EV to re-enter)." % _pname(pidx))
 
 func _do_reenter(pidx: int) -> void:
 	var paid := players[pidx].bet(ante_amount)
@@ -391,6 +405,7 @@ func _phase_showdown() -> void:
 	for pidx in active_players:
 		var card_names := ", ".join(players[pidx].hand.map(func(c: Card): return c.display_name()))
 		game_log.emit("%s shows: %s (%s)" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx]), card_names])
+		player_hand_revealed.emit(pidx, players[pidx].hand)
 		await get_tree().create_timer(0.8).timeout
 
 	var sorted_players: Array = active_players.duplicate()
@@ -534,16 +549,29 @@ func _apply_arcana(id: int) -> void:
 							game_log.emit("You skip Temperance.")
 					else:
 						await _ai_think()
-						var flop_pick := randi() % flop.size()
-						var hand_pick := randi() % players[pidx].hand.size()
-						var taken: Card = flop[flop_pick]
-						var discarded: Card = players[pidx].hand[hand_pick]
-						players[pidx].hand.remove_at(hand_pick)
-						players[pidx].receive_cards([taken])
-						deck.add_cards([discarded])
-						flop.remove_at(flop_pick)
-						player_hand_updated.emit(pidx, players[pidx].hand)
-						game_log.emit("%s discards and takes from the flop." % _pname(pidx))
+						var best_score := _ai_score_hand(players[pidx].hand)
+						var best_hand_pick := -1
+						var best_flop_pick := -1
+						for fi in flop.size():
+							for hi in players[pidx].hand.size():
+								var test_hand := players[pidx].hand.duplicate()
+								test_hand[hi] = flop[fi]
+								var s := _ai_score_hand(test_hand)
+								if s > best_score:
+									best_score = s
+									best_hand_pick = hi
+									best_flop_pick = fi
+						if best_hand_pick >= 0:
+							var taken: Card = flop[best_flop_pick]
+							var discarded: Card = players[pidx].hand[best_hand_pick]
+							players[pidx].hand.remove_at(best_hand_pick)
+							players[pidx].receive_cards([taken])
+							deck.add_cards([discarded])
+							flop.remove_at(best_flop_pick)
+							player_hand_updated.emit(pidx, players[pidx].hand)
+							game_log.emit("%s discards and takes from the flop." % _pname(pidx))
+						else:
+							game_log.emit("%s passes on the Temperance flop." % _pname(pidx))
 				if not flop.is_empty():
 					deck.add_cards(flop)
 
@@ -578,7 +606,7 @@ func _apply_arcana(id: int) -> void:
 						game_log.emit("You reveal the %s." % players[pidx].hand[idx].display_name())
 				else:
 					await _ai_think()
-					var idx := randi() % players[pidx].hand.size()
+					var idx := _ai_weakest_card_idx(pidx)
 					round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
 					player_hand_updated.emit(pidx, players[pidx].hand)
 					game_log.emit("%s reveals a card." % _pname(pidx))
@@ -629,8 +657,9 @@ func _apply_arcana(id: int) -> void:
 						game_log.emit("You pass.")
 				else:
 					await _ai_think()
-					if not deck.is_empty() and randi() % 2 == 0:
-						var idx := randi() % players[pidx].hand.size()
+					var hand_type: float = _ai_score_hand(players[pidx].hand) / 1048576.0
+					if not deck.is_empty() and hand_type < 3.0:
+						var idx := _ai_weakest_card_idx(pidx)
 						var new_card: Card = deck.deal_one()
 						var old_card: Card = players[pidx].hand[idx]
 						players[pidx].hand.remove_at(idx)
@@ -651,7 +680,7 @@ func _apply_arcana(id: int) -> void:
 					game_log.emit("You pass a card left.")
 				else:
 					await _ai_think()
-					chosen[pidx] = randi() % players[pidx].hand.size()
+					chosen[pidx] = _ai_weakest_card_idx(pidx)
 					game_log.emit("%s passes a card left." % _pname(pidx))
 			var passing: Dictionary = {}
 			for pidx in active_players:
@@ -904,6 +933,34 @@ func _ai_discard(pidx: int) -> Array[int]:
 		if (hand[i].rank as int) != best_rank:
 			result.append(i)
 	return result
+
+func _ai_score_hand(hand: Array) -> int:
+	return HandEvaluator.score(hand, round_state.king_beats_ace, round_state.inverted_values, round_state.fool_active)
+
+# Returns the index of the weakest card: lowest cval kicker (not in a group).
+# Falls back to lowest cval overall if every card is in a group.
+func _ai_weakest_card_idx(pidx: int) -> int:
+	var hand := players[pidx].hand
+	var cvals: Array[int] = []
+	for c: Card in hand:
+		cvals.append(HandEvaluator._cmp(c.rank as int, round_state.king_beats_ace, round_state.inverted_values))
+	var counts: Dictionary = {}
+	for v in cvals:
+		counts[v] = counts.get(v, 0) + 1
+	var best_idx := 0
+	var best_cval := 999
+	for i in hand.size():
+		if counts[cvals[i]] == 1 and cvals[i] < best_cval:
+			best_cval = cvals[i]
+			best_idx = i
+	if best_cval < 999:
+		return best_idx
+	best_cval = 999
+	for i in hand.size():
+		if cvals[i] < best_cval:
+			best_cval = cvals[i]
+			best_idx = i
+	return best_idx
 
 func _ai_four_straight_discard(hand: Array) -> int:
 	var ranks: Array[int] = []

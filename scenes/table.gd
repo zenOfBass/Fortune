@@ -124,6 +124,7 @@ func _ready() -> void:
 	GameManager.bet_input_needed.connect(_on_bet_input_needed)
 	GameManager.discard_input_needed.connect(_on_discard_input_needed)
 	GameManager.arcana_choice_needed.connect(_on_arcana_choice_needed)
+	GameManager.player_hand_revealed.connect(_on_player_hand_revealed)
 	GameManager.round_ended.connect(_on_round_ended)
 	GameManager.page_bonus.connect(_on_page_bonus)
 	GameManager.game_ended.connect(_on_game_ended)
@@ -236,6 +237,20 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 		1: _set_ai_hand(ai1_hand, player_idx, hand)
 		2: _set_ai_hand(ai2_hand, player_idx, hand)
 		3: _set_ai_hand(ai3_hand, player_idx, hand)
+
+func _on_player_hand_revealed(player_idx: int, hand: Array) -> void:
+	if player_idx == GameManager.HUMAN_IDX or hand.is_empty():
+		return
+	_flip_sfx.play()
+	var sort_order := HandEvaluator.sort_order_for_display(
+		hand,
+		GameManager.round_state.king_beats_ace,
+		GameManager.round_state.inverted_values
+	)
+	match player_idx:
+		1: ai1_hand.set_hand(hand, true, sort_order)
+		2: ai2_hand.set_hand(hand, true, sort_order)
+		3: ai3_hand.set_hand(hand, true, sort_order)
 
 func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 	var revealed: Card = GameManager.round_state.priestess_revealed.get(pidx)
