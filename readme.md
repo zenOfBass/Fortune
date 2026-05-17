@@ -32,7 +32,7 @@ One arcana can fire per round. Its effect lasts until the next ante phase. There
 
 | # | Card | Effect |
 |---|---|---|
-| 0 | The Fool | A wild card enters play as a shared flop — all players can use it as part of their hand. |
+| 0 | The Fool | Each player's hand is evaluated with one card treated as wild — the best possible combination counts. |
 | 1 | The Magician | Each player guesses a suit and flips the top card of the deck. Guess right and keep it. |
 | 2 | The High Priestess | All players reveal one card face-up. It stays visible for the rest of the round. |
 | 3 | The Empress | Everyone draws a sixth card. |
@@ -59,6 +59,7 @@ One arcana can fire per round. Its effect lasts until the next ante phase. There
 
 - Full five-card draw loop with AI opponents
 - All 22 Major Arcana implemented and playable
-- Card deal animations and sound effects
+- Card deal animations and sound effects (staggered per card drawn)
+- Video poker-style betting panel with +1/+5/+10/+25 increment buttons
 - Chip tracking, bust detection, and final standings screen
 - Dealer rotation and game log
