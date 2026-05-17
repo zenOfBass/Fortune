@@ -215,7 +215,8 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana_name.text = ""
 
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
-	_flip_sfx.play()
+	if not hand.is_empty():
+		_flip_sfx.play()
 	match player_idx:
 		0:
 			var sort_order := HandEvaluator.sort_order_for_display(

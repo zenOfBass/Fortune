@@ -6,6 +6,7 @@ signal card_toggled(index: int, selected: bool)
 var card_index: int = -1
 var _selected: bool = false
 var _selectable: bool = false
+var _tween: Tween = null
 
 func _ready() -> void:
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -26,23 +27,29 @@ func set_back() -> void:
 	_selected = false
 	modulate = Color.WHITE
 
+func _exit_tree() -> void:
+	if is_instance_valid(_tween):
+		_tween.kill()
+
 func animate_in(delay: float, flip: bool = false) -> void:
+	if is_instance_valid(_tween):
+		_tween.kill()
 	if flip and texture != null:
 		var face_tex := texture
 		texture = load("res://assets/cards/backs/back_of_card.png")
-		var tween := create_tween()
-		tween.tween_interval(delay)
-		tween.tween_property(self, "scale:x", 0.0, 0.07)
-		tween.tween_callback(func(): texture = face_tex)
-		tween.tween_property(self, "scale:x", 1.0, 0.07)
+		_tween = create_tween()
+		_tween.tween_interval(delay)
+		_tween.tween_property(self, "scale:x", 0.0, 0.07)
+		_tween.tween_callback(func(): texture = face_tex)
+		_tween.tween_property(self, "scale:x", 1.0, 0.07)
 	else:
 		scale = Vector2(0.8, 0.8)
 		modulate.a = 0.0
-		var tween := create_tween()
-		tween.tween_interval(delay)
-		tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.12) \
+		_tween = create_tween()
+		_tween.tween_interval(delay)
+		_tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.12) \
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-		tween.parallel().tween_property(self, "modulate:a", 1.0, 0.10)
+		_tween.parallel().tween_property(self, "modulate:a", 1.0, 0.10)
 
 func set_selectable(selectable: bool) -> void:
 	_selectable = selectable

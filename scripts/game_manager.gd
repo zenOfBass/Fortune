@@ -89,6 +89,7 @@ func _run_round() -> void:
 	for pidx in active_players:
 		if players[pidx].chips == 0:
 			game_log.emit("*** %s is eliminated! ***" % _pname(pidx))
+			player_hand_updated.emit(pidx, [])
 
 	active_players.assign(range(players.size()).filter(func(i): return players[i].chips > 0))
 	for p in players:
