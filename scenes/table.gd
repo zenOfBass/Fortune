@@ -73,6 +73,7 @@ var _shuffle_sfx: AudioStreamPlayer
 var _game_over: bool = false
 var _log_tween: Tween = null
 var _skip_flip := false
+var _bet_contributed: Dictionary = {}
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -116,6 +117,7 @@ func _ready() -> void:
 	judgement_panel.reenter_chosen.connect(_on_judgement_reenter)
 	judgement_panel.pass_chosen.connect(_on_judgement_pass)
 
+	GameManager.player_bet_changed.connect(_on_player_bet_changed)
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
 	GameManager.player_chips_changed.connect(_on_player_chips_changed)
@@ -202,7 +204,13 @@ func _place_side(area: Control, vp: Vector2, is_left: bool) -> void:
 
 # ---- Signal handlers ---------------------------------------------------------
 
+func _on_player_bet_changed(player_idx: int, contributed: int) -> void:
+	_bet_contributed[player_idx] = contributed
+	_set_player_label(player_idx, GameManager.players[player_idx].chips)
+
 func _on_phase_changed(phase_name: String) -> void:
+	_bet_contributed.clear()
+	_refresh_player_labels()
 	if phase_name == "DEAL":
 		_shuffle_sfx.play()
 	phase_label.text = "Phase: " + phase_name
@@ -282,7 +290,8 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 
 func _label_for(pidx: int, chips: int) -> String:
 	var dealer := " (D)" if pidx == GameManager.dealer_idx else ""
-	return "%s%s: %d chips" % [GameManager._pname(pidx), dealer, chips]
+	var in_str := " (%d in)" % _bet_contributed[pidx] if _bet_contributed.has(pidx) else ""
+	return "%s%s: %d chips%s" % [GameManager._pname(pidx), dealer, chips, in_str]
 
 func _set_player_label(pidx: int, chips: int) -> void:
 	var text := _label_for(pidx, chips)

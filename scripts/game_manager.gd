@@ -26,6 +26,7 @@ signal page_bonus(winner_idx: int, bonus_per_player: int)
 signal game_ended(final_chips: Array)
 
 signal game_log(message: String)
+signal player_bet_changed(player_idx: int, contributed: int)
 
 # ---- Internal signals (awaited inside coroutines) ----------------------------
 
@@ -267,6 +268,7 @@ func _phase_bet(g: int) -> void:
 				contributed[pidx] = contributed.get(pidx, 0) + paid
 				_add_to_pot(paid, pidx)
 				game_log.emit("%s calls %d." % [_pname(pidx), paid])
+				player_bet_changed.emit(pidx, contributed[pidx])
 
 			"raise":
 				var raise_to: int = max(amount, min_raise)
@@ -276,6 +278,7 @@ func _phase_bet(g: int) -> void:
 					contributed[pidx] = contributed.get(pidx, 0) + paid
 					_add_to_pot(paid, pidx)
 					raise_to = contributed[pidx]  # cap to what was actually paid
+					player_bet_changed.emit(pidx, contributed[pidx])
 				_current_bet = max(_current_bet, raise_to)
 				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
 				player_raises[pidx] = player_raises.get(pidx, 0) + 1
