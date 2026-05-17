@@ -10,7 +10,7 @@ var raise_cap:         int
 
 static func aggressor() -> AIProfile:
 	var p := AIProfile.new()
-	p.persona_name     = "Voivode the Reckless"
+	p.persona_name     = "Tarvosk the Brazen"
 	p.raise_threshold  = 2.8
 	p.fold_threshold   = 0.8
 	p.bluff_chance     = 0.18
@@ -20,7 +20,7 @@ static func aggressor() -> AIProfile:
 
 static func rock() -> AIProfile:
 	var p := AIProfile.new()
-	p.persona_name     = "Pharesm the Unmoved"
+	p.persona_name     = "Haldemar the Still"
 	p.raise_threshold  = 4.5
 	p.fold_threshold   = 2.5
 	p.bluff_chance     = 0.0
@@ -30,7 +30,7 @@ static func rock() -> AIProfile:
 
 static func ghost() -> AIProfile:
 	var p := AIProfile.new()
-	p.persona_name     = "Iucounu the Inscrutable"
+	p.persona_name     = "Mercival the Oblique"
 	p.raise_threshold  = 3.5
 	p.fold_threshold   = 1.5
 	p.bluff_chance     = 0.12
