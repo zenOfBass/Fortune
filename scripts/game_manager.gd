@@ -175,6 +175,8 @@ func _phase_bet() -> void:
 	phase_changed.emit("BET")
 	if active_players.size() <= 1:
 		return
+	if active_players.all(func(p): return players[p].chips == 0):
+		return
 
 	game_log.emit("--- Betting ---")
 
@@ -204,7 +206,7 @@ func _phase_bet() -> void:
 			continue
 
 		var can_check  := _current_bet == 0
-		var min_raise: int = 1 if round_state.no_forced_min_bet \
+		var min_raise: int = (_current_bet + 1) if round_state.no_forced_min_bet \
 						else (max(1, _current_bet * 2) if round_state.raise_must_double \
 						else (_current_bet + 1))
 
@@ -217,7 +219,7 @@ func _phase_bet() -> void:
 			action = r[0]; amount = r[1]
 		else:
 			await _ai_think()
-			var r := _ai_bet(pidx, _current_bet, can_check)
+			var r := _ai_bet(pidx, _current_bet, can_check, contributed.get(pidx, 0))
 			action = r[0]; amount = r[1]
 
 		acted[pidx] = true
@@ -251,8 +253,8 @@ func _phase_bet() -> void:
 					raise_to = contributed[pidx]  # cap to what was actually paid
 				_current_bet = max(_current_bet, raise_to)
 				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
-				# Re-queue everyone who hasn't matched the new bet.
-				for other: int in active_players:
+				# Re-queue in seat order starting left of the raiser.
+				for other in _act_order_from(pidx):
 					if other != pidx and contributed.get(other, 0) < _current_bet:
 						if not queue.has(other):
 							queue.append(other)
@@ -831,7 +833,7 @@ func _only_one_solvent() -> bool:
 
 # ---- AI ----------------------------------------------------------------------
 
-func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
+func _ai_bet(pidx: int, current_bet: int, can_check: bool, already_contributed: int = 0) -> Array:
 	var hand_score: int = HandEvaluator.score(
 		players[pidx].hand,
 		round_state.king_beats_ace,
@@ -863,10 +865,18 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 	if not can_check and hand_type < 3.0 and randf() < 0.09:
 		effective = raise_threshold + 0.1
 
+	# Hanged Man: going all-in draws an extra card. Weak-to-medium drawing hands
+	# should go all-in opportunistically; strong made hands play normally.
+	if round_state.hanged_man_active and hand_type < 4.0 and effective >= fold_threshold:
+		effective = raise_threshold + 0.1  # commit to raising
+		var all_in_level := players[pidx].chips + already_contributed
+		return ["raise", all_in_level]
+
 	if effective >= raise_threshold:
+		var all_in_level := players[pidx].chips + already_contributed
 		var bump: int = max(1, int(current_bet * randf_range(0.4, 0.9))) if not round_state.raise_must_double \
 						else max(1, current_bet)
-		var raise_to: int = min(current_bet + bump, players[pidx].chips + current_bet)
+		var raise_to: int = min(current_bet + bump, all_in_level)
 		return ["raise", raise_to]
 	elif effective >= fold_threshold:
 		return ["check", 0] if can_check else ["call", 0]
