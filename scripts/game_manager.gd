@@ -240,7 +240,7 @@ func _phase_bet(g: int) -> void:
 		else:
 			await _ai_think()
 			if g != _game_gen: return
-			var r := _ai_bet(pidx, _current_bet, can_check, contributed.get(pidx, 0), player_raises.get(pidx, 0), raise_count)
+			var r := AIPlayer.bet(pidx, _current_bet, can_check, contributed.get(pidx, 0), player_raises.get(pidx, 0), raise_count)
 			action = r[0]; amount = r[1]
 
 		acted[pidx] = true
@@ -312,7 +312,7 @@ func _phase_draw(g: int) -> void:
 		else:
 			await _ai_think()
 			if g != _game_gen: return
-			_do_discard(pidx, _ai_discard(pidx))
+			_do_discard(pidx, AIPlayer.discard(pidx))
 
 # ---- Phase: Moon swap --------------------------------------------------------
 
@@ -341,11 +341,11 @@ func _phase_moon_swap(g: int) -> void:
 			await _ai_think()
 			if g != _game_gen: return
 			var best_swap_idx := -1
-			var best_score := _ai_score_hand(players[pidx].hand)
+			var best_score := AIPlayer.score_hand(players[pidx].hand)
 			for i in players[pidx].hand.size():
 				var test_hand := players[pidx].hand.duplicate()
 				test_hand[i] = secret
-				var s := _ai_score_hand(test_hand)
+				var s := AIPlayer.score_hand(test_hand)
 				if s > best_score:
 					best_score = s
 					best_swap_idx = i
@@ -600,14 +600,14 @@ func _apply_arcana(id: int, g: int) -> void:
 					else:
 						await _ai_think()
 						if g != _game_gen: return
-						var best_score := _ai_score_hand(players[pidx].hand)
+						var best_score := AIPlayer.score_hand(players[pidx].hand)
 						var best_hand_pick := -1
 						var best_flop_pick := -1
 						for fi in flop.size():
 							for hi in players[pidx].hand.size():
 								var test_hand := players[pidx].hand.duplicate()
 								test_hand[hi] = flop[fi]
-								var s := _ai_score_hand(test_hand)
+								var s := AIPlayer.score_hand(test_hand)
 								if s > best_score:
 									best_score = s
 									best_hand_pick = hi
@@ -660,7 +660,7 @@ func _apply_arcana(id: int, g: int) -> void:
 				else:
 					await _ai_think()
 					if g != _game_gen: return
-					var idx := _ai_weakest_card_idx(pidx)
+					var idx := AIPlayer.weakest_card_idx(pidx)
 					round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
 					player_hand_updated.emit(pidx, players[pidx].hand)
 					game_log.emit("%s reveals a card." % _pname(pidx))
@@ -715,9 +715,9 @@ func _apply_arcana(id: int, g: int) -> void:
 				else:
 					await _ai_think()
 					if g != _game_gen: return
-					var hand_type: float = _ai_score_hand(players[pidx].hand) / 1048576.0
+					var hand_type: float = AIPlayer.score_hand(players[pidx].hand) / 1048576.0
 					if not deck.is_empty() and hand_type < 3.0:
-						var idx := _ai_weakest_card_idx(pidx)
+						var idx := AIPlayer.weakest_card_idx(pidx)
 						var new_card: Card = deck.deal_one()
 						var old_card: Card = players[pidx].hand[idx]
 						players[pidx].hand.remove_at(idx)
@@ -740,7 +740,7 @@ func _apply_arcana(id: int, g: int) -> void:
 				else:
 					await _ai_think()
 					if g != _game_gen: return
-					chosen[pidx] = _ai_weakest_card_idx(pidx)
+					chosen[pidx] = AIPlayer.weakest_card_idx(pidx)
 					game_log.emit("%s passes a card left." % _pname(pidx))
 			var passing: Dictionary = {}
 			for pidx in active_players:
@@ -887,172 +887,6 @@ func _act_order_from(dealer: int) -> Array[int]:
 
 func _only_one_solvent() -> bool:
 	return players.filter(func(p): return p.chips > 0).size() <= 1
-
-# ---- AI ----------------------------------------------------------------------
-
-func _ai_bet(pidx: int, current_bet: int, can_check: bool, already_contributed: int = 0, times_raised: int = 0, raises_so_far: int = 0) -> Array:
-	var hand_score: int = HandEvaluator.score(
-		players[pidx].hand,
-		round_state.king_beats_ace,
-		round_state.inverted_values,
-		round_state.fool_active
-	)
-	var hand_type: float = hand_score / 1048576.0  # 1.0 (high card) to 10.0 (royal flush)
-
-	# Noise shrinks as the hand gets stronger: weak hands play unpredictably,
-	# strong hands play their value consistently.
-	var noise_mag: float = clamp(1.4 - (hand_type - 1.0) * 0.13, 0.2, 1.4)
-	var effective: float = clamp(hand_type + randf_range(-noise_mag, noise_mag), 0.0, 11.0)
-
-	var raise_threshold := 3.5
-	var fold_threshold  := 1.5
-
-	if active_players.size() == 2:
-		raise_threshold = 2.5
-		fold_threshold  = 0.5
-		var total_chips: int = players.reduce(func(s, p): return s + p.chips, 0)
-		if total_chips > 0 and float(players[pidx].chips) / total_chips > 0.6:
-			raise_threshold -= 0.3
-
-	# Flush or better always raises — strong hands never leak value through noise.
-	if hand_type >= 6.0:
-		effective = max(effective, raise_threshold + 0.1)
-
-	# Occasional bluff-raise when facing a bet: weak hand, ~9% chance.
-	if not can_check and hand_type < 3.0 and randf() < 0.09:
-		effective = raise_threshold + 0.1
-
-	# Hanged Man: going all-in draws an extra card. Weak-to-medium drawing hands
-	# should go all-in opportunistically; strong made hands play normally.
-	if round_state.hanged_man_active and hand_type < 4.0 and effective >= fold_threshold:
-		effective = raise_threshold + 0.1  # commit to raising
-		var all_in_level := players[pidx].chips + already_contributed
-		return ["raise", all_in_level]
-
-	# Raise cap: after this player has raised twice (or the round has seen 6+ raises),
-	# switch to call unless holding flush or better — prevents runaway escalation.
-	var at_raise_cap := (times_raised >= 2 and hand_type < 6.0) or \
-						(raises_so_far >= 6 and hand_type < 8.0)
-
-	if effective >= raise_threshold and not at_raise_cap:
-		var all_in_level := players[pidx].chips + already_contributed
-		var max_bump: int = max(2, ante_amount * 4)
-		var bump: int = min(max(1, int(current_bet * randf_range(0.4, 0.9))), max_bump) \
-						if not round_state.raise_must_double \
-						else max(1, current_bet)
-		var raise_to: int = min(current_bet + bump, all_in_level)
-		return ["raise", raise_to]
-	elif effective >= fold_threshold:
-		return ["check", 0] if can_check else ["call", 0]
-	elif can_check:
-		return ["check", 0]
-	else:
-		return ["fold", 0]
-
-func _ai_discard(pidx: int) -> Array[int]:
-	var hand := players[pidx].hand
-	var rank_counts: Dictionary = {}
-	var suit_counts: Dictionary = {}
-	for c: Card in hand:
-		rank_counts[c.rank as int] = rank_counts.get(c.rank as int, 0) + 1
-		suit_counts[c.suit as int] = suit_counts.get(c.suit as int, 0) + 1
-
-	var max_count: int = rank_counts.values().max() if not rank_counts.is_empty() else 0
-
-	# Keep strong made hands: quads, full house, three of a kind, two pair.
-	if max_count >= 3 or rank_counts.values().count(2) == 2:
-		return []
-
-	# 4-flush draw: discard the one off-suit card.
-	var max_suit: int = suit_counts.values().max() if not suit_counts.is_empty() else 0
-	if max_suit >= 4:
-		var flush_suit := -1
-		for s in suit_counts:
-			if suit_counts[s] == max_suit:
-				flush_suit = s
-				break
-		var flush_result: Array[int] = []
-		for i in range(hand.size()):
-			if (hand[i].suit as int) != flush_suit:
-				flush_result.append(i)
-		return flush_result
-
-	# 4-straight draw (5-card hands only): discard the card that doesn't fit.
-	if hand.size() == 5:
-		var skip_idx := _ai_four_straight_discard(hand)
-		if skip_idx >= 0:
-			return [skip_idx]
-
-	# One pair: keep the pair, discard the rest.
-	if max_count == 2:
-		var pair_rank := -1
-		for r in rank_counts:
-			if rank_counts[r] == 2:
-				pair_rank = r
-				break
-		var pair_result: Array[int] = []
-		for i in range(hand.size()):
-			if (hand[i].rank as int) != pair_rank:
-				pair_result.append(i)
-		return pair_result
-
-	# High card: keep the card with the best comparison value in the current context.
-	var best_cval := -1
-	var best_rank := -1
-	for c: Card in hand:
-		var cv := HandEvaluator._cmp(c.rank as int, round_state.king_beats_ace, round_state.inverted_values)
-		if cv > best_cval:
-			best_cval = cv
-			best_rank = c.rank as int
-	var result: Array[int] = []
-	for i in range(hand.size()):
-		if (hand[i].rank as int) != best_rank:
-			result.append(i)
-	return result
-
-func _ai_score_hand(hand: Array) -> int:
-	return HandEvaluator.score(hand, round_state.king_beats_ace, round_state.inverted_values, round_state.fool_active)
-
-# Returns the index of the weakest card: lowest cval kicker (not in a group).
-# Falls back to lowest cval overall if every card is in a group.
-func _ai_weakest_card_idx(pidx: int) -> int:
-	var hand := players[pidx].hand
-	var cvals: Array[int] = []
-	for c: Card in hand:
-		cvals.append(HandEvaluator._cmp(c.rank as int, round_state.king_beats_ace, round_state.inverted_values))
-	var counts: Dictionary = {}
-	for v in cvals:
-		counts[v] = counts.get(v, 0) + 1
-	var best_idx := 0
-	var best_cval := 999
-	for i in hand.size():
-		if counts[cvals[i]] == 1 and cvals[i] < best_cval:
-			best_cval = cvals[i]
-			best_idx = i
-	if best_cval < 999:
-		return best_idx
-	best_cval = 999
-	for i in hand.size():
-		if cvals[i] < best_cval:
-			best_cval = cvals[i]
-			best_idx = i
-	return best_idx
-
-func _ai_four_straight_discard(hand: Array) -> int:
-	var ranks: Array[int] = []
-	for c: Card in hand:
-		ranks.append(c.rank as int)
-	for skip in range(hand.size()):
-		var unique: Dictionary = {}
-		for i in range(hand.size()):
-			if i != skip:
-				unique[ranks[i]] = true
-		if unique.size() == 4:
-			var keys: Array = unique.keys()
-			keys.sort()
-			if keys[-1] - keys[0] == 3:
-				return skip
-	return -1
 
 # ---- Public API (UI calls these) ---------------------------------------------
 
