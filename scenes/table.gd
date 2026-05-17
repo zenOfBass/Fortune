@@ -139,7 +139,7 @@ func _ready() -> void:
 
 	bet_panel.anchor_top = 1.0
 	bet_panel.anchor_bottom = 1.0
-	bet_panel.offset_top = -95.0
+	bet_panel.offset_top = -150.0
 	bet_panel.offset_bottom = -5.0
 	draw_panel.anchor_top = 1.0
 	draw_panel.anchor_bottom = 1.0

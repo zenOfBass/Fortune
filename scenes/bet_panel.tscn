@@ -6,32 +6,61 @@
 script = ExtResource("1_bp")
 
 [node name="VBox" type="VBoxContainer" parent="."]
+theme_override_constants/separation = 4
 
 [node name="InfoLabel" type="Label" parent="VBox"]
 text = "Current bet: 0"
 size_flags_horizontal = 3
+horizontal_alignment = 1
 
-[node name="ButtonRow" type="HBoxContainer" parent="VBox"]
+[node name="RaiseLabel" type="Label" parent="VBox"]
+text = "Raise to: 1"
+size_flags_horizontal = 3
+horizontal_alignment = 1
 
-[node name="CheckButton" type="Button" parent="VBox/ButtonRow"]
+[node name="IncrRow" type="HBoxContainer" parent="VBox"]
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="Plus1Button" type="Button" parent="VBox/IncrRow"]
+text = "+1"
+custom_minimum_size = Vector2(52, 0)
+
+[node name="Plus5Button" type="Button" parent="VBox/IncrRow"]
+text = "+5"
+custom_minimum_size = Vector2(52, 0)
+
+[node name="Plus10Button" type="Button" parent="VBox/IncrRow"]
+text = "+10"
+custom_minimum_size = Vector2(52, 0)
+
+[node name="Plus25Button" type="Button" parent="VBox/IncrRow"]
+text = "+25"
+custom_minimum_size = Vector2(52, 0)
+
+[node name="MinButton" type="Button" parent="VBox/IncrRow"]
+text = "Min"
+custom_minimum_size = Vector2(52, 0)
+
+[node name="ActionRow" type="HBoxContainer" parent="VBox"]
+theme_override_constants/separation = 6
+
+[node name="CheckButton" type="Button" parent="VBox/ActionRow"]
 text = "Check"
+size_flags_horizontal = 3
 
-[node name="CallButton" type="Button" parent="VBox/ButtonRow"]
+[node name="CallButton" type="Button" parent="VBox/ActionRow"]
 text = "Call"
+size_flags_horizontal = 3
 
-[node name="FoldButton" type="Button" parent="VBox/ButtonRow"]
-text = "Fold"
-
-[node name="RaiseRow" type="HBoxContainer" parent="VBox"]
-
-[node name="RaiseSpin" type="SpinBox" parent="VBox/RaiseRow"]
-min_value = 1.0
-max_value = 9999.0
-value = 1.0
-custom_minimum_size = Vector2(100, 0)
-
-[node name="RaiseButton" type="Button" parent="VBox/RaiseRow"]
+[node name="RaiseButton" type="Button" parent="VBox/ActionRow"]
 text = "Raise"
+size_flags_horizontal = 3
 
-[node name="AllInButton" type="Button" parent="VBox/RaiseRow"]
+[node name="AllInButton" type="Button" parent="VBox/ActionRow"]
 text = "All In"
+size_flags_horizontal = 3
+
+[node name="FoldButton" type="Button" parent="VBox/ActionRow"]
+text = "Fold"
+size_flags_horizontal = 3
