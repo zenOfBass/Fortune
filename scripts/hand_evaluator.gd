@@ -236,3 +236,28 @@ static func _pack(hand_type: int, tiebreakers: Array) -> int:
 
 static func _b5() -> int:
 	return _B * _B * _B * _B * _B  # 16^5 = 1 048 576
+
+
+# Returns card indices in the order they should be displayed: groups sorted by
+# count descending, then by comparison value descending within each group.
+# Result is a permutation of [0, hand.size()-1] suitable for HandDisplay.set_hand.
+static func sort_order_for_display(hand: Array, king_beats_ace: bool = false, inverted_values: bool = false) -> Array[int]:
+	var raw: Array[int] = []
+	for c: Card in hand:
+		raw.append(c.rank as int)
+	var cvals := _comparison_values(raw, king_beats_ace, inverted_values)
+	var counts := {}
+	for v: int in cvals:
+		counts[v] = counts.get(v, 0) + 1
+	var indexed: Array = []
+	for i in hand.size():
+		indexed.append([i, counts[cvals[i]], cvals[i]])
+	indexed.sort_custom(func(a, b):
+		if a[1] != b[1]:
+			return a[1] > b[1]
+		return a[2] > b[2]
+	)
+	var result: Array[int] = []
+	for entry in indexed:
+		result.append(entry[0] as int)
+	return result

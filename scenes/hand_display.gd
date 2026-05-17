@@ -6,15 +6,16 @@ const CardDisplayGD := preload("res://scenes/card_display.gd")
 
 var _max_select: int = 0  # 0 = unlimited
 
-func set_hand(hand: Array, face_up: bool) -> void:
+func set_hand(hand: Array, face_up: bool, sort_order: Array[int] = []) -> void:
 	_clear()
-	for i in hand.size():
+	for display_pos in hand.size():
+		var orig_idx: int = sort_order[display_pos] if not sort_order.is_empty() else display_pos
 		var display: CardDisplayGD = CardDisplayScene.instantiate()
 		add_child(display)
-		display.card_index = i
-		display.set_card(hand[i] as Card, face_up)
+		display.card_index = orig_idx
+		display.set_card(hand[orig_idx] as Card, face_up)
 		display.card_toggled.connect(_on_child_toggled)
-		display.animate_in(i * 0.12, face_up)
+		display.animate_in(display_pos * 0.12, face_up)
 
 func set_back_count(count: int) -> void:
 	_clear()
@@ -53,12 +54,9 @@ func _on_child_toggled(index: int, selected: bool) -> void:
 
 func get_selected_indices() -> Array[int]:
 	var indices: Array[int] = []
-	var i := 0
 	for child in get_children():
-		if child is CardDisplayGD:
-			if child.is_selected():
-				indices.append(i)
-			i += 1
+		if child is CardDisplayGD and child.is_selected():
+			indices.append(child.card_index)
 	return indices
 
 func clear_selection() -> void:

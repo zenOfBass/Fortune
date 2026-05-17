@@ -217,7 +217,13 @@ func _on_phase_changed(phase_name: String) -> void:
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	_flip_sfx.play()
 	match player_idx:
-		0: player_hand.set_hand(hand, true)
+		0:
+			var sort_order := HandEvaluator.sort_order_for_display(
+				hand,
+				GameManager.round_state.king_beats_ace,
+				GameManager.round_state.inverted_values
+			)
+			player_hand.set_hand(hand, true, sort_order)
 		1: _set_ai_hand(ai1_hand, player_idx, hand)
 		2: _set_ai_hand(ai2_hand, player_idx, hand)
 		3: _set_ai_hand(ai3_hand, player_idx, hand)
