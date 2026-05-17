@@ -83,7 +83,6 @@ func _ready() -> void:
 	_layout_ai_areas(num_players)
 
 	draw_panel.visible = false
-	result_panel.visible = false
 	last_round_label.visible = false
 	arcana_panel.visible = false
 	chariot_panel.visible = false
