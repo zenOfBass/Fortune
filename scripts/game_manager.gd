@@ -31,6 +31,7 @@ signal game_log(message: String)
 signal _bet_ready(action: String, amount: int)
 signal _discard_ready(indices: Array)
 signal _arcana_effect_done  # UI calls complete_arcana_effect() when interactive done
+signal _round_advance_ready # UI calls confirm_next_round() after result panel
 
 # ---- State -------------------------------------------------------------------
 
@@ -74,6 +75,7 @@ func start_game() -> void:
 		await _run_round()
 		if last_round or _only_one_solvent():
 			break
+		await _round_advance_ready
 	var chips: Array = []
 	for p in players:
 		chips.append(p.chips)
@@ -988,6 +990,9 @@ func submit_discard(indices: Array) -> void:
 
 func complete_arcana_effect() -> void:
 	_arcana_effect_done.emit()
+
+func confirm_next_round() -> void:
+	_round_advance_ready.emit()
 
 func submit_arcana_choice(choice: int) -> void:
 	arcana_choice = choice

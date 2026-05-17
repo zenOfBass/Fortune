@@ -440,6 +440,10 @@ func _on_confirm_discard() -> void:
 
 func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> void:
 	_hide_all_overlays()
+	bet_panel.hide_betting()
+	draw_panel.visible = false
+	player_hand.set_selectable(false)
+	player_hand.clear_selection()
 	var msg := ""
 	if split and hand_names.is_empty():
 		msg = "Split pot! (equal share)"
@@ -502,6 +506,8 @@ func _on_next_pressed() -> void:
 	result_panel.visible = false
 	if _game_over:
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	else:
+		GameManager.confirm_next_round()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
