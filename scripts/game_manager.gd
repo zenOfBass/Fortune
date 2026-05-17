@@ -838,7 +838,10 @@ func _ai_think() -> void:
 	await get_tree().create_timer(randf_range(0.4, 0.9)).timeout
 
 func _pname(pidx: int) -> String:
-	return "You" if pidx == HUMAN_IDX else "AI %d" % pidx
+	if pidx == HUMAN_IDX:
+		return "You"
+	var profile := players[pidx].profile
+	return profile.persona_name if profile else "AI %d" % pidx
 
 func _add_to_pot(amount: int, pidx: int) -> void:
 	pot += amount

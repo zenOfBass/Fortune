@@ -34,12 +34,14 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 		effective = raise_threshold + 0.1
 
 	if gm.round_state.hanged_man_active and hand_type < 4.0 and effective >= fold_threshold:
-		effective = raise_threshold + 0.1
-		var all_in_level := gm.players[pidx].chips + already_contributed
-		return ["raise", all_in_level]
+		var remaining := gm.players[pidx].chips
+		var short_stacked := remaining <= maxi(current_bet * 2, gm.ante_amount * 6)
+		if short_stacked or randf() < 0.20:
+			effective = raise_threshold + 0.1
+			var all_in_level := remaining + already_contributed
+			return ["raise", all_in_level]
 
-	var at_raise_cap := (times_raised >= profile.raise_cap and hand_type < 6.0) or \
-						(raises_so_far >= 6 and hand_type < 8.0)
+	var at_raise_cap := times_raised >= profile.raise_cap or raises_so_far >= 6
 
 	if effective >= raise_threshold and not at_raise_cap:
 		var all_in_level := gm.players[pidx].chips + already_contributed

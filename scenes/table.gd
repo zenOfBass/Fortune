@@ -282,10 +282,6 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 
 func _label_for(pidx: int, chips: int) -> String:
 	var dealer := " (D)" if pidx == GameManager.dealer_idx else ""
-	if pidx != GameManager.HUMAN_IDX:
-		var profile: AIProfile = GameManager.players[pidx].profile
-		if profile:
-			return "AI %d (%s)%s: %d chips" % [pidx, profile.persona_name, dealer, chips]
 	return "%s%s: %d chips" % [GameManager._pname(pidx), dealer, chips]
 
 func _set_player_label(pidx: int, chips: int) -> void:
