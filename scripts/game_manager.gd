@@ -62,8 +62,12 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	debug_arcana_id = arcana_id
 	last_round = false
 	players.clear()
+	var ai_profiles := [AIProfile.aggressor(), AIProfile.rock(), AIProfile.ghost()]
 	for i in num_players:
-		players.append(Player.new(starting_chips))
+		var p := Player.new(starting_chips)
+		if i > 0:
+			p.profile = ai_profiles[i - 1]
+		players.append(p)
 	ante_amount = ante
 	round_num = 0
 	deck = Deck.new()

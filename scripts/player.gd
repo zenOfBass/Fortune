@@ -5,6 +5,7 @@ var hand: Array[Card] = []
 var chips: int = 0
 var folded: bool = false
 var has_page: bool = false  # tracks Page card for the win bonus rule
+var profile: AIProfile = null  # null for the human player
 
 func _init(starting_chips: int) -> void:
 	chips = starting_chips

@@ -27,6 +27,7 @@ var _shuffle_sfx: AudioStreamPlayer
 
 @onready var player_chips_label: Label = $PlayerArea/ChipsLabel
 @onready var player_hand: HandDisplay = $PlayerArea/HandDisplay
+@onready var hand_rank_label: Label = $PlayerArea/HandRankLabel
 
 # ---- Game log ----------------------------------------------------------------
 
@@ -37,6 +38,7 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var current_arcana: Control = $CurrentArcana
 @onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaThumb
 @onready var current_arcana_name: Label = $CurrentArcana/ArcanaNameLabel
+@onready var current_arcana_desc: Label = $CurrentArcana/ArcanaDescLabel
 @onready var latest_log_label: Label = $LatestLogLabel
 
 # ---- Action panels -----------------------------------------------------------
@@ -208,6 +210,7 @@ func _on_phase_changed(phase_name: String) -> void:
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
+	hand_rank_label.visible = (phase_name == "BET")
 	if not arcana_panel.is_interactive():
 		arcana_panel.visible = false
 	if phase_name == "ANTE":
@@ -218,6 +221,8 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana.visible = false
 		current_arcana_thumb.texture = null
 		current_arcana_name.text = ""
+		current_arcana_desc.text = ""
+		current_arcana_desc.visible = false
 
 func _on_cards_drawn(_player_idx: int, count: int) -> void:
 	_skip_flip = true
@@ -245,6 +250,10 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 				GameManager.round_state.inverted_values
 			)
 			player_hand.set_hand(hand, true, sort_order)
+			if not hand.is_empty():
+				var opts := GameManager.round_state.eval_options()
+				var score := HandEvaluator.score(hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
+				hand_rank_label.text = HandEvaluator.hand_type_name(score)
 		1: _set_ai_hand(ai1_hand, player_idx, hand)
 		2: _set_ai_hand(ai2_hand, player_idx, hand)
 		3: _set_ai_hand(ai3_hand, player_idx, hand)
@@ -273,6 +282,10 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
 
 func _label_for(pidx: int, chips: int) -> String:
 	var dealer := " (D)" if pidx == GameManager.dealer_idx else ""
+	if pidx != GameManager.HUMAN_IDX:
+		var profile: AIProfile = GameManager.players[pidx].profile
+		if profile:
+			return "AI %d (%s)%s: %d chips" % [pidx, profile.persona_name, dealer, chips]
 	return "%s%s: %d chips" % [GameManager._pname(pidx), dealer, chips]
 
 func _set_player_label(pidx: int, chips: int) -> void:
@@ -318,6 +331,8 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	var tex_path := MajorArcana.texture_path(arcana_id)
 	current_arcana_thumb.texture = load(tex_path) if ResourceLoader.exists(tex_path) else null
 	current_arcana_name.text = MajorArcana.arcana_name(arcana_id)
+	current_arcana_desc.text = MajorArcana.get_desc(arcana_id)
+	current_arcana_desc.visible = true
 	current_arcana.visible = true
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:

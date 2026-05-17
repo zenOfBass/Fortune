@@ -4,6 +4,7 @@ extends RefCounted
 static func bet(pidx: int, current_bet: int, can_check: bool,
 		already_contributed: int = 0, times_raised: int = 0, raises_so_far: int = 0) -> Array:
 	var gm := GameManager
+	var profile: AIProfile = gm.players[pidx].profile
 	var hand_score: int = HandEvaluator.score(
 		gm.players[pidx].hand,
 		gm.round_state.king_beats_ace,
@@ -12,15 +13,16 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 	)
 	var hand_type: float = hand_score / 1048576.0
 
-	var noise_mag: float = clamp(1.4 - (hand_type - 1.0) * 0.13, 0.2, 1.4)
+	var noise_base: float = clamp(1.4 - (hand_type - 1.0) * 0.13, 0.2, 1.4)
+	var noise_mag: float = noise_base * profile.noise_multiplier
 	var effective: float = clamp(hand_type + randf_range(-noise_mag, noise_mag), 0.0, 11.0)
 
-	var raise_threshold := 3.5
-	var fold_threshold  := 1.5
+	var raise_threshold := profile.raise_threshold
+	var fold_threshold  := profile.fold_threshold
 
 	if gm.active_players.size() == 2:
-		raise_threshold = 2.5
-		fold_threshold  = 0.5
+		raise_threshold -= 1.0
+		fold_threshold  -= 1.0
 		var total_chips: int = gm.players.reduce(func(s, p): return s + p.chips, 0)
 		if total_chips > 0 and float(gm.players[pidx].chips) / total_chips > 0.6:
 			raise_threshold -= 0.3
@@ -28,7 +30,7 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 	if hand_type >= 6.0:
 		effective = max(effective, raise_threshold + 0.1)
 
-	if not can_check and hand_type < 3.0 and randf() < 0.09:
+	if not can_check and hand_type < 3.0 and randf() < profile.bluff_chance:
 		effective = raise_threshold + 0.1
 
 	if gm.round_state.hanged_man_active and hand_type < 4.0 and effective >= fold_threshold:
@@ -36,7 +38,7 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 		var all_in_level := gm.players[pidx].chips + already_contributed
 		return ["raise", all_in_level]
 
-	var at_raise_cap := (times_raised >= 2 and hand_type < 6.0) or \
+	var at_raise_cap := (times_raised >= profile.raise_cap and hand_type < 6.0) or \
 						(raises_so_far >= 6 and hand_type < 8.0)
 
 	if effective >= raise_threshold and not at_raise_cap:
