@@ -808,19 +808,29 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 		round_state.fool_active
 	)
 	var hand_type: float = hand_score / 1048576.0  # 1.0 (high card) to 10.0 (royal flush)
-	var effective: float = clamp(hand_type + randf_range(-1.0, 1.0), 0.0, 11.0)
 
-	var raise_threshold := 4.5
+	# Noise shrinks as the hand gets stronger: weak hands play unpredictably,
+	# strong hands play their value consistently.
+	var noise_mag: float = clamp(1.4 - (hand_type - 1.0) * 0.13, 0.2, 1.4)
+	var effective: float = clamp(hand_type + randf_range(-noise_mag, noise_mag), 0.0, 11.0)
+
+	var raise_threshold := 3.5
 	var fold_threshold  := 1.5
 
 	if active_players.size() == 2:
-		# Heads-up: raise with any pair, almost never fold facing a small bet.
-		raise_threshold = 3.0
+		raise_threshold = 2.5
 		fold_threshold  = 0.5
-		# Press the advantage when sitting on a big chip lead.
 		var total_chips: int = players.reduce(func(s, p): return s + p.chips, 0)
 		if total_chips > 0 and float(players[pidx].chips) / total_chips > 0.6:
-			raise_threshold -= 0.5
+			raise_threshold -= 0.3
+
+	# Flush or better always raises — strong hands never leak value through noise.
+	if hand_type >= 6.0:
+		effective = max(effective, raise_threshold + 0.1)
+
+	# Occasional bluff-raise when facing a bet: weak hand, ~9% chance.
+	if not can_check and hand_type < 3.0 and randf() < 0.09:
+		effective = raise_threshold + 0.1
 
 	if effective >= raise_threshold:
 		var bump: int = max(1, int(current_bet * randf_range(0.4, 0.9))) if not round_state.raise_must_double \
@@ -881,11 +891,17 @@ func _ai_discard(pidx: int) -> Array[int]:
 				pair_result.append(i)
 		return pair_result
 
-	# High card: keep only the highest-ranked card.
-	var max_rank: int = rank_counts.keys().max()
+	# High card: keep the card with the best comparison value in the current context.
+	var best_cval := -1
+	var best_rank := -1
+	for c: Card in hand:
+		var cv := HandEvaluator._cmp(c.rank as int, round_state.king_beats_ace, round_state.inverted_values)
+		if cv > best_cval:
+			best_cval = cv
+			best_rank = c.rank as int
 	var result: Array[int] = []
 	for i in range(hand.size()):
-		if (hand[i].rank as int) != max_rank:
+		if (hand[i].rank as int) != best_rank:
 			result.append(i)
 	return result
 
