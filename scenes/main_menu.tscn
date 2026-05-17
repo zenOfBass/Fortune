@@ -68,6 +68,27 @@ value = 1.0
 
 [node name="Separator2" type="HSeparator" parent="VBox"]
 
+[node name="CardBackRow" type="HBoxContainer" parent="VBox"]
+
+[node name="CardBackLabel" type="Label" parent="VBox/CardBackRow"]
+text = "Card back:"
+size_flags_horizontal = 3
+
+[node name="Back0Btn" type="TextureButton" parent="VBox/CardBackRow"]
+custom_minimum_size = Vector2(54, 80)
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Back1Btn" type="TextureButton" parent="VBox/CardBackRow"]
+custom_minimum_size = Vector2(54, 80)
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Back2Btn" type="TextureButton" parent="VBox/CardBackRow"]
+custom_minimum_size = Vector2(54, 80)
+ignore_texture_size = true
+stretch_mode = 5
+
 [node name="ArcanaRow" type="HBoxContainer" parent="VBox"]
 
 [node name="ArcanaLabel" type="Label" parent="VBox/ArcanaRow"]

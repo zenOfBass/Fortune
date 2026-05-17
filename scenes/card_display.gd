@@ -18,12 +18,12 @@ func set_card(card: Card, face_up: bool) -> void:
 	if face_up:
 		texture = load(card.texture_path())
 	else:
-		texture = load("res://assets/cards/backs/back_of_card.png")
+		texture = load(SettingsManager.card_back_path())
 	_selected = false
 	modulate = Color.WHITE
 
 func set_back() -> void:
-	texture = load("res://assets/cards/backs/back_of_card.png")
+	texture = load(SettingsManager.card_back_path())
 	_selected = false
 	modulate = Color.WHITE
 
@@ -36,7 +36,7 @@ func animate_in(delay: float, flip: bool = false) -> void:
 		_tween.kill()
 	if flip and texture != null:
 		var face_tex := texture
-		texture = load("res://assets/cards/backs/back_of_card.png")
+		texture = load(SettingsManager.card_back_path())
 		_tween = create_tween()
 		_tween.tween_interval(delay)
 		_tween.tween_property(self, "scale:x", 0.0, 0.07)
