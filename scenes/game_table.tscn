@@ -12,6 +12,11 @@
 [ext_resource type="PackedScene" path="res://scenes/arcana/temperance_panel.tscn" id="10_temp"]
 [ext_resource type="PackedScene" path="res://scenes/arcana/judgement_panel.tscn" id="11_judg"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_log"]
+font_size = 14
+outline_size = 3
+outline_color = Color(0, 0, 0, 0.75)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panels"]
 bg_color = Color(0.08, 0.10, 0.18, 0.97)
 border_width_left = 2
@@ -169,6 +174,18 @@ size_flags_vertical = 3
 text = ""
 horizontal_alignment = 1
 size_flags_horizontal = 3
+
+[node name="LatestLogLabel" type="Label" parent="."]
+anchor_left = 0.22
+anchor_right = 0.78
+anchor_top = 0.62
+anchor_bottom = 0.71
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+label_settings = SubResource("LabelSettings_log")
+modulate = Color(1, 1, 1, 0)
 
 [node name="ArcanaPanel" parent="." instance=ExtResource("4_ap")]
 anchor_left = 0.30

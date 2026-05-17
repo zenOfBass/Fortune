@@ -37,6 +37,7 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var current_arcana: Control = $CurrentArcana
 @onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaThumb
 @onready var current_arcana_name: Label = $CurrentArcana/ArcanaNameLabel
+@onready var latest_log_label: Label = $LatestLogLabel
 
 # ---- Action panels -----------------------------------------------------------
 
@@ -68,6 +69,7 @@ var _shuffle_sfx: AudioStreamPlayer
 # ---- Setup -------------------------------------------------------------------
 
 var _game_over: bool = false
+var _log_tween: Tween = null
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -470,6 +472,15 @@ func _on_game_log(message: String) -> void:
 	print(message)
 	log_label.append_text(message + "\n")
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
+	_flash_latest_log(message)
+
+func _flash_latest_log(message: String) -> void:
+	if is_instance_valid(_log_tween):
+		_log_tween.kill()
+	_log_tween = create_tween()
+	_log_tween.tween_property(latest_log_label, "modulate:a", 0.0, 0.10)
+	_log_tween.tween_callback(func(): latest_log_label.text = message)
+	_log_tween.tween_property(latest_log_label, "modulate:a", 1.0, 0.20).set_ease(Tween.EASE_OUT)
 
 func _on_next_pressed() -> void:
 	get_tree().paused = false
