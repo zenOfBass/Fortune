@@ -217,6 +217,12 @@ func _on_phase_changed(phase_name: String) -> void:
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 	if not hand.is_empty():
 		_flip_sfx.play()
+	if GameManager.active_players.has(player_idx):
+		match player_idx:
+			0: player_hand.modulate = Color.WHITE
+			1: ai1_area.modulate = Color.WHITE
+			2: ai2_area.modulate = Color.WHITE
+			3: ai3_area.modulate = Color.WHITE
 	match player_idx:
 		0:
 			var sort_order := HandEvaluator.sort_order_for_display(
