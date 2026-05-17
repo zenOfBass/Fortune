@@ -808,12 +808,25 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool) -> Array:
 	)
 	var hand_type: float = hand_score / 1048576.0  # 1.0 (high card) to 10.0 (royal flush)
 	var effective: float = clamp(hand_type + randf_range(-1.0, 1.0), 0.0, 11.0)
-	if effective >= 4.5:
+
+	var raise_threshold := 4.5
+	var fold_threshold  := 1.5
+
+	if active_players.size() == 2:
+		# Heads-up: raise with any pair, almost never fold facing a small bet.
+		raise_threshold = 3.0
+		fold_threshold  = 0.5
+		# Press the advantage when sitting on a big chip lead.
+		var total_chips: int = players.reduce(func(s, p): return s + p.chips, 0)
+		if total_chips > 0 and float(players[pidx].chips) / total_chips > 0.6:
+			raise_threshold -= 0.5
+
+	if effective >= raise_threshold:
 		var bump: int = max(1, int(current_bet * randf_range(0.4, 0.9))) if not round_state.raise_must_double \
 						else max(1, current_bet)
 		var raise_to: int = min(current_bet + bump, players[pidx].chips + current_bet)
 		return ["raise", raise_to]
-	elif effective >= 1.5:
+	elif effective >= fold_threshold:
 		return ["check", 0] if can_check else ["call", 0]
 	elif can_check:
 		return ["check", 0]
