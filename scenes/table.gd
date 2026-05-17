@@ -426,6 +426,7 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	next_button.text = "Next Round"
 	_game_over = false
 	result_panel.visible = true
+	get_tree().paused = true
 
 func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
 	var player_name := "You" if winner_idx == 0 else "AI %d" % winner_idx
@@ -450,6 +451,7 @@ func _on_game_ended(final_chips: Array) -> void:
 	next_button.text = "Main Menu"
 	_game_over = true
 	result_panel.visible = true
+	get_tree().paused = true
 
 func _on_game_log(message: String) -> void:
 	print(message)
@@ -457,6 +459,7 @@ func _on_game_log(message: String) -> void:
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
 
 func _on_next_pressed() -> void:
+	get_tree().paused = false
 	result_panel.visible = false
 	if _game_over:
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
