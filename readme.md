@@ -1,6 +1,6 @@
 # Fortune
 
-A digital implementation of Fortune, a tarot-themed 5-card draw poker variant, built in Godot 4.x (GDScript).
+A digital implementation of Fortune, a tarot-themed 5-card draw poker variant, built in Godot 4.6 (GDScript).
 
 ## Running the Game
 
@@ -24,7 +24,9 @@ A digital implementation of Fortune, a tarot-themed 5-card draw poker variant, b
 - Page card rules (0-value, straight wrap, winner bonus, arcana trigger)
 - Dealer rotation with on-screen label
 - Automatic hand sorting by suit then rank
-- Game log with round numbers, chip standings, pot sizes, card names at showdown, and draw details
+- Game log panel with round numbers, chip standings, pot sizes, card names at showdown, and draw details
+- Card deal animations: flip reveal for the player's hand, staggered pop-in for AI hands
+- Sound effects for card flip and shuffle
 - Bust/elimination announcements
 - Game-over screen with final standings
 
