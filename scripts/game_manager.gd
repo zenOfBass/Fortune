@@ -371,6 +371,7 @@ func _phase_showdown() -> void:
 
 	if round_state.sun_end:
 		game_log.emit("The Sun splits the pot equally.")
+		await get_tree().create_timer(1.5).timeout
 		@warning_ignore("integer_division")
 		var share := pot / active_players.size()
 		for pidx in active_players:

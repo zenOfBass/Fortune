@@ -39,7 +39,7 @@ const DATA: Array = [
 const TEXTURE_FILE: Array = [
 	"the_fool", "magician", "priestess", "empress", "emperor", "hierophant",
 	"the_lovers", "chariot", "strength", "the_hermit", "wheel_of_fortune", "justice",
-	"the_hanged_man", "death", "temperance", "the_devil", "the_tower", "the_star",
+	"hanged_man", "death", "temperance", "the_devil", "the_tower", "the_star",
 	"the_moon", "the_sun", "judgement", "the_world",
 ]
 
