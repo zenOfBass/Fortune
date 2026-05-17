@@ -138,15 +138,7 @@ func _ready() -> void:
 
 func _layout_ai_areas(num_players: int) -> void:
 	var vp := get_viewport_rect().size
-	var gl: PanelContainer = $GameLog
-	if num_players == 4:
-		gl.visible = false
-	else:
-		gl.visible = true
-		gl.anchor_top = 0.0
-		gl.anchor_bottom = 0.5
-		gl.offset_top = 5.0
-		gl.offset_bottom = -5.0
+	$GameLog.visible = false
 	match num_players:
 		2:
 			ai1_area.visible = true
@@ -154,8 +146,8 @@ func _layout_ai_areas(num_players: int) -> void:
 		3:
 			ai1_area.visible = true
 			ai2_area.visible = true
-			_anchor_area(ai1_area, 0.22, 0.06, 0.5, 0.36)
-			_anchor_area(ai2_area, 0.5, 0.06, 0.78, 0.36)
+			_place_side(ai1_area, vp, true)
+			_place_side(ai2_area, vp, false)
 		4:
 			ai1_area.visible = true
 			ai2_area.visible = true
