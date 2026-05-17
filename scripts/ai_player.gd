@@ -62,6 +62,7 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 static func discard(pidx: int) -> Array[int]:
 	var gm := GameManager
 	var hand := gm.players[pidx].hand
+	var fool_active: bool = gm.round_state.fool_active
 	var rank_counts: Dictionary = {}
 	var suit_counts: Dictionary = {}
 	for c: Card in hand:
@@ -74,7 +75,9 @@ static func discard(pidx: int) -> Array[int]:
 		return []
 
 	var max_suit: int = suit_counts.values().max() if not suit_counts.is_empty() else 0
-	if max_suit >= 4:
+	# With wild, 3 suited cards is a strong flush draw (wild can match any suit).
+	var flush_threshold := 3 if fool_active else 4
+	if max_suit >= flush_threshold:
 		var flush_suit := -1
 		for s in suit_counts:
 			if suit_counts[s] == max_suit:
@@ -86,7 +89,8 @@ static func discard(pidx: int) -> Array[int]:
 				flush_result.append(i)
 		return flush_result
 
-	if hand.size() == 5:
+	# Wild takes highest not present, not a gap-filler, so straight draws are unreliable.
+	if hand.size() == 5 and not fool_active:
 		var skip_idx := four_straight_discard(hand)
 		if skip_idx >= 0:
 			return [skip_idx]
