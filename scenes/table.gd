@@ -119,21 +119,38 @@ func _ready() -> void:
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.game_log.connect(_on_game_log)
 
+	bet_panel.anchor_top = 1.0
+	bet_panel.anchor_bottom = 1.0
+	bet_panel.offset_top = -95.0
+	bet_panel.offset_bottom = -5.0
+	draw_panel.anchor_top = 1.0
+	draw_panel.anchor_bottom = 1.0
+	draw_panel.offset_top = -95.0
+	draw_panel.offset_bottom = -5.0
 	GameManager.start_game()
 
 # ---- Layout ------------------------------------------------------------------
 
 func _layout_ai_areas(num_players: int) -> void:
 	var vp := get_viewport_rect().size
+	var gl: PanelContainer = $GameLog
+	if num_players == 4:
+		gl.visible = false
+	else:
+		gl.visible = true
+		gl.anchor_top = 0.0
+		gl.anchor_bottom = 0.5
+		gl.offset_top = 5.0
+		gl.offset_bottom = -5.0
 	match num_players:
 		2:
 			ai1_area.visible = true
-			_anchor_area(ai1_area, 0.2, 0.06, 0.8, 0.36)
+			_anchor_area(ai1_area, 0.22, 0.06, 0.78, 0.36)
 		3:
 			ai1_area.visible = true
 			ai2_area.visible = true
-			_anchor_area(ai1_area, 0.02, 0.06, 0.5, 0.36)
-			_anchor_area(ai2_area, 0.5, 0.06, 0.98, 0.36)
+			_anchor_area(ai1_area, 0.22, 0.06, 0.5, 0.36)
+			_anchor_area(ai2_area, 0.5, 0.06, 0.78, 0.36)
 		4:
 			ai1_area.visible = true
 			ai2_area.visible = true
