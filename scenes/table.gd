@@ -70,7 +70,6 @@ var _shuffle_sfx: AudioStreamPlayer
 
 # ---- Setup -------------------------------------------------------------------
 
-var _game_over: bool = false
 var _log_tween: Tween = null
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
@@ -102,7 +101,6 @@ func _ready() -> void:
 	judgement_panel.visible = false
 
 	confirm_button.pressed.connect(_on_confirm_discard)
-	next_button.pressed.connect(_on_next_pressed)
 	resume_button.pressed.connect(_on_resume_pressed)
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	chariot_panel.confirmed.connect(_on_chariot_confirmed)
@@ -332,13 +330,14 @@ func _hide_all_overlays() -> void:
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
-	arcana_panel.show_arcana(arcana_id)
 	var tex_path := MajorArcana.texture_path(arcana_id)
 	current_arcana_thumb.texture = load(tex_path) if ResourceLoader.exists(tex_path) else null
 	current_arcana_name.text = MajorArcana.arcana_name(arcana_id)
 	current_arcana_desc.text = MajorArcana.get_desc(arcana_id)
 	current_arcana_desc.visible = true
 	current_arcana.visible = true
+	await get_tree().create_timer(1.5).timeout
+	GameManager.complete_arcana_effect()
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:
 	phase_label.text = "Hierophant cancelled: " + MajorArcana.arcana_name(cancelled_id)
@@ -387,7 +386,8 @@ func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 			moon_panel.show_swap(secret, pname)
 			player_hand.set_selectable(true, 1)
 	else:
-		arcana_panel.show_interactive(arcana_id)
+		await get_tree().create_timer(1.0).timeout
+		GameManager.complete_arcana_effect()
 
 func _on_priestess_confirmed() -> void:
 	var selected := player_hand.get_selected_indices()
@@ -475,23 +475,21 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
-	var msg := ""
+	var parts: Array = []
 	if split and hand_names.is_empty():
-		msg = "Split pot! (equal share)"
+		parts.append("Split pot!")
 	else:
-		if split:
-			msg = "Split pot!\n"
 		for i in winner_indices.size():
 			var w: int = winner_indices[i]
 			var player_name := "You" if w == 0 else "AI %d" % w
 			var hand_name: String = hand_names[i] if i < hand_names.size() else ""
 			var verb := "win" if w == 0 else "wins"
-			msg += "%s %s with %s\n" % [player_name, verb, hand_name]
-	result_label.text = msg.strip_edges()
-	next_button.text = "Next Round"
-	_game_over = false
-	result_panel.visible = true
-	get_tree().paused = true
+			parts.append("%s %s with %s" % [player_name, verb, hand_name])
+		if split:
+			parts.insert(0, "Split pot!")
+	phase_label.text = " | ".join(parts)
+	await get_tree().create_timer(4.0).timeout
+	GameManager.confirm_next_round()
 
 func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
 	var player_name := "You" if winner_idx == 0 else "AI %d" % winner_idx
@@ -506,17 +504,15 @@ func _on_game_ended(final_chips: Array) -> void:
 			winners.append("You" if i == 0 else "AI %d" % i)
 	var header := "%s wins!" % " & ".join(winners) if winners.size() < final_chips.size() \
 		else "It's a tie!"
+	phase_label.text = "Game Over — " + header
 	var standings: Array = range(final_chips.size())
 	standings.sort_custom(func(a, b): return final_chips[a] > final_chips[b])
-	var lines := header + "\n\nFinal standings:\n"
 	for i in standings:
-		var player_name := "You" if i == 0 else "AI %d" % i
-		lines += "%s: %d chips\n" % [player_name, final_chips[i]]
-	result_label.text = lines.strip_edges()
-	next_button.text = "Main Menu"
-	_game_over = true
-	result_panel.visible = true
-	get_tree().paused = true
+		var pname := "You" if i == 0 else "AI %d" % i
+		log_label.append_text("%s: %d chips\n" % [pname, final_chips[i]])
+	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
+	await get_tree().create_timer(5.0).timeout
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _on_game_log(message: String) -> void:
 	print(message)
@@ -531,14 +527,6 @@ func _flash_latest_log(message: String) -> void:
 	_log_tween.tween_property(latest_log_label, "modulate:a", 0.0, 0.10)
 	_log_tween.tween_callback(func(): latest_log_label.text = message)
 	_log_tween.tween_property(latest_log_label, "modulate:a", 1.0, 0.20).set_ease(Tween.EASE_OUT)
-
-func _on_next_pressed() -> void:
-	get_tree().paused = false
-	result_panel.visible = false
-	if _game_over:
-		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
-	else:
-		GameManager.confirm_next_round()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
