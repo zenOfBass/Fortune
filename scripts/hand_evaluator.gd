@@ -2,6 +2,7 @@ class_name HandEvaluator
 extends RefCounted
 
 # Hand type constants — higher integer = better hand.
+const FIVE_OF_A_KIND  := 11
 const ROYAL_FLUSH     := 10
 const STRAIGHT_FLUSH  := 9
 const FOUR_OF_A_KIND  := 8
@@ -68,6 +69,10 @@ static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool,
 			return ROYAL_FLUSH * _b5()  # all Royal Flushes tie
 		return _pack(STRAIGHT_FLUSH, [high, 0, 0, 0, 0])
 
+	# ---- Five of a Kind -------------------------------------------------------
+	if cnt_vals[0] == 5:
+		return _pack(FIVE_OF_A_KIND, [_first_with_count(counts, 5), 0, 0, 0, 0])
+
 	# ---- Four of a Kind -------------------------------------------------------
 	if cnt_vals[0] == 4:
 		return _pack(FOUR_OF_A_KIND, [
@@ -107,20 +112,32 @@ static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool,
 	return _pack(HIGH_CARD, sorted_cvals)
 
 
-# Tries every rank/suit substitution for each hand position and returns the best score.
+# For each card position treated as wild, the wild takes the highest rank
+# (by comparison value under active modifiers) not already held in the other
+# four cards, plus whichever suit scores best. Returns the highest score found.
 static func _best_wild_score(raw: Array[int], suits: Array[int], king_beats_ace: bool, inverted_values: bool) -> int:
 	var best: int = _score_raw(raw, suits, king_beats_ace, inverted_values)
-	var wild_ranks: Array[int] = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+	var rank_order: Array[int] = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+	rank_order.sort_custom(func(a, b):
+		return _cmp(a, king_beats_ace, inverted_values) > _cmp(b, king_beats_ace, inverted_values))
 	for i in range(raw.size()):
-		for r: int in wild_ranks:
-			for s in range(4):
-				var test_raw: Array[int] = raw.duplicate()
-				var test_suits: Array[int] = suits.duplicate()
-				test_raw[i] = r
-				test_suits[i] = s
-				var candidate: int = _score_raw(test_raw, test_suits, king_beats_ace, inverted_values)
-				if candidate > best:
-					best = candidate
+		var others: Dictionary = {}
+		for j in range(raw.size()):
+			if j != i:
+				others[raw[j]] = true
+		var wild_rank := -1
+		for r in rank_order:
+			if not others.has(r):
+				wild_rank = r
+				break
+		for s in range(4):
+			var test_raw := raw.duplicate()
+			var test_suits := suits.duplicate()
+			test_raw[i] = wild_rank
+			test_suits[i] = s
+			var candidate := _score_raw(test_raw, test_suits, king_beats_ace, inverted_values)
+			if candidate > best:
+				best = candidate
 	return best
 
 
@@ -128,6 +145,7 @@ static func _best_wild_score(raw: Array[int], suits: Array[int], king_beats_ace:
 static func hand_type_name(hand_score: int) -> String:
 	@warning_ignore("integer_division")
 	match hand_score / _b5():
+		11: return "Five of a Kind"
 		10: return "Royal Flush"
 		9:  return "Straight Flush"
 		8:  return "Four of a Kind"
