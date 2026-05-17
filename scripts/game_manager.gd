@@ -267,7 +267,8 @@ func _phase_bet(g: int) -> void:
 				var paid   := players[pidx].bet(to_pay)
 				contributed[pidx] = contributed.get(pidx, 0) + paid
 				_add_to_pot(paid, pidx)
-				game_log.emit("%s calls %d." % [_pname(pidx), paid])
+				var call_suffix := " (all in)" if players[pidx].chips == 0 else ""
+				game_log.emit("%s calls %d.%s" % [_pname(pidx), paid, call_suffix])
 				player_bet_changed.emit(pidx, contributed[pidx])
 
 			"raise":
@@ -280,7 +281,8 @@ func _phase_bet(g: int) -> void:
 					raise_to = contributed[pidx]  # cap to what was actually paid
 					player_bet_changed.emit(pidx, contributed[pidx])
 				_current_bet = max(_current_bet, raise_to)
-				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
+				var raise_suffix := " (all in)" if players[pidx].chips == 0 else ""
+				game_log.emit("%s raises to %d.%s" % [_pname(pidx), _current_bet, raise_suffix])
 				player_raises[pidx] = player_raises.get(pidx, 0) + 1
 				raise_count += 1
 				# Re-queue in seat order starting left of the raiser.
