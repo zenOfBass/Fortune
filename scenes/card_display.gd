@@ -26,6 +26,24 @@ func set_back() -> void:
 	_selected = false
 	modulate = Color.WHITE
 
+func animate_in(delay: float, flip: bool = false) -> void:
+	if flip and texture != null:
+		var face_tex := texture
+		texture = load("res://assets/cards/backs/back_of_card.png")
+		var tween := create_tween()
+		tween.tween_interval(delay)
+		tween.tween_property(self, "scale:x", 0.0, 0.07)
+		tween.tween_callback(func(): texture = face_tex)
+		tween.tween_property(self, "scale:x", 1.0, 0.07)
+	else:
+		scale = Vector2(0.8, 0.8)
+		modulate.a = 0.0
+		var tween := create_tween()
+		tween.tween_interval(delay)
+		tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.12) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tween.parallel().tween_property(self, "modulate:a", 1.0, 0.10)
+
 func set_selectable(selectable: bool) -> void:
 	_selectable = selectable
 	mouse_filter = MOUSE_FILTER_STOP if selectable else MOUSE_FILTER_PASS

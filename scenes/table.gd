@@ -119,6 +119,11 @@ func _ready() -> void:
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.game_log.connect(_on_game_log)
 
+	current_arcana_thumb.custom_minimum_size = Vector2(80, 120)
+	current_arcana_thumb.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+	current_arcana_thumb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	current_arcana_thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
 	bet_panel.anchor_top = 1.0
 	bet_panel.anchor_bottom = 1.0
 	bet_panel.offset_top = -95.0

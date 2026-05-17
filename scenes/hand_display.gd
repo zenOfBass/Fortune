@@ -14,13 +14,15 @@ func set_hand(hand: Array, face_up: bool) -> void:
 		display.card_index = i
 		display.set_card(hand[i] as Card, face_up)
 		display.card_toggled.connect(_on_child_toggled)
+		display.animate_in(i * 0.12, face_up)
 
 func set_back_count(count: int) -> void:
 	_clear()
-	for _i in count:
+	for i in count:
 		var display: CardDisplayGD = CardDisplayScene.instantiate()
 		add_child(display)
 		display.set_back()
+		display.animate_in(i * 0.10)
 
 func set_selectable(selectable: bool, max_select: int = 0) -> void:
 	_max_select = max_select
@@ -34,11 +36,13 @@ func set_hand_mixed(hand: Array, face_up_indices: Array) -> void:
 		var display: CardDisplayGD = CardDisplayScene.instantiate()
 		add_child(display)
 		display.card_index = i
-		if i in face_up_indices:
+		var is_face_up := i in face_up_indices
+		if is_face_up:
 			display.set_card(hand[i] as Card, true)
 		else:
 			display.set_back()
 		display.card_toggled.connect(_on_child_toggled)
+		display.animate_in(i * 0.12, is_face_up)
 
 func _on_child_toggled(index: int, selected: bool) -> void:
 	if _max_select <= 0 or not selected:
