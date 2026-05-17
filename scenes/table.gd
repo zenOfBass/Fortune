@@ -59,6 +59,12 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var result_label: Label = $ResultPanel/VBox/ResultLabel
 @onready var next_button: Button = $ResultPanel/VBox/NextButton
 
+# ---- Pause panel -------------------------------------------------------------
+
+@onready var pause_panel: PanelContainer = $PausePanel
+@onready var resume_button: Button = $PausePanel/VBox/ResumeButton
+@onready var main_menu_button: Button = $PausePanel/VBox/MainMenuButton
+
 # ---- Setup -------------------------------------------------------------------
 
 var _game_over: bool = false
@@ -91,6 +97,8 @@ func _ready() -> void:
 
 	confirm_button.pressed.connect(_on_confirm_discard)
 	next_button.pressed.connect(_on_next_pressed)
+	resume_button.pressed.connect(_on_resume_pressed)
+	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	chariot_panel.confirmed.connect(_on_chariot_confirmed)
 	star_panel.swap_chosen.connect(_on_star_swap)
 	star_panel.pass_chosen.connect(_on_star_pass)
@@ -452,3 +460,19 @@ func _on_next_pressed() -> void:
 	result_panel.visible = false
 	if _game_over:
 		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		_toggle_pause()
+
+func _toggle_pause() -> void:
+	var pausing := not pause_panel.visible
+	pause_panel.visible = pausing
+	get_tree().paused = pausing
+
+func _on_resume_pressed() -> void:
+	_toggle_pause()
+
+func _on_main_menu_pressed() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
