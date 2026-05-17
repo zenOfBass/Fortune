@@ -70,6 +70,7 @@ var _shuffle_sfx: AudioStreamPlayer
 
 var _game_over: bool = false
 var _log_tween: Tween = null
+var _skip_flip := false
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -124,6 +125,7 @@ func _ready() -> void:
 	GameManager.bet_input_needed.connect(_on_bet_input_needed)
 	GameManager.discard_input_needed.connect(_on_discard_input_needed)
 	GameManager.arcana_choice_needed.connect(_on_arcana_choice_needed)
+	GameManager.cards_drawn.connect(_on_cards_drawn)
 	GameManager.player_hand_revealed.connect(_on_player_hand_revealed)
 	GameManager.round_ended.connect(_on_round_ended)
 	GameManager.page_bonus.connect(_on_page_bonus)
@@ -217,8 +219,17 @@ func _on_phase_changed(phase_name: String) -> void:
 		current_arcana_thumb.texture = null
 		current_arcana_name.text = ""
 
+func _on_cards_drawn(_player_idx: int, count: int) -> void:
+	_skip_flip = true
+	_flip_sfx.play()
+	for i in range(1, count):
+		await get_tree().create_timer(0.15).timeout
+		_flip_sfx.play()
+
 func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
-	if not hand.is_empty():
+	if _skip_flip:
+		_skip_flip = false
+	elif not hand.is_empty():
 		_flip_sfx.play()
 	if GameManager.active_players.has(player_idx):
 		match player_idx:

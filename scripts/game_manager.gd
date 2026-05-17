@@ -5,6 +5,7 @@ extends Node
 signal phase_changed(phase_name: String)
 
 signal player_hand_updated(player_idx: int, hand: Array)
+signal cards_drawn(player_idx: int, count: int)
 signal player_chips_changed(player_idx: int, chips: int)
 signal player_folded(player_idx: int)
 
@@ -203,6 +204,9 @@ func _phase_bet(g: int) -> void:
 
 	# acted[pidx] = true once the player has taken any action this round.
 	var acted: Dictionary = {}
+	# Per-player raise count and total raise count for this phase.
+	var player_raises: Dictionary = {}
+	var raise_count := 0
 
 	# Betting order starts left of dealer.
 	var queue: Array[int] = _act_order_from(dealer_idx)
@@ -236,7 +240,7 @@ func _phase_bet(g: int) -> void:
 		else:
 			await _ai_think()
 			if g != _game_gen: return
-			var r := _ai_bet(pidx, _current_bet, can_check, contributed.get(pidx, 0))
+			var r := _ai_bet(pidx, _current_bet, can_check, contributed.get(pidx, 0), player_raises.get(pidx, 0), raise_count)
 			action = r[0]; amount = r[1]
 
 		acted[pidx] = true
@@ -270,6 +274,8 @@ func _phase_bet(g: int) -> void:
 					raise_to = contributed[pidx]  # cap to what was actually paid
 				_current_bet = max(_current_bet, raise_to)
 				game_log.emit("%s raises to %d." % [_pname(pidx), _current_bet])
+				player_raises[pidx] = player_raises.get(pidx, 0) + 1
+				raise_count += 1
 				# Re-queue in seat order starting left of the raiser.
 				for other in _act_order_from(pidx):
 					if other != pidx and contributed.get(other, 0) < _current_bet:
@@ -407,8 +413,21 @@ func _phase_showdown(g: int) -> void:
 	game_log.emit("--- Showdown (pot: %d) ---" % pot)
 
 	if active_players.size() == 1:
-		game_log.emit("%s wins %d uncontested." % [_pname(active_players[0]), pot])
+		var solo := active_players[0]
+		game_log.emit("%s wins %d uncontested." % [_pname(solo), pot])
 		_award_pot(active_players)
+		round_ended.emit([solo], [], false)
+		if players[solo].has_page:
+			var bonus_total := 0
+			for pidx in range(players.size()):
+				if pidx != solo and players[pidx].chips >= ante_amount:
+					var paid := players[pidx].bet(ante_amount)
+					bonus_total += paid
+					player_chips_changed.emit(pidx, players[pidx].chips)
+			players[solo].receive_chips(bonus_total)
+			player_chips_changed.emit(solo, players[solo].chips)
+			page_bonus.emit(solo, ante_amount)
+			game_log.emit("%s collects the Page bonus: +%d from each player!" % [_pname(solo), ante_amount])
 		return
 
 	if round_state.sun_end:
@@ -831,14 +850,15 @@ func _add_to_pot(amount: int, pidx: int) -> void:
 func _do_discard(pidx: int, indices: Array) -> void:
 	if indices.is_empty():
 		game_log.emit("%s keeps their hand." % _pname(pidx))
-	else:
-		game_log.emit("%s discards %d card(s)." % [_pname(pidx), indices.size()])
+		return
+	game_log.emit("%s discards %d card(s)." % [_pname(pidx), indices.size()])
 	var discarded := players[pidx].discard_at(indices)
 	deck.add_cards(discarded)
 	var new_cards := deck.deal_many(discarded.size())
 	players[pidx].receive_cards(new_cards)
+	cards_drawn.emit(pidx, new_cards.size())
 	player_hand_updated.emit(pidx, players[pidx].hand)
-	if pidx == HUMAN_IDX and not indices.is_empty():
+	if pidx == HUMAN_IDX:
 		var disc_names := ", ".join(discarded.map(func(c: Card): return c.display_name()))
 		var drawn_names := ", ".join(new_cards.map(func(c: Card): return c.display_name()))
 		game_log.emit("Discarded: %s" % disc_names)
@@ -870,7 +890,7 @@ func _only_one_solvent() -> bool:
 
 # ---- AI ----------------------------------------------------------------------
 
-func _ai_bet(pidx: int, current_bet: int, can_check: bool, already_contributed: int = 0) -> Array:
+func _ai_bet(pidx: int, current_bet: int, can_check: bool, already_contributed: int = 0, times_raised: int = 0, raises_so_far: int = 0) -> Array:
 	var hand_score: int = HandEvaluator.score(
 		players[pidx].hand,
 		round_state.king_beats_ace,
@@ -909,9 +929,16 @@ func _ai_bet(pidx: int, current_bet: int, can_check: bool, already_contributed: 
 		var all_in_level := players[pidx].chips + already_contributed
 		return ["raise", all_in_level]
 
-	if effective >= raise_threshold:
+	# Raise cap: after this player has raised twice (or the round has seen 6+ raises),
+	# switch to call unless holding flush or better — prevents runaway escalation.
+	var at_raise_cap := (times_raised >= 2 and hand_type < 6.0) or \
+						(raises_so_far >= 6 and hand_type < 8.0)
+
+	if effective >= raise_threshold and not at_raise_cap:
 		var all_in_level := players[pidx].chips + already_contributed
-		var bump: int = max(1, int(current_bet * randf_range(0.4, 0.9))) if not round_state.raise_must_double \
+		var max_bump: int = max(2, ante_amount * 4)
+		var bump: int = min(max(1, int(current_bet * randf_range(0.4, 0.9))), max_bump) \
+						if not round_state.raise_must_double \
 						else max(1, current_bet)
 		var raise_to: int = min(current_bet + bump, all_in_level)
 		return ["raise", raise_to]
