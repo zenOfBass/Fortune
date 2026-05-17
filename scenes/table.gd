@@ -56,12 +56,6 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var temperance_panel = $TemperancePanel
 @onready var judgement_panel = $JudgementPanel
 
-# ---- Result panel ------------------------------------------------------------
-
-@onready var result_panel: PanelContainer = $ResultPanel
-@onready var result_label: Label = $ResultPanel/VBox/ResultLabel
-@onready var next_button: Button = $ResultPanel/VBox/NextButton
-
 # ---- Pause panel -------------------------------------------------------------
 
 @onready var pause_panel: PanelContainer = $PausePanel
@@ -319,7 +313,6 @@ func _on_pot_changed(new_amount: int) -> void:
 
 func _hide_all_overlays() -> void:
 	arcana_panel.visible = false
-	result_panel.visible = false
 	chariot_panel.visible = false
 	star_panel.visible = false
 	magician_panel.visible = false
@@ -357,29 +350,29 @@ func _on_discard_input_needed(_player_idx: int) -> void:
 func _on_arcana_choice_needed(player_idx: int, arcana_id: int) -> void:
 	_hide_all_overlays()
 	if arcana_id == 7:
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		chariot_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
 	elif arcana_id == 17:
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		star_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
 	elif arcana_id == 1:
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		magician_panel.show_for_player(pname)
 	elif arcana_id == 2:
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		priestess_panel.show_for_player(pname)
 		player_hand.set_selectable(true, 1)
 	elif arcana_id == 20:
 		judgement_panel.show_for_player("You", GameManager.ante_amount)
 	elif arcana_id == 14:
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		temperance_panel.show_for_player(pname, GameManager.round_state.temperance_flop)
 		player_hand.set_selectable(true, 1)
 	elif arcana_id == 18:
 		var secret: Card = GameManager.round_state.moon_secret.get(player_idx)
-		var pname := "You" if player_idx == GameManager.HUMAN_IDX else "AI %d" % player_idx
+		var pname := GameManager._pname(player_idx)
 		if not GameManager.round_state.moon_reveal_done:
 			moon_panel.show_reveal(secret, pname)
 		else:
@@ -481,7 +474,7 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	else:
 		for i in winner_indices.size():
 			var w: int = winner_indices[i]
-			var player_name := "You" if w == 0 else "AI %d" % w
+			var player_name := GameManager._pname(w)
 			var hand_name: String = hand_names[i] if i < hand_names.size() else ""
 			var verb := "win" if w == 0 else "wins"
 			parts.append("%s %s with %s" % [player_name, verb, hand_name])
@@ -492,7 +485,7 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	GameManager.confirm_next_round()
 
 func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
-	var player_name := "You" if winner_idx == 0 else "AI %d" % winner_idx
+	var player_name := GameManager._pname(winner_idx)
 	phase_label.text = "%s gets Page bonus: +%d per player!" % [player_name, bonus_per_player]
 
 func _on_game_ended(final_chips: Array) -> void:
@@ -501,14 +494,14 @@ func _on_game_ended(final_chips: Array) -> void:
 	var winners: Array = []
 	for i in final_chips.size():
 		if final_chips[i] == max_chips:
-			winners.append("You" if i == 0 else "AI %d" % i)
+			winners.append(GameManager._pname(i))
 	var header := "%s wins!" % " & ".join(winners) if winners.size() < final_chips.size() \
 		else "It's a tie!"
 	phase_label.text = "Game Over — " + header
 	var standings: Array = range(final_chips.size())
 	standings.sort_custom(func(a, b): return final_chips[a] > final_chips[b])
 	for i in standings:
-		var pname := "You" if i == 0 else "AI %d" % i
+		var pname := GameManager._pname(i)
 		log_label.append_text("%s: %d chips\n" % [pname, final_chips[i]])
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
 	await get_tree().create_timer(5.0).timeout
