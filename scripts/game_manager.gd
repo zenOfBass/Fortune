@@ -257,7 +257,7 @@ func _phase_bet() -> void:
 						if not queue.has(other):
 							queue.append(other)
 
-		if round_state.death_end or round_state.sun_end:
+		if round_state.death_end:
 			return
 
 	if round_state.no_forced_min_bet:
