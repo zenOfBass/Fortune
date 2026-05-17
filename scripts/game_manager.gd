@@ -47,6 +47,7 @@ var pot:            int = 0
 var ante_amount:    int = 1
 var last_round:     bool = false
 var round_num:      int = 0
+var _game_gen: int = 0          # incremented by setup_game(); stale coroutines self-exit on mismatch
 var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
 var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
 var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (Temperance)
@@ -56,6 +57,7 @@ const HUMAN_IDX := 0  # player 0 is always the human
 # ---- Public API (called by the game setup scene) -----------------------------
 
 func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int = -1) -> void:
+	_game_gen += 1  # invalidate any coroutine from a previous game
 	debug_arcana_id = arcana_id
 	last_round = false
 	players.clear()
@@ -70,12 +72,15 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	round_state = RoundState.new()
 
 func start_game() -> void:
+	var g := _game_gen
 	game_log.emit("=== Game start — ante: %d, players: %d ===" % [ante_amount, players.size()])
 	while true:
-		await _run_round()
+		await _run_round(g)
+		if g != _game_gen: return
 		if last_round or _only_one_solvent():
 			break
 		await _round_advance_ready
+		if g != _game_gen: return
 	var chips: Array = []
 	for p in players:
 		chips.append(p.chips)
@@ -83,7 +88,7 @@ func start_game() -> void:
 
 # ---- Round loop --------------------------------------------------------------
 
-func _run_round() -> void:
+func _run_round(g: int) -> void:
 	# Carry over Hierophant state between rounds.
 	var hierophant_carry := round_state.hierophant_active
 	round_state = RoundState.new()
@@ -108,36 +113,46 @@ func _run_round() -> void:
 	dealer_idx = (dealer_idx + 1) % players.size()
 
 	_phase_ante()
-	await _phase_deal()
+	await _phase_deal(g)
+	if g != _game_gen: return
 
 	if round_state.death_end:
 		if not round_state.moon_secret.is_empty():
-			await _phase_moon_swap()
+			await _phase_moon_swap(g)
+			if g != _game_gen: return
 		if round_state.judgement_active:
-			await _phase_judgement_reentry()
-		await _phase_showdown()
+			await _phase_judgement_reentry(g)
+			if g != _game_gen: return
+		await _phase_showdown(g)
 		return
 
-	await _phase_bet()
+	await _phase_bet(g)
+	if g != _game_gen: return
 
 	if round_state.death_end or active_players.size() <= 1:
 		if not round_state.moon_secret.is_empty():
-			await _phase_moon_swap()
+			await _phase_moon_swap(g)
+			if g != _game_gen: return
 		if round_state.judgement_active:
-			await _phase_judgement_reentry()
-		await _phase_showdown()
+			await _phase_judgement_reentry(g)
+			if g != _game_gen: return
+		await _phase_showdown(g)
 		return
 
 	if not round_state.skip_draw:
-		await _phase_draw()
+		await _phase_draw(g)
+		if g != _game_gen: return
 
-	await _phase_bet()
+	await _phase_bet(g)
+	if g != _game_gen: return
 
 	if not round_state.moon_secret.is_empty():
-		await _phase_moon_swap()
+		await _phase_moon_swap(g)
+		if g != _game_gen: return
 	if round_state.judgement_active:
-		await _phase_judgement_reentry()
-	await _phase_showdown()
+		await _phase_judgement_reentry(g)
+		if g != _game_gen: return
+	await _phase_showdown(g)
 
 # ---- Phase: Ante -------------------------------------------------------------
 
@@ -155,7 +170,7 @@ func _phase_ante() -> void:
 
 # ---- Phase: Deal -------------------------------------------------------------
 
-func _phase_deal() -> void:
+func _phase_deal(g: int) -> void:
 	phase_changed.emit("DEAL")
 	for pidx in active_players:
 		players[pidx].receive_cards(deck.deal_many(5))
@@ -164,14 +179,14 @@ func _phase_deal() -> void:
 
 	if not round_state.arcana_drawn:
 		if debug_arcana_id >= 0:
-			await _draw_arcana()
+			await _draw_arcana(g)
 		elif players[dealer_idx].has_page:
 			game_log.emit("%s holds the Page — drawing arcana..." % _pname(dealer_idx))
-			await _draw_arcana()
+			await _draw_arcana(g)
 
 # ---- Phase: Bet --------------------------------------------------------------
 
-func _phase_bet() -> void:
+func _phase_bet(g: int) -> void:
 	phase_changed.emit("BET")
 	if active_players.size() <= 1:
 		return
@@ -216,9 +231,11 @@ func _phase_bet() -> void:
 		if pidx == HUMAN_IDX:
 			bet_input_needed.emit(pidx, _current_bet, can_check, min_raise)
 			var r = await _bet_ready
+			if g != _game_gen: return
 			action = r[0]; amount = r[1]
 		else:
 			await _ai_think()
+			if g != _game_gen: return
 			var r := _ai_bet(pidx, _current_bet, can_check, contributed.get(pidx, 0))
 			action = r[0]; amount = r[1]
 
@@ -277,21 +294,23 @@ func _phase_bet() -> void:
 
 # ---- Phase: Draw -------------------------------------------------------------
 
-func _phase_draw() -> void:
+func _phase_draw(g: int) -> void:
 	phase_changed.emit("DRAW")
 	game_log.emit("--- Draw phase ---")
 	for pidx in active_players:
 		if pidx == HUMAN_IDX:
 			discard_input_needed.emit(pidx)
 			var indices: Array = await _discard_ready
+			if g != _game_gen: return
 			_do_discard(pidx, indices)
 		else:
 			await _ai_think()
+			if g != _game_gen: return
 			_do_discard(pidx, _ai_discard(pidx))
 
 # ---- Phase: Moon swap --------------------------------------------------------
 
-func _phase_moon_swap() -> void:
+func _phase_moon_swap(g: int) -> void:
 	game_log.emit("--- The Moon — swap your secret card or keep your hand? ---")
 	for pidx in round_state.moon_secret.keys():
 		var secret: Card = round_state.moon_secret[pidx]
@@ -301,6 +320,7 @@ func _phase_moon_swap() -> void:
 		if pidx == HUMAN_IDX:
 			arcana_choice_needed.emit(pidx, 18)
 			await _arcana_effect_done
+			if g != _game_gen: return
 			var choice := arcana_choice
 			if choice >= 0 and choice < players[pidx].hand.size():
 				var old_card: Card = players[pidx].hand[choice]
@@ -313,6 +333,7 @@ func _phase_moon_swap() -> void:
 				game_log.emit("You keep your hand, discarding your Moon secret.")
 		else:
 			await _ai_think()
+			if g != _game_gen: return
 			var best_swap_idx := -1
 			var best_score := _ai_score_hand(players[pidx].hand)
 			for i in players[pidx].hand.size():
@@ -335,7 +356,7 @@ func _phase_moon_swap() -> void:
 
 # ---- Phase: Judgement re-entry -----------------------------------------------
 
-func _phase_judgement_reentry() -> void:
+func _phase_judgement_reentry(g: int) -> void:
 	game_log.emit("--- Judgement — last chance to re-enter ---")
 	var can_reenter: Array[int] = []
 	for pidx in range(players.size()):
@@ -351,12 +372,14 @@ func _phase_judgement_reentry() -> void:
 		if pidx == HUMAN_IDX:
 			arcana_choice_needed.emit(pidx, 20)
 			await _arcana_effect_done
+			if g != _game_gen: return
 			if arcana_choice == 1:
 				_do_reenter(pidx)
 			else:
 				game_log.emit("You choose to stay folded.")
 		else:
 			await _ai_think()
+			if g != _game_gen: return
 			var expected_share := float(pot) / float(active_players.size() + 1)
 			var threshold := float(ante_amount) * (1.5 if players[pidx].chips <= ante_amount * 2 else 1.1)
 			if expected_share >= threshold:
@@ -379,7 +402,7 @@ func _do_reenter(pidx: int) -> void:
 
 # ---- Phase: Showdown ---------------------------------------------------------
 
-func _phase_showdown() -> void:
+func _phase_showdown(g: int) -> void:
 	phase_changed.emit("SHOWDOWN")
 	game_log.emit("--- Showdown (pot: %d) ---" % pot)
 
@@ -391,6 +414,7 @@ func _phase_showdown() -> void:
 	if round_state.sun_end:
 		game_log.emit("The Sun splits the pot equally.")
 		await get_tree().create_timer(1.5).timeout
+		if g != _game_gen: return
 		@warning_ignore("integer_division")
 		var share := pot / active_players.size()
 		for pidx in active_players:
@@ -411,6 +435,7 @@ func _phase_showdown() -> void:
 		game_log.emit("%s shows: %s (%s)" % [_pname(pidx), HandEvaluator.hand_type_name(scores[pidx]), card_names])
 		player_hand_revealed.emit(pidx, players[pidx].hand)
 		await get_tree().create_timer(0.8).timeout
+		if g != _game_gen: return
 
 	var sorted_players: Array = active_players.duplicate()
 	sorted_players.sort_custom(func(a, b): return scores[a] > scores[b])
@@ -490,7 +515,7 @@ func _setup_arcana_deck() -> void:
 	arcana_deck = pile_b + pile_a
 	arcana_pos = 0
 
-func _draw_arcana() -> void:
+func _draw_arcana(g: int) -> void:
 	if arcana_pos >= arcana_deck.size():
 		return
 	var id: int = arcana_deck[arcana_pos]
@@ -508,9 +533,10 @@ func _draw_arcana() -> void:
 	game_log.emit("Arcana: %s" % MajorArcana.arcana_name(id))
 	round_state.arcana_id = id
 	await _arcana_effect_done
-	await _apply_arcana(id)
+	if g != _game_gen: return
+	await _apply_arcana(id, g)
 
-func _apply_arcana(id: int) -> void:
+func _apply_arcana(id: int, g: int) -> void:
 	match id:
 		0:  # The Fool — wild-card evaluation
 			round_state.fool_active = true
@@ -537,6 +563,7 @@ func _apply_arcana(id: int) -> void:
 						round_state.temperance_flop = flop
 						arcana_choice_needed.emit(pidx, 14)
 						await _arcana_effect_done
+						if g != _game_gen: return
 						var discard_idx := arcana_choice
 						var flop_idx := arcana_choice2
 						if discard_idx >= 0 and discard_idx < players[pidx].hand.size() \
@@ -553,6 +580,7 @@ func _apply_arcana(id: int) -> void:
 							game_log.emit("You skip Temperance.")
 					else:
 						await _ai_think()
+						if g != _game_gen: return
 						var best_score := _ai_score_hand(players[pidx].hand)
 						var best_hand_pick := -1
 						var best_flop_pick := -1
@@ -590,6 +618,7 @@ func _apply_arcana(id: int) -> void:
 				if pidx == HUMAN_IDX:
 					arcana_choice_needed.emit(pidx, 18)
 					await _arcana_effect_done
+					if g != _game_gen: return
 					round_state.moon_reveal_done = true
 					game_log.emit("You tuck a card away secretly.")
 				else:
@@ -603,6 +632,7 @@ func _apply_arcana(id: int) -> void:
 				if pidx == HUMAN_IDX:
 					arcana_choice_needed.emit(pidx, 2)
 					await _arcana_effect_done
+					if g != _game_gen: return
 					var idx := arcana_choice
 					if idx >= 0 and idx < players[pidx].hand.size():
 						round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
@@ -610,6 +640,7 @@ func _apply_arcana(id: int) -> void:
 						game_log.emit("You reveal the %s." % players[pidx].hand[idx].display_name())
 				else:
 					await _ai_think()
+					if g != _game_gen: return
 					var idx := _ai_weakest_card_idx(pidx)
 					round_state.priestess_revealed[pidx] = players[pidx].hand[idx]
 					player_hand_updated.emit(pidx, players[pidx].hand)
@@ -625,6 +656,7 @@ func _apply_arcana(id: int) -> void:
 				if pidx == HUMAN_IDX:
 					arcana_choice_needed.emit(pidx, 1)
 					await _arcana_effect_done
+					if g != _game_gen: return
 					if arcana_choice == (drawn.suit as int):
 						players[pidx].receive_cards([drawn])
 						player_hand_updated.emit(pidx, players[pidx].hand)
@@ -634,6 +666,7 @@ func _apply_arcana(id: int) -> void:
 						game_log.emit("Wrong — the card was the %s." % drawn.display_name())
 				else:
 					await _ai_think()
+					if g != _game_gen: return
 					if randi() % 4 == (drawn.suit as int):
 						players[pidx].receive_cards([drawn])
 						player_hand_updated.emit(pidx, players[pidx].hand)
@@ -648,6 +681,7 @@ func _apply_arcana(id: int) -> void:
 				if pidx == HUMAN_IDX:
 					arcana_choice_needed.emit(pidx, 17)
 					await _arcana_effect_done
+					if g != _game_gen: return
 					var choice := arcana_choice
 					if choice >= 0 and not deck.is_empty():
 						var new_card: Card = deck.deal_one()
@@ -661,6 +695,7 @@ func _apply_arcana(id: int) -> void:
 						game_log.emit("You pass.")
 				else:
 					await _ai_think()
+					if g != _game_gen: return
 					var hand_type: float = _ai_score_hand(players[pidx].hand) / 1048576.0
 					if not deck.is_empty() and hand_type < 3.0:
 						var idx := _ai_weakest_card_idx(pidx)
@@ -680,10 +715,12 @@ func _apply_arcana(id: int) -> void:
 				if pidx == HUMAN_IDX:
 					arcana_choice_needed.emit(pidx, 7)
 					await _arcana_effect_done
+					if g != _game_gen: return
 					chosen[pidx] = arcana_choice
 					game_log.emit("You pass a card left.")
 				else:
 					await _ai_think()
+					if g != _game_gen: return
 					chosen[pidx] = _ai_weakest_card_idx(pidx)
 					game_log.emit("%s passes a card left." % _pname(pidx))
 			var passing: Dictionary = {}
