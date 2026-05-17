@@ -110,7 +110,7 @@ func _run_round() -> void:
 	_phase_ante()
 	await _phase_deal()
 
-	if round_state.death_end or round_state.sun_end:
+	if round_state.death_end:
 		if not round_state.moon_secret.is_empty():
 			await _phase_moon_swap()
 		if round_state.judgement_active:
@@ -120,7 +120,7 @@ func _run_round() -> void:
 
 	await _phase_bet()
 
-	if round_state.death_end or round_state.sun_end or active_players.size() <= 1:
+	if round_state.death_end or active_players.size() <= 1:
 		if not round_state.moon_secret.is_empty():
 			await _phase_moon_swap()
 		if round_state.judgement_active:
