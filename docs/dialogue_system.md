@@ -119,7 +119,7 @@ A `DialogueManager` autoload handles:
 | Haldemar the Still | left | Steel blue `#6BA6D9` |
 | Mercival the Oblique | right | Violet `#B36BE6` |
 
-The box fades in (0.3s), holds for 4s, then fades out (0.5s). No portraits implemented yet.
+The box fades in (0.3s), holds for 4s, then fades out (0.5s).
 
 ---
 
@@ -159,9 +159,7 @@ The box fades in (0.3s), holds for 4s, then fades out (0.5s). No portraits imple
 
 ## Open Questions (decide before Phase 1)
 
-1. **Portraits**: Do the characters get visual avatars? Even simple illustrated portraits would significantly raise the production value. This affects UI design for Phase 1.
-
-2. **Text only or voice?** Voice acting is a big lift but would be extraordinary. Text-only is the practical default. Worth deciding early in case it affects how lines are written (VO-friendly phrasing vs. prose).
+1. **Text only or voice?** Voice acting is a big lift but would be extraordinary. Text-only is the practical default. Worth deciding early in case it affects how lines are written (VO-friendly phrasing vs. prose).
 
 3. **Inter-character dialogue in Phase 1?** Even one or two exchanges between Tarvosk and Haldemar in Phase 1 would do a lot. Low technical cost if the trigger system is built right.
 
