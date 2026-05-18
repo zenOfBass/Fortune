@@ -611,36 +611,30 @@ func _ai_area_for_speaker(speaker_idx: int) -> Control:
 	return null
 
 func _reposition_dialogue(speaker_idx: int) -> void:
+	# get_global_rect() is unreliable for all three AI areas (layout rects extend
+	# past viewport edges), so position directly from speaker_idx + fixed fractions.
 	var vp := get_viewport_rect().size
-	var area := _ai_area_for_speaker(speaker_idx)
 	var box_h := 70.0
-	if area == null or not area.visible:
-		dialogue_display.offset_left = vp.x * 0.30
-		dialogue_display.offset_top = vp.y * 0.60
-		dialogue_display.offset_right = vp.x * 0.70
-		dialogue_display.offset_bottom = vp.y * 0.60 + box_h
-		return
-	var center := area.get_global_rect().get_center()
 	var box_w: float
 	var left: float
 	var top: float
-	if center.x < vp.x * 0.3:
-		# Left-side speaker — box starts just inside their right edge
-		box_w = vp.x * 0.35
-		left = center.x + vp.x * 0.02
-		top = center.y + box_h * 0.3
-	elif center.x > vp.x * 0.7:
-		# Right-side speaker — box ends just inside their left edge
-		box_w = vp.x * 0.35
-		left = center.x - box_w - vp.x * 0.10
-		# ai3_area's layout rect extends past the viewport edge, so
-		# get_global_rect().center.y is unreliable — use a fixed fraction instead.
-		top = vp.y * 0.45
-	else:
-		# Top-center speaker — box below their area
-		box_w = vp.x * 0.45
-		left = center.x - box_w * 0.5
-		top = center.y + vp.y * 0.05
+	match speaker_idx:
+		1:  # Tarvosk — top-center
+			box_w = vp.x * 0.45
+			left = (vp.x - box_w) * 0.5
+			top = vp.y * 0.30
+		2:  # Haldemar — left
+			box_w = vp.x * 0.35
+			left = vp.x * 0.13
+			top = vp.y * 0.45
+		3:  # Mercival — right
+			box_w = vp.x * 0.35
+			left = vp.x * 0.62
+			top = vp.y * 0.45
+		_:  # fallback
+			box_w = vp.x * 0.40
+			left = (vp.x - box_w) * 0.5
+			top = vp.y * 0.60
 	left = clampf(left, 0.0, vp.x - box_w)
 	top = clampf(top, 0.0, vp.y - box_h)
 	dialogue_display.offset_left = left
