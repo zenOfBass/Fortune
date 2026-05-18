@@ -79,7 +79,7 @@ const _SPEAKER_COLORS: Dictionary = {
 
 var _log_tween: Tween = null
 var _dialogue_tween: Tween = null
-var _dialogue_queue: Array = []
+var _dialogue_queue: Array = []  # lines queue so rapid-fire triggers don't cut each other off
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
 var _starting_chips: int = 0
@@ -633,6 +633,8 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 		# Right-side speaker — box ends just inside their left edge
 		box_w = vp.x * 0.35
 		left = center.x - box_w - vp.x * 0.10
+		# ai3_area's layout rect extends past the viewport edge, so
+		# get_global_rect().center.y is unreliable — use a fixed fraction instead.
 		top = vp.y * 0.45
 	else:
 		# Top-center speaker — box below their area
