@@ -157,15 +157,9 @@ The box fades in (0.3s), holds for 4s, then fades out (0.5s).
 
 ---
 
-## Open Questions (decide before Phase 1)
+1. **Inter-character dialogue in Phase 1?** Even one or two exchanges between Tarvosk and Haldemar in Phase 1 would do a lot. Low technical cost if the trigger system is built right.
 
-1. **Text only or voice?** Voice acting is a big lift but would be extraordinary. Text-only is the practical default. Worth deciding early in case it affects how lines are written (VO-friendly phrasing vs. prose).
-
-3. **Inter-character dialogue in Phase 1?** Even one or two exchanges between Tarvosk and Haldemar in Phase 1 would do a lot. Low technical cost if the trigger system is built right.
-
-4. **Arcana commentary scope**: Should characters have lines for all 22 arcana in Phase 1, or just the most common/impactful ones? Full coverage is the high-value play but requires more writing upfront.
-
-5. **Line authorship**: Are you writing all the dialogue, or is this something you'd want help generating? Either way, establishing a voice guide per character (tone, vocabulary, sentence rhythm) before writing is worth the hour it takes.
+2. **Arcana commentary scope**: Should characters have lines for all 22 arcana in Phase 1, or just the most common/impactful ones? Full coverage is the high-value play but requires more writing upfront.
 
 ---
 
