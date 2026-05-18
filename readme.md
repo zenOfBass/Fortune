@@ -63,3 +63,4 @@ One arcana can fire per round. Its effect lasts until the next ante phase. There
 - Video poker-style betting panel with +1/+5/+10/+25 increment buttons
 - Chip tracking, bust detection, and final standings screen
 - Dealer rotation and game log
+- Character dialogue — Tarvosk, Haldemar, and Mercival comment on arcana, bets, wins, and patterns; each has a signature color and their dialogue box appears near their side of the table

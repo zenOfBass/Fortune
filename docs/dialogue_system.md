@@ -109,12 +109,17 @@ A `DialogueManager` autoload handles:
 
 ### Display
 
-Open design decision — see questions below. Options:
-- **Speech bubble** floating above/beside the AI's hand area
-- **Portrait card** in a dedicated sidebar panel with name + line
-- **Ticker** at the bottom of the screen (less character, easier to implement)
+**Resolved.** Each character gets a `DialogueDisplay` panel (speaker name + dialogue text) that:
+- Is positioned near their side of the table (`_reposition_dialogue()` in `table.gd`)
+- Renders the speaker name in a distinct signature color via a per-character `LabelSettings` duplicate
 
-Recommendation: portrait card panel. It gives the characters a visual face, fits the card-game aesthetic, and doesn't obstruct the table.
+| Character | Screen position | Color |
+|---|---|---|
+| Tarvosk the Brazen | top-center | Burnt orange `#ED7521` |
+| Haldemar the Still | left | Steel blue `#6BA6D9` |
+| Mercival the Oblique | right | Violet `#B36BE6` |
+
+The box fades in (0.3s), holds for 4s, then fades out (0.5s). No portraits implemented yet.
 
 ---
 

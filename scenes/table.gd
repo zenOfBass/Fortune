@@ -71,12 +71,18 @@ var _shuffle_sfx: AudioStreamPlayer
 # ---- Setup -------------------------------------------------------------------
 
 const _STRONG_HANDS := ["Royal Flush", "Straight Flush", "Four of a Kind"]
+const _SPEAKER_COLORS: Dictionary = {
+	1: Color(0.93, 0.46, 0.13),  # Tarvosk — burnt orange
+	2: Color(0.42, 0.65, 0.85),  # Haldemar — steel blue
+	3: Color(0.70, 0.42, 0.90),  # Mercival — violet
+}
 
 var _log_tween: Tween = null
 var _dialogue_tween: Tween = null
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
 var _starting_chips: int = 0
+var _colored_label_settings: Dictionary = {}
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -153,6 +159,21 @@ func _ready() -> void:
 	draw_panel.anchor_bottom = 1.0
 	draw_panel.offset_top = -95.0
 	draw_panel.offset_bottom = -5.0
+
+	# Switch dialogue_display from anchor-based to offset-based positioning
+	# so _reposition_dialogue can move it freely without anchor interference.
+	dialogue_display.anchor_left = 0.0
+	dialogue_display.anchor_right = 0.0
+
+	# LabelSettings.font_color wins over add_theme_color_override, so we
+	# duplicate the resource once per speaker color instead of using overrides.
+	if dialogue_speaker.label_settings != null:
+		var base_ls := dialogue_speaker.label_settings
+		for pidx: int in _SPEAKER_COLORS:
+			var ls: LabelSettings = base_ls.duplicate()
+			ls.font_color = _SPEAKER_COLORS[pidx]
+			_colored_label_settings[pidx] = ls
+
 	GameManager.start_game()
 	if GameManager.players.size() > 0:
 		_starting_chips = GameManager.players[0].chips
@@ -581,9 +602,56 @@ func _flash_latest_log(message: String) -> void:
 	_log_tween.tween_callback(func(): latest_log_label.text = message)
 	_log_tween.tween_property(latest_log_label, "modulate:a", 1.0, 0.20).set_ease(Tween.EASE_OUT)
 
-func _on_dialogue_line(_speaker_idx: int, speaker_name: String, line: String) -> void:
+func _ai_area_for_speaker(speaker_idx: int) -> Control:
+	match speaker_idx:
+		1: return ai1_area
+		2: return ai2_area
+		3: return ai3_area
+	return null
+
+func _reposition_dialogue(speaker_idx: int) -> void:
+	var vp := get_viewport_rect().size
+	var area := _ai_area_for_speaker(speaker_idx)
+	var box_h := 70.0
+	if area == null or not area.visible:
+		dialogue_display.offset_left = vp.x * 0.30
+		dialogue_display.offset_top = vp.y * 0.60
+		dialogue_display.offset_right = vp.x * 0.70
+		dialogue_display.offset_bottom = vp.y * 0.60 + box_h
+		return
+	var center := area.get_global_rect().get_center()
+	var box_w: float
+	var left: float
+	var top: float
+	if center.x < vp.x * 0.3:
+		# Left-side speaker — box starts just inside their right edge
+		box_w = vp.x * 0.35
+		left = center.x + vp.x * 0.10
+		top = center.y - box_h * 0.5
+	elif center.x > vp.x * 0.7:
+		# Right-side speaker — box ends just inside their left edge
+		box_w = vp.x * 0.35
+		left = center.x - box_w - vp.x * 0.05
+		top = vp.y * 0.45
+	else:
+		# Top-center speaker — box below their area
+		box_w = vp.x * 0.45
+		left = center.x - box_w * 0.5
+		top = center.y + vp.y * 0.05
+	left = clampf(left, 0.0, vp.x - box_w)
+	top = clampf(top, 0.0, vp.y - box_h)
+	dialogue_display.offset_left = left
+	dialogue_display.offset_top = top
+	dialogue_display.offset_right = left + box_w
+	dialogue_display.offset_bottom = top + box_h
+
+func _on_dialogue_line(speaker_idx: int, speaker_name: String, line: String) -> void:
+	var ls: LabelSettings = _colored_label_settings.get(speaker_idx)
+	if ls != null:
+		dialogue_speaker.label_settings = ls
 	dialogue_speaker.text = speaker_name
 	dialogue_text.text = line
+	_reposition_dialogue(speaker_idx)
 	if is_instance_valid(_dialogue_tween):
 		_dialogue_tween.kill()
 	dialogue_display.modulate.a = 0.0
