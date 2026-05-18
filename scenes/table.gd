@@ -120,6 +120,7 @@ func _ready() -> void:
 	judgement_panel.pass_chosen.connect(_on_judgement_pass)
 
 	GameManager.player_bet_changed.connect(_on_player_bet_changed)
+	GameManager.player_raised.connect(_on_player_raised)
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.player_hand_updated.connect(_on_player_hand_updated)
 	GameManager.player_chips_changed.connect(_on_player_chips_changed)
@@ -217,6 +218,12 @@ func _on_player_bet_changed(player_idx: int, contributed: int) -> void:
 			DialogueManager.try_fire_any("player_went_all_in", 0.90)
 		else:
 			DialogueManager.try_fire("ai_went_all_in", player_idx, 0.85)
+
+func _on_player_raised(player_idx: int, raise_to: int, prev_bet: int) -> void:
+	if player_idx != GameManager.HUMAN_IDX:
+		return
+	if prev_bet <= 0 or raise_to >= prev_bet * 2:
+		DialogueManager.try_fire_any("player_raised_aggressively", 0.65)
 
 func _on_phase_changed(phase_name: String) -> void:
 	_bet_contributed.clear()

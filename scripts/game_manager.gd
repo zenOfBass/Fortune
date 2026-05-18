@@ -27,6 +27,7 @@ signal game_ended(final_chips: Array)
 
 signal game_log(message: String)
 signal player_bet_changed(player_idx: int, contributed: int)
+signal player_raised(player_idx: int, raise_to: int, prev_bet: int)
 
 # ---- Internal signals (awaited inside coroutines) ----------------------------
 
@@ -280,9 +281,11 @@ func _phase_bet(g: int) -> void:
 					_add_to_pot(paid, pidx)
 					raise_to = contributed[pidx]  # cap to what was actually paid
 					player_bet_changed.emit(pidx, contributed[pidx])
+				var prev_bet := _current_bet
 				_current_bet = max(_current_bet, raise_to)
 				var raise_suffix := " (all in)" if players[pidx].chips == 0 else ""
 				game_log.emit("%s raises to %d.%s" % [_pname(pidx), _current_bet, raise_suffix])
+				player_raised.emit(pidx, raise_to, prev_bet)
 				player_raises[pidx] = player_raises.get(pidx, 0) + 1
 				raise_count += 1
 				# Re-queue in seat order starting left of the raiser.
