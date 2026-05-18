@@ -146,6 +146,7 @@ func _ready() -> void:
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.game_log.connect(_on_game_log)
 	DialogueManager.dialogue_line.connect(_on_dialogue_line)
+	DialogueManager.tell_read.connect(func(): GameManager.game_log.emit("You read Tarvosk's tell."))
 
 	current_arcana_thumb.custom_minimum_size = Vector2(80, 120)
 	current_arcana_thumb.expand_mode = TextureRect.EXPAND_KEEP_SIZE

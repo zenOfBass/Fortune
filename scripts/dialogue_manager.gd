@@ -116,6 +116,8 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	_cooldowns[speaker_idx][trigger_id] = _COOLDOWN_ROUNDS
 	var formatted := line.format(context) if not context.is_empty() else line
 	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), formatted)
+	if trigger_id == "tarvosk_bluffing":
+		_tarvosk_bluff_announced = true
 
 # Pick one eligible AI at random and fire a trigger for them.
 func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
@@ -160,6 +162,8 @@ func try_fire_exchange(trigger_id: String = "random") -> void:
 		await get_tree().create_timer(2.5).timeout
 
 func _on_round_ended_internal(winner_indices: Array, hand_names: Array, split: bool) -> void:
+	if _tarvosk_bluff_announced and winner_indices.has(GameManager.HUMAN_IDX):
+		tell_read.emit()
 	_advance_round()
 	_update_round_stats(winner_indices, hand_names, split)
 	_fire_pattern_triggers_deferred()
@@ -232,3 +236,4 @@ func _advance_round() -> void:
 		for key in _cooldowns[i].keys():
 			_cooldowns[i][key] = max(0, _cooldowns[i][key] - 1)
 	_exchange_cooldown = max(0, _exchange_cooldown - 1)
+	_tarvosk_bluff_announced = false
