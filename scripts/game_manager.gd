@@ -313,6 +313,26 @@ func _phase_bet(g: int) -> void:
 		if refunded:
 			pot_changed.emit(pot)
 
+	# Refund unmatched overbet: if a player put in more than any other active
+	# player (e.g. they raised and the only caller went all-in short), return the
+	# uncallable excess — it has no one to win against.
+	var overbet_refund := false
+	for pidx in active_players:
+		var own := contributed.get(pidx, 0)
+		var others_max := 0
+		for other in active_players:
+			if other != pidx:
+				others_max = max(others_max, contributed.get(other, 0))
+		var excess := own - others_max
+		if excess > 0:
+			players[pidx].receive_chips(excess)
+			pot -= excess
+			player_chips_changed.emit(pidx, players[pidx].chips)
+			game_log.emit("%s refunded %d (unmatched overbet)." % [_pname(pidx), excess])
+			overbet_refund = true
+	if overbet_refund:
+		pot_changed.emit(pot)
+
 # ---- Phase: Draw -------------------------------------------------------------
 
 func _phase_draw(g: int) -> void:
