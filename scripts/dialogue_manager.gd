@@ -1,6 +1,7 @@
 extends Node
 
 signal dialogue_line(speaker_idx: int, speaker_name: String, line: String)
+signal tell_read
 
 const _DIALOGUE_PATH := "res://assets/dialogue/"
 const _COOLDOWN_ROUNDS := 3
@@ -28,6 +29,13 @@ var _player_win_streak: int = 0
 var _ai_win_streak: int = 0
 var _streak_ai_idx: int = -1
 
+const _MOOD_THRESHOLD := 3
+var _tarvosk_humiliation: int = 0  # increments on player showdown wins
+var _haldemar_impressed: int = 0   # increments on player showdown wins
+var _mercival_curiosity: int = 0   # increments on unusual arcana + split pots
+
+var _tarvosk_bluff_announced: bool = false  # set when a bluff tell line fires; cleared each round
+
 
 func _ready() -> void:
 	_load_character(1, "tarvosk")
@@ -40,6 +48,8 @@ func _ready() -> void:
 	GameManager.phase_changed.connect(func(phase): if phase == "DEAL" and _rounds_played == 0: try_fire_any("game_start", 1.0))
 	GameManager.ai_bluffing.connect(func(pidx): try_fire("tarvosk_bluffing", pidx, 0.75))
 	GameManager.game_ended.connect(_on_game_ended)
+	GameManager.arcana_revealed.connect(func(arcana_id, _n):
+		if arcana_id in [16, 18, 20, 21]: _mercival_curiosity += 1)
 
 func _load_exchanges() -> void:
 	var path := _DIALOGUE_PATH + "exchanges.json"
@@ -61,6 +71,13 @@ func _load_character(pidx: int, filename: String) -> void:
 	if parsed is Dictionary:
 		_lines[pidx] = parsed
 
+func _mood_suffix(speaker_idx: int) -> String:
+	match speaker_idx:
+		1: return "_humiliated" if _tarvosk_humiliation >= _MOOD_THRESHOLD else ""
+		2: return "_impressed"  if _haldemar_impressed  >= _MOOD_THRESHOLD else ""
+		3: return "_curious"    if _mercival_curiosity  >= _MOOD_THRESHOLD else ""
+	return ""
+
 # Fire a line for a specific AI speaker. chance ∈ [0,1].
 # context keys (e.g. {"hand_name": "Flush"}) are substituted into the line via String.format().
 func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
@@ -72,7 +89,12 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		return
 	if _cooldowns[speaker_idx].get(trigger_id, 0) > 0:
 		return
-	var pool: Array = _lines[speaker_idx].get(trigger_id, [])
+	# Try mood-shifted variant first; fall back to base trigger if no lines exist for it.
+	var pool_key := trigger_id
+	var suffix := _mood_suffix(speaker_idx)
+	if not suffix.is_empty() and not _lines[speaker_idx].get(trigger_id + suffix, []).is_empty():
+		pool_key = trigger_id + suffix
+	var pool: Array = _lines[speaker_idx].get(pool_key, [])
 	if pool.is_empty():
 		return
 	var recent: Array = _recent[speaker_idx]
@@ -137,17 +159,20 @@ func try_fire_exchange(trigger_id: String = "random") -> void:
 			dialogue_line.emit(idx, GameManager._pname(idx), line)
 		await get_tree().create_timer(2.5).timeout
 
-func _on_round_ended_internal(winner_indices: Array, _hand_names: Array, _split: bool) -> void:
+func _on_round_ended_internal(winner_indices: Array, hand_names: Array, split: bool) -> void:
 	_advance_round()
-	_update_round_stats(winner_indices)
+	_update_round_stats(winner_indices, hand_names, split)
 	_fire_pattern_triggers_deferred()
 
-func _update_round_stats(winner_indices: Array) -> void:
+func _update_round_stats(winner_indices: Array, hand_names: Array, split: bool) -> void:
 	_rounds_played += 1
 	if winner_indices.has(GameManager.HUMAN_IDX):
 		_player_win_streak += 1
 		_ai_win_streak = 0
 		_streak_ai_idx = -1
+		if not hand_names.is_empty():  # showdown win (not uncontested)
+			_tarvosk_humiliation += 1
+			_haldemar_impressed += 1
 	elif not winner_indices.is_empty():
 		var w: int = winner_indices[0]
 		if w == _streak_ai_idx:
@@ -159,6 +184,8 @@ func _update_round_stats(winner_indices: Array) -> void:
 	else:
 		_player_win_streak = 0
 		_ai_win_streak = 0
+	if split:
+		_mercival_curiosity += 1
 
 func _fire_pattern_triggers_deferred() -> void:
 	await get_tree().create_timer(5.2).timeout
@@ -196,6 +223,9 @@ func _reset_stats() -> void:
 	_player_win_streak = 0
 	_ai_win_streak = 0
 	_streak_ai_idx = -1
+	_tarvosk_humiliation = 0
+	_haldemar_impressed = 0
+	_mercival_curiosity = 0
 
 func _advance_round() -> void:
 	for i in 4:

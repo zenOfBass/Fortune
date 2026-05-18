@@ -210,5 +210,20 @@
     "The pot will be mine. I am saying this in advance so there is no confusion later. Clarity is important to me.",
     "Do not look at my chips. Look at my confidence. The chips are irrelevant. The confidence is REAL.",
     "I am definitely not bluffing. The fact that I said that means nothing. I always say that. You cannot read me."
+  ],
+  "player_won_round_humiliated": [
+    "Again. Fine. The cards have made their position clear. I am... reevaluating.",
+    "You win. I am not angry. This is not anger. This is a strategic reassessment of my relationship with fortune.",
+    "Another round to you. I would say I allowed it, but even I am tired of that joke."
+  ],
+  "ai_won_round_humiliated": [
+    "I won. It feels... adequate. Which is not my usual adjective. My usual adjective is MAGNIFICENT.",
+    "A victory. I should be celebrating. I am celebrating. This IS celebrating. It looks different when you have been losing.",
+    "The pot is mine. At least this round. At least for now. I will take what I can get."
+  ],
+  "game_over_lose_humiliated": [
+    "The game is yours. I have no speech. I had a speech prepared. It does not seem appropriate now.",
+    "You played well. Those words hurt to say. They are true, which hurts more.",
+    "Defeated. Properly, thoroughly, undeniably defeated. I will be in the corner, reevaluating my entire philosophy."
   ]
 }

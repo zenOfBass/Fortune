@@ -1,8 +1,8 @@
 {
   "arcana_revealed_0": [
-  "Unpredictable. Adjust.",
-  "The Fool. Expected disruption.",
-  "Chaos introduced. I have already accounted for it."
+    "Unpredictable. Adjust.",
+    "The Fool. Expected disruption.",
+    "Chaos introduced. I have already accounted for it."
   ],
   "arcana_revealed_1": [
     "Guessing games.",
@@ -33,9 +33,9 @@
     "What you give away reveals you."
   ],
   "arcana_revealed_8": [
-  "Inversion. Adapt.",
-  "The smallest becomes the largest. Noted.",
-  "Values reversed. The mathematics remain the same. Only the inputs change."
+    "Inversion. Adapt.",
+    "The smallest becomes the largest. Noted.",
+    "Values reversed. The mathematics remain the same. Only the inputs change."
   ],
   "arcana_revealed_9": [
     "More information.",
@@ -66,9 +66,9 @@
     "Commitment or nothing. I can respect that."
   ],
   "arcana_revealed_16": [
-  "Destruction. Accommodate it.",
-  "Disruption. I will adapt faster than most.",
-  "The Tower takes its portion. The remainder is still worth winning."
+    "Destruction. Accommodate it.",
+    "Disruption. I will adapt faster than most.",
+    "The Tower takes its portion. The remainder is still worth winning."
   ],
   "arcana_revealed_17": [
     "A choice. I have already made mine.",
@@ -91,75 +91,75 @@
     "The stakes justify full attention."
   ],
   "player_won_round": [
-  "You won. Noted.",
-  "Expected. This round.",
-  "The hand was {hand_name}. Sufficient to win. Barely, perhaps.",
-  "Your {hand_name} prevailed. I will adjust my model.",
-  "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong."
+    "You won. Noted.",
+    "Expected. This round.",
+    "The hand was {hand_name}. Sufficient to win. Barely, perhaps.",
+    "Your {hand_name} prevailed. I will adjust my model.",
+    "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong."
   ],
   "ai_won_round": [
-  "Sufficient.",
-  "The outcome was determined some time ago.",
-  "{hand_name}. It was always going to be enough.",
-  "I held {hand_name}. The rest was waiting for you to realize.",
-  "Victory. My {hand_name} exceeded expectations. Modestly."
+    "Sufficient.",
+    "The outcome was determined some time ago.",
+    "{hand_name}. It was always going to be enough.",
+    "I held {hand_name}. The rest was waiting for you to realize.",
+    "Victory. My {hand_name} exceeded expectations. Modestly."
   ],
   "player_folded": [
     "Expected.",
     "Fold. The only sensible move, apparently."
   ],
   "player_went_all_in": [
-  "All in. Your conviction is noted.",
-  "You commit everything. The data will be instructive.",
-  "Total commitment. Either desperation or certainty. I will learn which.",
-  "All chips. You have made your position unambiguous."
+    "All in. Your conviction is noted.",
+    "You commit everything. The data will be instructive.",
+    "Total commitment. Either desperation or certainty. I will learn which.",
+    "All chips. You have made your position unambiguous."
   ],
   "ai_went_all_in": [
-  "I am all in. The numbers supported this decision.",
-  "Everything. The expected value was positive.",
-  "My stack. I have calculated that this is correct.",
-  "All of it. Hesitation would have been the error."
+    "I am all in. The numbers supported this decision.",
+    "Everything. The expected value was positive.",
+    "My stack. I have calculated that this is correct.",
+    "All of it. Hesitation would have been the error."
   ],
   "player_raised_aggressively": [
-  "A significant raise. You believe your hand is strong.",
-  "You push. That tells me something. You may not realize what.",
-  "Aggression. I have noted the pattern.",
-  "That raise exceeds the pot. Information received."
+    "A significant raise. You believe your hand is strong.",
+    "You push. That tells me something. You may not realize what.",
+    "Aggression. I have noted the pattern.",
+    "That raise exceeds the pot. Information received."
   ],
   "strong_hand_shown": [
-  "{player_name} has {hand_name}. The probability was low. And yet.",
-  "{hand_name}. Impressive. I had assigned that outcome a 2% likelihood.",
-  "A {hand_name} from {player_name}. My model requires updating.",
-  "That is a {hand_name}. I do not say this often: well played."
+    "{player_name} has {hand_name}. The probability was low. And yet.",
+    "{hand_name}. Impressive. I had assigned that outcome a 2% likelihood.",
+    "A {hand_name} from {player_name}. My model requires updating.",
+    "That is a {hand_name}. I do not say this often: well played."
   ],
   "five_of_a_kind_shown": [
-  "Five of a kind. The Page does not favor me tonight.",
-  "All five. Statistically improbable. Statistically not impossible. Clearly.",
-  "Five matching. I do not have a line prepared for this. I rarely need one."
+    "Five of a kind. The Page does not favor me tonight.",
+    "All five. Statistically improbable. Statistically not impossible. Clearly.",
+    "Five matching. I do not have a line prepared for this. I rarely need one."
   ],
   "last_round_announced": [
-  "The World. This concludes the exercise.",
-  "Final round. All previous outcomes were preamble.",
-  "The end. I have been ready.",
-  "One more hand. Make it count. I will."
+    "The World. This concludes the exercise.",
+    "Final round. All previous outcomes were preamble.",
+    "The end. I have been ready.",
+    "One more hand. Make it count. I will."
   ],
   "player_low_chips": [
-  "You have {chips} chips. The situation is clear.",
-  "{chips}. You are approaching elimination.",
-  "Only {chips} remaining. I would offer advice, but you would not take it.",
-  "Your stack is {chips}. Mathematically, your options are limited."
+    "You have {chips} chips. The situation is clear.",
+    "{chips}. You are approaching elimination.",
+    "Only {chips} remaining. I would offer advice, but you would not take it.",
+    "Your stack is {chips}. Mathematically, your options are limited."
   ],
   "ai_low_chips": [
-  "I hold {chips} chips. This is not a problem. It is a condition.",
-  "Down to {chips}. The margin is adequate.",
-  "{chips}. I have operated with less. I do not recommend it.",
-  "My stack: {chips}. I will not be eliminated before I intend to be."
+    "I hold {chips} chips. This is not a problem. It is a condition.",
+    "Down to {chips}. The margin is adequate.",
+    "{chips}. I have operated with less. I do not recommend it.",
+    "My stack: {chips}. I will not be eliminated before I intend to be."
   ],
   "split_pot": [
-  "Divided. The Lovers complicate the arithmetic.",
-  "A split. Neither victory nor defeat. Unsatisfying.",
-  "The pot is shared. An inefficient outcome.",
-  "Half each. I would have preferred a clear result."
+    "Divided. The Lovers complicate the arithmetic.",
+    "A split. Neither victory nor defeat. Unsatisfying.",
+    "The pot is shared. An inefficient outcome.",
+    "Half each. I would have preferred a clear result."
   ],
   "player_aggressive_pattern": [
     "You raise often. The pattern is noted.",
@@ -182,19 +182,28 @@
     "The streak continues. I have made no mistakes. This is not a coincidence."
   ],
   "game_start": [
-  "We begin. The outcome is not yet determined. That will change.",
-  "The game commences. I have no remarks. That was my remark.",
-  "Cards. Chips. Opponents. All present. Proceed."
-  ],
+    "We begin. The outcome is not yet determined. That will change.",
+    "The game commences. I have no remarks. That was my remark.",
+    "Cards. Chips. Opponents. All present. Proceed."
+    ],
   "game_over_win": [
-  "The game is concluded. The result was inevitable. I merely happened to be the one who won.",
-  "Victory. I will not celebrate. Celebration implies surprise.",
-  "I have won. The data supported this outcome from the beginning."
+    "The game is concluded. The result was inevitable. I merely happened to be the one who won.",
+    "Victory. I will not celebrate. Celebration implies surprise.",
+    "I have won. The data supported this outcome from the beginning."
   ],
   "game_over_lose": [
-  "You have won the game. I will review the hands. There will be adjustments.",
-  "The player wins. Noted. I will return with a revised model.",
-  "Game over. I lost. The distinction between losing and being defeated is meaningful. This was the former."
+    "You have won the game. I will review the hands. There will be adjustments.",
+    "The player wins. Noted. I will return with a revised model.",
+    "Game over. I lost. The distinction between losing and being defeated is meaningful. This was the former."
+  ],
+  "player_won_round_impressed": [
+    "You won. That was well played.",
+    "Another round to you. The pattern is no longer noise. It is signal.",
+    "Your decisions are improving. Or they were always good and I am only now acknowledging it."
+  ],
+  "game_over_lose_impressed": [
+    "The game is yours. You earned it. That is not a compliment. It is an assessment. But it is a positive one.",
+    "You played better than I did. I have said that to very few people. You are now one of them.",
+    "Defeat. The data is conclusive. You were the superior player tonight. I will study the hands."
   ]
-
 }
