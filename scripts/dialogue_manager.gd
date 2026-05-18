@@ -45,11 +45,16 @@ func _ready() -> void:
 	GameManager.round_ended.connect(_on_round_ended_internal)
 	GameManager.player_raised.connect(func(pidx, _r, _p): if pidx == GameManager.HUMAN_IDX: _player_raises += 1)
 	GameManager.player_folded.connect(func(pidx): if pidx == GameManager.HUMAN_IDX: _player_folds += 1)
-	GameManager.phase_changed.connect(func(phase): if phase == "DEAL" and _rounds_played == 0: try_fire_any("game_start", 1.0))
+	GameManager.phase_changed.connect(_on_first_deal)
 	GameManager.ai_bluffing.connect(func(pidx): try_fire("tarvosk_bluffing", pidx, 0.75))
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.arcana_revealed.connect(func(arcana_id, _n):
 		if arcana_id in [16, 18, 20, 21]: _mercival_curiosity += 1)
+
+func _on_first_deal(phase: String) -> void:
+	if phase == "DEAL" and _rounds_played == 0:
+		try_fire_any("game_start", 1.0)
+		try_fire_exchange("game_start")
 
 func _load_exchanges() -> void:
 	var path := _DIALOGUE_PATH + "exchanges.json"
@@ -203,8 +208,12 @@ func _fire_pattern_triggers_deferred() -> void:
 		return
 	if _player_win_streak >= 2:
 		try_fire_any("player_on_streak", 0.60)
+		if randf() < 0.25:
+			try_fire_exchange("player_on_streak")
 	if _ai_win_streak >= 2 and _streak_ai_idx > 0:
 		try_fire("ai_on_streak", _streak_ai_idx, 0.65)
+		if randf() < 0.25:
+			try_fire_exchange("ai_on_streak")
 	var aggression := float(_player_raises) / _rounds_played
 	if aggression >= 0.4:
 		try_fire_any("player_aggressive_pattern", 0.45)
@@ -218,10 +227,12 @@ func _on_game_ended(final_chips: Array) -> void:
 	var max_chips: int = int(final_chips.max())
 	if final_chips[GameManager.HUMAN_IDX] >= max_chips:
 		try_fire_any("game_over_lose", 1.0)
+		try_fire_exchange("game_over_lose")
 	else:
 		var winner_idx := final_chips.find(max_chips)
 		if winner_idx > 0:
 			try_fire("game_over_win", winner_idx, 1.0)
+			try_fire_exchange("ai_won_game_%d" % winner_idx)
 		else:
 			try_fire_any("game_over_win", 1.0)
 	_reset_stats()

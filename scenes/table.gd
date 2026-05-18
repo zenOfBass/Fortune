@@ -241,6 +241,9 @@ func _on_player_bet_changed(player_idx: int, contributed: int) -> void:
 			DialogueManager.try_fire_any("player_went_all_in", 0.90)
 		else:
 			DialogueManager.try_fire("ai_went_all_in", player_idx, 0.85)
+		if randf() < 0.25:
+			var allin_key := "player_went_all_in" if player_idx == GameManager.HUMAN_IDX else "ai_went_all_in"
+			DialogueManager.try_fire_exchange(allin_key)
 
 func _on_player_raised(player_idx: int, raise_to: int, prev_bet: int) -> void:
 	if player_idx != GameManager.HUMAN_IDX:
@@ -352,8 +355,12 @@ func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 		if chips <= threshold:
 			if player_idx == GameManager.HUMAN_IDX:
 				DialogueManager.try_fire_any("player_low_chips", 0.75, {"chips": chips})
+				if randf() < 0.25:
+					DialogueManager.try_fire_exchange("player_low_chips")
 			else:
 				DialogueManager.try_fire("ai_low_chips", player_idx, 0.70, {"chips": chips})
+				if randf() < 0.25:
+					DialogueManager.try_fire_exchange("ai_low_chips")
 
 func _on_player_folded(player_idx: int) -> void:
 	const DIM = Color(0.45, 0.45, 0.45)
@@ -554,9 +561,12 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 		var ctx := {"hand_name": hand_names[i], "player_name": GameManager._pname(w)}
 		if hand_names[i] == "Five of a Kind":
 			DialogueManager.try_fire_any_except("five_of_a_kind_shown", w, 1.0)
+			DialogueManager.try_fire_exchange("five_of_a_kind_shown")
 			break
 		elif hand_names[i] in _STRONG_HANDS:
 			DialogueManager.try_fire_any_except("strong_hand_shown", w, 0.95, ctx)
+			if randf() < 0.25:
+				DialogueManager.try_fire_exchange("strong_hand_shown")
 			break
 	# Split pot commentary.
 	if split:

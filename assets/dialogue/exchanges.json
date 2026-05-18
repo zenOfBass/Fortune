@@ -35,6 +35,17 @@
     [
       {"idx": 1, "line": "One day you will lose your composure. I intend to be there."},
       {"idx": 2, "line": "You have been present every round. It has not happened yet."}
+    ],
+    [
+      {"idx": 3, "line": "Tarvosk, your manner today is particularly... percussive. Is there a reason for the noise?"},
+      {"idx": 1, "line": "I am projecting, Mercival! A man of my stature must occupy the space he is given!"},
+      {"idx": 2, "line": "You occupy the space the rest of us are trying to think in."},
+      {"idx": 1, "line": "Ha! Haldemar admits he thinks! A breakthrough!"}
+    ],
+    [
+      {"idx": 2, "line": "Mercival, you are staring at the Page as if it might speak to you."},
+      {"idx": 3, "line": "It does speak, Haldemar. It simply uses a grammar you haven't bothered to learn."},
+      {"idx": 1, "line": "If the card starts talking, I am leaving. I have enough voices in this room already."}
     ]
   ],
 
@@ -71,6 +82,16 @@
       {"idx": 3, "line": "Surprise is a strong word. I am... interested."},
       {"idx": 2, "line": "That is not an answer."},
       {"idx": 3, "line": "It is the answer I have."}
+    ],
+    [
+      {"idx": 1, "line": "The player takes it! Haldemar, your 'model' is looking a bit tattered around the edges, isn't it?"},
+      {"idx": 2, "line": "The model is fine. The player's variance is simply... wider than I anticipated."},
+      {"idx": 3, "line": "The model and the outcome disagreed, Haldemar."}
+    ],
+    [
+      {"idx": 3, "line": "A clean victory for our guest. Tarvosk, notice how they didn't need to shout to win?"},
+      {"idx": 1, "line": "Shouting is a separate hobby! I can win AND be loud! I just chose not to win this time!"},
+      {"idx": 2, "line": "A fascinating choice. I hope you don't make it a habit."}
     ]
   ],
 
@@ -144,6 +165,16 @@
       {"idx": 3, "line": "I do not love it. I merely find it unavoidable."},
       {"idx": 1, "line": "Then unavoidably interpret."},
       {"idx": 3, "line": "The arcana suggests that someone's plans are about to become irrelevant. I will leave it at that."}
+    ],
+    [
+      {"idx": 1, "line": "Another Major Arcana! The air smells of ozone and poor decisions!"},
+      {"idx": 3, "line": "Mostly the latter, I suspect. The cards merely provide the theater."},
+      {"idx": 2, "line": "Theater or not, the probabilities have just inverted."}
+    ],
+    [
+      {"idx": 2, "line": "The arcana has fired. Mercival, you look pleased. This concerns me."},
+      {"idx": 3, "line": "I am not pleased. I am merely... appreciative of the symmetry."},
+      {"idx": 1, "line": "I hate it when he appreciates symmetry. It usually means someone is about to go bankrupt."}
     ]
   ],
 
@@ -232,6 +263,302 @@
       {"idx": 3, "line": "You are the one who spoke first, Tarvosk."},
       {"idx": 1, "line": "That means nothing."},
       {"idx": 3, "line": "It means you are the one who needed to speak."}
+    ]
+  ],
+
+  "game_start": [
+    [
+      {"idx": 1, "line": "Look at us! A gathering of legends, or at least a gathering of people I haven't bankrupted yet!"},
+      {"idx": 2, "line": "The night is young, Tarvosk. Your confidence is usually the first thing to depart."},
+      {"idx": 3, "line": "It is a noisy ghost, isn't it? I wonder which of us will be haunted by it tonight."}
+    ],
+    [
+      {"idx": 2, "line": "The deck is shuffled. The variables are reset. Shall we proceed?"},
+      {"idx": 3, "line": "Haldemar wants to get to the math. He finds the anticipation... messy."},
+      {"idx": 1, "line": "Messy is where the fun is! Deal the cards before Haldemar turns into a pillar of salt!"}
+    ],
+    [
+      {"idx": 3, "line": "The Page is waiting. The arcana are hungry. Does everyone feel that?"},
+      {"idx": 1, "line": "I feel the weight of my chips and the heat of my ambition! That is enough for me!"},
+      {"idx": 2, "line": "I feel a headache forming. Deal."}
+    ],
+    [
+      {"idx": 1, "line": "The table is assembled! The cards await! I am here! The other details are less important."},
+      {"idx": 2, "line": "You named yourself first. Then the cards. Then nothing else."},
+      {"idx": 3, "line": "He named himself twice, actually. Once as 'the table' and once as 'I.' An interesting ratio."},
+      {"idx": 1, "line": "I am being analyzed. Before the first hand. This is a new record."}
+    ],
+    [
+      {"idx": 1, "line": "Haldemar. Mercival. We meet again. Try to keep up this time."},
+      {"idx": 2, "line": "I will play at my pace."},
+      {"idx": 3, "line": "Keeping up implies a direction. I am not convinced we are all heading the same way."},
+      {"idx": 1, "line": "We are heading toward my VICTORY. That is the direction."}
+    ],
+    [
+      {"idx": 3, "line": "A new game. I wonder what we will learn about each other tonight."},
+      {"idx": 2, "line": "We will learn who plays optimally."},
+      {"idx": 1, "line": "We will learn who is BRAVE."},
+      {"idx": 3, "line": "We have already learned something, I think."}
+    ],
+    [
+      {"idx": 1, "line": "Before the cards are dealt, I want it known: I intend to win."},
+      {"idx": 2, "line": ""},
+      {"idx": 1, "line": "Nothing? No rebuttal?"},
+      {"idx": 2, "line": "Everyone intends to win. Stating it is redundant."},
+      {"idx": 3, "line": "Not everyone states it so loudly. That part is not redundant. That part is Tarvosk."}
+    ]
+  ],
+
+  "player_went_all_in": [
+    [
+      {"idx": 1, "line": "ALL IN! The guest has finally found their spine—or lost their mind!"},
+      {"idx": 3, "line": "It’s a beautiful cliff. I wonder if they’re jumping or pushed."},
+      {"idx": 2, "line": "The motive is irrelevant. The stack is committed. Do you call or continue your monologue?"}
+    ],
+    [
+      {"idx": 2, "line": "Total commitment. A statistically risky gesture."},
+      {"idx": 1, "line": "Risky? It’s magnificent! They’re putting their soul on the baize!"},
+      {"idx": 3, "line": "Soul, chips... in this room, they are much the same currency."}
+    ],
+    [
+      {"idx": 1, "line": "ALL IN! The player has found their nerve! Haldemar, are you seeing this?"},
+      {"idx": 2, "line": "I am seeing it. The bet is noted."},
+      {"idx": 1, "line": "NOTED? The player just committed EVERYTHING and you are TAKING NOTES."},
+      {"idx": 2, "line": "Notes precede decisions. Decisions precede outcomes."}
+    ],
+    [
+      {"idx": 3, "line": "The player pushes all in. That is a statement of considerable volume."},
+      {"idx": 1, "line": "I am PROUD of the player. This is the kind of commitment I have been waiting for."},
+      {"idx": 3, "line": "You are proud of someone else's boldness. How generous of you."},
+      {"idx": 1, "line": "I am a generous person. In SPIRIT."}
+    ],
+    [
+      {"idx": 2, "line": "All in. The player is either very confident or very desperate."},
+      {"idx": 3, "line": "The two states look remarkably similar from the outside. That is what makes this interesting."},
+      {"idx": 1, "line": "I am CALLING it. Whatever it is. Confidence or desperation. I want to be part of it."}
+    ],
+    [
+      {"idx": 1, "line": "Everything the player has is in the pot. This is the moment where games become LEGENDS."},
+      {"idx": 2, "line": "This is the moment where the player either doubles their stack or is eliminated."},
+      {"idx": 1, "line": "That is what I SAID. Legends."}
+    ]
+  ],
+
+  "ai_went_all_in": [
+    [
+      {"idx": 1, "line": "EVERYTHING! I am pushing it all! Witness me!"},
+      {"idx": 2, "line": "We are witnessing all of it, Tarvosk. Nothing more."},
+      {"idx": 3, "line": "He wants it to be a poem. It’s actually just a ledger entry. A loud one, but an entry."}
+    ],
+    [
+      {"idx": 1, "line": "ALL OF IT. My chips are in the pot. My fate is sealed. My confidence is ABSOLUTE."},
+      {"idx": 2, "line": "You have committed everything. The decision is made."},
+      {"idx": 3, "line": "He committed everything and then continued talking about committing everything. That is a separate decision."}
+    ],
+    [
+      {"idx": 3, "line": "Someone is all in. Haldemar, does this change the arithmetic?"},
+      {"idx": 2, "line": "The arithmetic now includes the possibility of elimination. The numbers are the same. The stakes are higher."},
+      {"idx": 1, "line": "Higher stakes are the ONLY stakes worth playing for."}
+    ],
+    [
+      {"idx": 2, "line": "All in. The bet is total. There is no further action to take."},
+      {"idx": 1, "line": "That is exactly why I did it. The waiting is the hard part now."},
+      {"idx": 3, "line": "Tarvosk admitting something is hard. I am noting the date and time."}
+    ],
+    [
+      {"idx": 1, "line": "Someone at this table has just pushed everything forward. That someone is me. Obviously."},
+      {"idx": 3, "line": "Obviously."},
+      {"idx": 2, "line": "We all saw it. The announcement was redundant."},
+      {"idx": 1, "line": "The announcement is part of the EXPERIENCE."}
+    ]
+  ],
+
+  "ai_won_game_1": [
+    [
+      {"idx": 1, "line": "VICTORY! The king remains on his throne! Someone fetch me a larger bag for these chips!"},
+      {"idx": 2, "line": "The king is merely a man who happened to hold the last card. Don’t let the metaphor go to your head."},
+      {"idx": 3, "line": "Let him have his theater, Haldemar. It’s the only thing he has left now that the game is over."}
+    ],
+    [
+      {"idx": 1, "line": "VICTORY! Observe the standings. Observe who is at the top. It is ME."},
+      {"idx": 2, "line": "You won. You will now describe it at length."},
+      {"idx": 3, "line": "He has already begun. The length is considerable."}
+    ]
+  ],
+
+  "ai_won_game_2": [
+    [
+      {"idx": 2, "line": "The exercise is complete. I have won. The result was consistent with the long-term trend."},
+      {"idx": 3, "line": "Consistency is so drab. I prefer to think the cards simply got tired of resisting you."},
+      {"idx": 1, "line": "I’m not tired! I’m ready for another round! Who’s lending me chips?"}
+    ],
+    [
+      {"idx": 3, "line": "Haldemar takes the game. Quietly. As expected."},
+      {"idx": 2, "line": "I won. The outcome was consistent with optimal play."},
+      {"idx": 1, "line": "Optimal play. He says optimal play. I was OPTIMAL. I was VERY optimal."},
+      {"idx": 3, "line": "You were not optimal. That is why Haldemar won."}
+    ],
+    [
+      {"idx": 2, "line": "The game concludes. I have won. Tarvosk, your commentary was noted throughout."},
+      {"idx": 1, "line": "Noted? NOTED? I delivered ORATORY."},
+      {"idx": 3, "line": "He did. I noted it as well. We are all noting things. Only Haldemar is winning things."}
+    ]
+  ],
+
+  "ai_won_game_3": [
+    [
+      {"idx": 1, "line": "The game is over. The victor stands before you. Or sits. Sitting before you."},
+      {"idx": 2, "line": "Mercival won."},
+      {"idx": 1, "line": "I... what? I was giving MY victory speech."},
+      {"idx": 3, "line": "You were giving a victory speech. The wrong person’s victory speech. I found it moving regardless."}
+    ]
+  ],
+
+  "game_over_lose": [
+    [
+      {"idx": 1, "line": "The player wins? This is an outrage! A scandal! A statistical impossibility!"},
+      {"idx": 2, "line": "It was entirely possible, Tarvosk. You simply refused to believe it."},
+      {"idx": 3, "line": "Our guest has a talent for making the impossible look... effortless. I find that quite terrifying."}
+    ],
+    [
+      {"idx": 1, "line": "The player. The PLAYER. I was defeated by... you. I need to sit down. I am already sitting down."},
+      {"idx": 2, "line": "The player earned it. I have no objection."},
+      {"idx": 3, "line": "Tarvosk, your face is doing something I would describe as ‘processing.’ Take your time."},
+      {"idx": 1, "line": "I am NOT processing. I am... recontextualizing."}
+    ],
+    [
+      {"idx": 2, "line": "The player wins. Tarvosk, you were defeated by the person you taunted the most."},
+      {"idx": 1, "line": "I taunt everyone equally. That was supposed to protect me from this exact situation."},
+      {"idx": 3, "line": "Taunting equally does not distribute consequences equally. The universe is not symmetrical."}
+    ],
+    [
+      {"idx": 3, "line": "The player takes the game. Haldemar, your model predicted this, didn’t it."},
+      {"idx": 2, "line": "It assigned a non-zero probability."},
+      {"idx": 1, "line": "A NON-ZERO probability? That is what you gave me? What was MY probability?"},
+      {"idx": 2, "line": "Also non-zero."},
+      {"idx": 1, "line": "That is NOT satisfying."}
+    ],
+    [
+      {"idx": 1, "line": "I have lost to the player. I am choosing to view this as a compliment to my teaching."},
+      {"idx": 2, "line": "You did not teach the player anything."},
+      {"idx": 3, "line": "The player learned despite Tarvosk. That may be the more impressive achievement."}
+    ]
+  ],
+
+    "five_of_a_kind_shown": [
+    [
+      {"idx": 1, "line": "FIVE? That's not a hand, that's a miracle! Or a very talented cheat!"},
+      {"idx": 2, "line": "The probability is astronomical. I am... questioning the integrity of the deck."},
+      {"idx": 3, "line": "The deck doesn't care about your probabilities, Haldemar. It only cares about the spectacle. And what a spectacle."}
+    ],
+    [
+      {"idx": 1, "line": "FIVE. Five of a kind. I did not think that was allowed."},
+      {"idx": 2, "line": "It is statistically permitted. The Page makes it possible."},
+      {"idx": 3, "line": "The Page has opinions. We are all learning what those opinions are."},
+      {"idx": 1, "line": "The Page's opinion is WRONG."}
+    ],
+    [
+      {"idx": 3, "line": "Five identical cards. The deck has surrendered its ability to distinguish."},
+      {"idx": 2, "line": "The probability was extremely low. And yet it occurred."},
+      {"idx": 1, "line": "I am not even angry. I am something BEYOND angry. I do not have a word for it."},
+      {"idx": 3, "line": "That is the first time Tarvosk has run out of words. The hand is truly remarkable."}
+    ],
+    [
+      {"idx": 1, "line": "Five of a kind! FIVE! The Page has favorites and I am NOT AMONG THEM."},
+      {"idx": 2, "line": "The Page is an impartial mechanism. It does not have favorites."},
+      {"idx": 3, "line": "Everything has favorites, Haldemar. Even impartial mechanisms. Especially impartial mechanisms."}
+    ]
+  ],
+
+  "strong_hand_shown": [
+    [
+      {"idx": 1, "line": "That hand is DISGUSTING. Who allowed that hand to exist?"},
+      {"idx": 2, "line": "The deck allowed it. The deck does not require permission."},
+      {"idx": 3, "line": "Tarvosk is asking who is responsible. The answer is probability. Probability is not a satisfying answer for him."}
+    ],
+    [
+      {"idx": 3, "line": "A hand of considerable quality. One wonders if it was earned or merely received."},
+      {"idx": 2, "line": "The distinction does not affect the outcome."},
+      {"idx": 1, "line": "It affects my MOOD. Which is now TERRIBLE."},
+      {"idx": 3, "line": "The outcome and the mood are different things. Haldemar is correct. Tarvosk is also correct, in his way."}
+    ],
+    [
+      {"idx": 1, "line": "That hand. THAT hand. I am going to remember that hand."},
+      {"idx": 2, "line": "Remembering is useful. Dwelling is not."},
+      {"idx": 1, "line": "I am going to DWELL. Extensively."}
+    ]
+  ],
+
+  "player_on_streak": [
+    [
+      {"idx": 1, "line": "The player keeps winning. Haldemar, your model is failing."},
+      {"idx": 2, "line": "My model accounts for streaks. Streaks are statistically expected over sufficient sample sizes."},
+      {"idx": 3, "line": "He is saying the player's winning is normal. That is not what Tarvosk wanted to hear."}
+    ],
+    [
+      {"idx": 3, "line": "The player is accumulating victories. Tarvosk, you are accumulating something else."},
+      {"idx": 1, "line": "I am accumulating WISDOM. Through PAINFUL EXPERIENCE."},
+      {"idx": 3, "line": "That is one word for it."}
+    ],
+    [
+      {"idx": 2, "line": "The player is on a streak. Mercival, does this interest you?"},
+      {"idx": 3, "line": "Streaks interest me. What people do during streaks interests me more."},
+      {"idx": 1, "line": "What I am doing is SUFFERING. Is that interesting enough for you?"}
+    ]
+  ],
+
+  "ai_on_streak": [
+    [
+      {"idx": 3, "line": "There is a momentum at this table. I am watching it more closely than I usually watch things."},
+      {"idx": 1, "line": "I am watching it too. Presumably from the source."},
+      {"idx": 2, "line": "Three consecutive wins. The streak is noted."}
+    ],
+    [
+      {"idx": 3, "line": "Someone at this table is winning consistently. Haldemar, is that someone you?"},
+      {"idx": 2, "line": "It is."},
+      {"idx": 1, "line": "It is TEMPORARILY him. I am allowing it."},
+      {"idx": 3, "line": "Allowing it. Of course."}
+    ],
+    [
+      {"idx": 1, "line": "Three wins in a row from one corner of this table. I have questions."},
+      {"idx": 3, "line": "I have answers. Whether they are the answers you want is a separate matter."},
+      {"idx": 2, "line": "The streak is statistically notable. I am adjusting my priors."}
+    ]
+  ],
+
+  "player_low_chips": [
+    [
+      {"idx": 1, "line": "The player's stack is dwindling. Haldemar, how do you assess their chances?"},
+      {"idx": 2, "line": "Reduced but not eliminated. The player still has agency."},
+      {"idx": 3, "line": "Agency and chips are different things. The player is running low on one of them."}
+    ],
+    [
+      {"idx": 3, "line": "The player's chips are few. Tarvosk, you seem almost sympathetic."},
+      {"idx": 1, "line": "I am NEVER sympathetic. I am... strategically concerned. A worthy opponent should have resources."},
+      {"idx": 3, "line": "That is almost the same thing."}
+    ],
+    [
+      {"idx": 2, "line": "The player is low on chips. The situation is precarious."},
+      {"idx": 1, "line": "Precarious is where the BEST stories come from. I would know. I have been precarious."},
+      {"idx": 3, "line": "Tarvosk has been precarious many times. He tells us frequently."}
+    ]
+  ],
+
+  "ai_low_chips": [
+    [
+      {"idx": 1, "line": "Someone's stack is looking thin. It is not mine. But I am NOTICING."},
+      {"idx": 2, "line": "My stack is adequate. The margin is sufficient."},
+      {"idx": 3, "line": "Haldemar describes near-elimination as 'adequate.' His vocabulary is a fortress."}
+    ],
+    [
+      {"idx": 3, "line": "Mercival's chips are few. Tarvosk, do you feel an opportunity approaching?"},
+      {"idx": 1, "line": "I feel MANY things. Opportunity is among them. Glee is another."},
+      {"idx": 3, "line": "He named glee before he named strategy. That is informative."}
+    ],
+    [
+      {"idx": 2, "line": "Tarvosk is low on chips. His betting may become more aggressive."},
+      {"idx": 1, "line": "My betting will become more EFFECTIVE. There is a difference."},
+      {"idx": 3, "line": "The difference is not yet visible. But we are watching."}
     ]
   ]
 }

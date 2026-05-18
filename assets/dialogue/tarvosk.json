@@ -21,7 +21,9 @@
   ],
   "arcana_revealed_5": [
     "Cancelled. The Hierophant robs us of spectacle.",
-    "Rules above mystery? The Hierophant has no imagination."
+    "Rules above mystery? The Hierophant has no imagination.",
+    "The Hierophant? Bah! A wet blanket in a golden robe!",
+    "Order is for people who can't win a brawl. Boring!"
   ],
   "arcana_revealed_6": [
     "The Lovers! Someone will share my victory. I will try not to resent them for it.",
@@ -57,7 +59,9 @@
   ],
   "arcana_revealed_13": [
     "Death strips away the fantastical. Raw strength wins now.",
-    "No arcana. No tricks. Just the cards. I find I prefer myself that way."
+    "No arcana. No tricks. Just the cards. I find I prefer myself that way.",
+    "Death! Finally, a card with some backbone!",
+    "No more dancing! We show our steel right now!"
   ],
   "arcana_revealed_14": [
     "Trade what I have for what I might need. Calculated risk.",
@@ -90,7 +94,9 @@
   ],
   "arcana_revealed_21": [
     "The World! Double the stakes. Double the glory.",
-    "Everything doubled. Do not fold now. This is precisely what we came for."
+    "Everything doubled. Do not fold now. This is precisely what we came for.",
+    "Death! Finally, a card with some backbone!",
+    "No more dancing! We show our steel right now!"
   ],
   "arcana_aftermath_8": [
     "The two is king now. My strategy must... invert. I am excellent at inverting.",
@@ -122,7 +128,10 @@
     "Hmph. The cards favored you this time. Do not grow comfortable.",
     "A {hand_name}? That is what defeated me? I refuse to be impressed.",
     "You won with {hand_name}. I have lost to worse. Once. Possibly.",
-    "That {hand_name} of yours. Luck dressed in borrowed clothes."
+    "That {hand_name} of yours. Luck dressed in borrowed clothes.",
+    "A {hand_name}? I've seen better hands on a clock!",
+    "Robbery! Plain and simple! I shall be demanding a recount from the universe!",
+    "Take your chips. They'll look better when I win them back in five minutes."
   ],
   "ai_won_round": [
     "As expected. Shall we discuss your folding strategy?",
@@ -152,7 +161,10 @@
     "Oh ho! The quiet one finds their voice!",
     "That is a raise with volume. I approve of the volume if not the target.",
     "You push hard. I have pushed harder. But I am watching now.",
-    "Aggression! From you! This table has finally become interesting."
+    "Aggression! From you! This table has finally become interesting.",
+    "You dare? To me? In this lighting?",
+    "A raise! He lives! He breathes! He bleeds chips!",
+    "Throwing weight around? I invented weight! Consider me challenged!"
   ],
   "strong_hand_shown": [
     "{player_name} reveals {hand_name}. I am disgusted. Impressed, but disgusted.",
@@ -175,7 +187,10 @@
     "{chips} chips. That is not a stack, that is a suggestion.",
     "Down to {chips}. You are one bad decision from irrelevance.",
     "Only {chips} left? I have tipped servants more than that.",
-    "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful."
+    "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful.",
+    "{chips} chips left? That's not a stack, that's a cry for help!",
+    "You're circling the drain, friend. Try not to splash on the way down.",
+    "I've got more lint in my pocket than you have chips in that pile!"
   ],
   "ai_low_chips": [
     "My stack is {chips}. Do not mistake scarcity for weakness.",

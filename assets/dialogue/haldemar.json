@@ -2,7 +2,9 @@
   "arcana_revealed_0": [
     "Unpredictable. Adjust.",
     "The Fool. Expected disruption.",
-    "Chaos introduced. I have already accounted for it."
+    "Chaos introduced. I have already accounted for it.",
+    "The Fool. Entropy as a strategy. Irritating.",
+    "A wild variable. I have adjusted the weights accordingly."
   ],
   "arcana_revealed_1": [
     "Guessing games.",
@@ -26,7 +28,8 @@
   ],
   "arcana_revealed_6": [
     "One fewer variable.",
-    "Optimization. Acceptable."
+    "Optimization. Acceptable.",
+    "The Lovers. Shared equity is better than total loss. Barely."
   ],
   "arcana_revealed_7": [
     "Movement costs something.",
@@ -67,7 +70,9 @@
   "arcana_revealed_15": [
     "High variance. Acceptable.",
     "Commitment or nothing. I can respect that.",
-    "The Devil demands a price. I have determined that it is worth paying."
+    "The Devil demands a price. I have determined that it is worth paying.",
+    "The Devil. Coercive betting. I have the capital to endure it.",
+    "Extreme thresholds. A test of liquidity, not skill."
   ],
   "arcana_revealed_16": [
     "Destruction. Accommodate it.",
@@ -129,7 +134,10 @@
     "Expected. This round.",
     "My hand: {hand_name}. Sufficient to win. Barely, perhaps.",
     "Your {hand_name} prevailed. I will adjust my model.",
-    "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong."
+    "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong.",
+    "Statistical noise often favors the unprepared.",
+    "You have the pot. I have the data. We shall see which lasts longer.",
+    "A {hand_name}. The distribution was in your favor. Noted."
   ],
   "ai_won_round": [
     "Sufficient.",
@@ -188,7 +196,9 @@
     "I hold {chips} chips. This is not a problem. It is a condition.",
     "Down to {chips}. The margin is adequate.",
     "{chips}. I have operated with less. I do not recommend it.",
-    "My stack: {chips}. I will not be eliminated before I intend to be."
+    "My stack: {chips}. I will not be eliminated before I intend to be.",
+    "Precision is more necessary when the margin for error shrinks to {chips}.",
+    "My resources are depleted. My logic remains intact."
   ],
   "split_pot": [
     "Divided. The Lovers complicate the arithmetic.",
@@ -209,7 +219,10 @@
   "player_on_streak": [
     "You are winning consistently. I am revising my model.",
     "Consecutive victories. I do not attribute this to luck. I attribute it to something I have not yet identified.",
-    "You have won several rounds. I am watching more carefully now."
+    "You have won several rounds. I am watching more carefully now.",
+    "Your deviation from the mean is becoming significant.",
+    "A sustained anomaly. I am recalibrating my expectations of your playstyle.",
+    "Success has made you predictable. You lean into your luck."
   ],
   "ai_on_streak": [
     "I continue to win. The others will adapt. Or they will not.",
