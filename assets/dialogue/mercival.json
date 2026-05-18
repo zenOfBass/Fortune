@@ -155,7 +155,7 @@
     "{player_name} reveals {hand_name}. The cards have been keeping secrets again.",
     "A {hand_name} from {player_name}. Some hands announce themselves. This one declaims.",
     "That is a {hand_name}. Probability suggests this should not have happened. Probability is often wrong about people.",
-    "{hand_name}. {player_name} held that the entire time. What else are we all holding that no one knows about?"
+    "A {hand_name}. {player_name} held that the entire time. What else are we all holding that no one knows about?"
   ],
   "five_of_a_kind_shown": [
     "Five of a kind. The Page has favorites. I have long suspected this.",

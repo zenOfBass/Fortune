@@ -127,9 +127,9 @@
   "ai_won_round": [
     "As expected. Shall we discuss your folding strategy?",
     "Magnificent. I accept my victory with appropriate humility. Which is to say, none.",
-    "{hand_name}! I could have won with less, but I prefer to win with more.",
+    "A {hand_name}! I could have won with less, but I prefer to win with more.",
     "You see that {hand_name}? That is what conviction looks like.",
-    "I held {hand_name} and you held... something else. The universe is just."
+    "Mine was {hand_name}, yours was something else. The universe is just."
   ],
   "player_folded": [
       "Wise. The brazen know when to retreat. You are learning.",

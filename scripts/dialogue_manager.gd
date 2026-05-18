@@ -114,7 +114,13 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	if recent.size() > _RECENT_MEMORY:
 		recent.pop_front()
 	_cooldowns[speaker_idx][trigger_id] = _COOLDOWN_ROUNDS
-	var formatted := line.format(context) if not context.is_empty() else line
+	var ctx := context.duplicate()
+	if ctx.has("hand_name") and ctx["hand_name"] is String:
+		var hn: String = ctx["hand_name"].to_lower()
+		if hn == "one pair":
+			hn = "pair"
+		ctx["hand_name"] = hn
+	var formatted := line.format(ctx) if not ctx.is_empty() else line
 	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), formatted)
 	if trigger_id == "tarvosk_bluffing":
 		_tarvosk_bluff_announced = true

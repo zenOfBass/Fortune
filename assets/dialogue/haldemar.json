@@ -118,15 +118,15 @@
   "player_won_round": [
     "You won. Noted.",
     "Expected. This round.",
-    "The hand was {hand_name}. Sufficient to win. Barely, perhaps.",
+    "My hand: {hand_name}. Sufficient to win. Barely, perhaps.",
     "Your {hand_name} prevailed. I will adjust my model.",
     "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong."
   ],
   "ai_won_round": [
     "Sufficient.",
     "The outcome was determined some time ago.",
-    "{hand_name}. It was always going to be enough.",
-    "I held {hand_name}. The rest was waiting for you to realize.",
+    "My {hand_name}. It was always going to be enough.",
+    "My {hand_name}. The rest was waiting for you to realize.",
     "Victory. My {hand_name} exceeded expectations. Modestly."
   ],
   "player_folded": [
@@ -153,7 +153,7 @@
   ],
   "strong_hand_shown": [
     "{player_name} has {hand_name}. The probability was low. And yet.",
-    "{hand_name}. Impressive. I had assigned that outcome a 2% likelihood.",
+    "A {hand_name}. Impressive. I had assigned that outcome a 2% likelihood.",
     "A {hand_name} from {player_name}. My model requires updating.",
     "That is a {hand_name}. I do not say this often: well played."
   ],

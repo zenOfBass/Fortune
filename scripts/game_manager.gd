@@ -318,12 +318,12 @@ func _phase_bet(g: int) -> void:
 	# uncallable excess — it has no one to win against.
 	var overbet_refund := false
 	for pidx in active_players:
-		var own := contributed.get(pidx, 0)
-		var others_max := 0
+		var own: int = contributed.get(pidx, 0)
+		var others_max: int = 0
 		for other in active_players:
 			if other != pidx:
-				others_max = max(others_max, contributed.get(other, 0))
-		var excess := own - others_max
+				others_max = max(others_max, int(contributed.get(other, 0)))
+		var excess: int = own - others_max
 		if excess > 0:
 			players[pidx].receive_chips(excess)
 			pot -= excess
