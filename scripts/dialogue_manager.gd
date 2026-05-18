@@ -18,6 +18,13 @@ var _recent: Array = [[], [], [], []]
 
 var _exchange_cooldown: int = 0
 
+var _player_raises: int = 0
+var _player_folds: int = 0
+var _rounds_played: int = 0
+var _player_win_streak: int = 0
+var _ai_win_streak: int = 0
+var _streak_ai_idx: int = -1
+
 # Hardcoded Tarvosk (idx 1) vs Haldemar (idx 2) exchanges.
 # Each entry is an Array of {idx, line} steps shown in sequence.
 const _EXCHANGES: Array = [
@@ -47,7 +54,12 @@ func _ready() -> void:
 	_load_character(1, "tarvosk")
 	_load_character(2, "haldemar")
 	_load_character(3, "mercival")
-	GameManager.round_ended.connect(func(_a, _b, _c): _advance_round())
+	GameManager.round_ended.connect(_on_round_ended_internal)
+	GameManager.player_raised.connect(func(pidx, _r, _p): if pidx == GameManager.HUMAN_IDX: _player_raises += 1)
+	GameManager.player_folded.connect(func(pidx): if pidx == GameManager.HUMAN_IDX: _player_folds += 1)
+	GameManager.phase_changed.connect(func(phase): if phase == "DEAL" and _rounds_played == 0: try_fire_any("game_start", 1.0))
+	GameManager.ai_bluffing.connect(func(pidx): try_fire("tarvosk_bluffing", pidx, 0.75))
+	GameManager.game_ended.connect(_on_game_ended)
 
 func _load_character(pidx: int, filename: String) -> void:
 	var path := _DIALOGUE_PATH + filename + ".json"
@@ -117,6 +129,66 @@ func try_fire_exchange() -> void:
 		if idx < GameManager.players.size():
 			dialogue_line.emit(idx, GameManager._pname(idx), step["line"])
 		await get_tree().create_timer(2.5).timeout
+
+func _on_round_ended_internal(winner_indices: Array, _hand_names: Array, _split: bool) -> void:
+	_advance_round()
+	_update_round_stats(winner_indices)
+	_fire_pattern_triggers_deferred()
+
+func _update_round_stats(winner_indices: Array) -> void:
+	_rounds_played += 1
+	if winner_indices.has(GameManager.HUMAN_IDX):
+		_player_win_streak += 1
+		_ai_win_streak = 0
+		_streak_ai_idx = -1
+	elif not winner_indices.is_empty():
+		var w: int = winner_indices[0]
+		if w == _streak_ai_idx:
+			_ai_win_streak += 1
+		else:
+			_ai_win_streak = 1
+			_streak_ai_idx = w
+		_player_win_streak = 0
+	else:
+		_player_win_streak = 0
+		_ai_win_streak = 0
+
+func _fire_pattern_triggers_deferred() -> void:
+	await get_tree().create_timer(5.2).timeout
+	if _rounds_played < 3:
+		return
+	if _player_win_streak >= 2:
+		try_fire_any("player_on_streak", 0.60)
+	if _ai_win_streak >= 2 and _streak_ai_idx > 0:
+		try_fire("ai_on_streak", _streak_ai_idx, 0.65)
+	var aggression := float(_player_raises) / _rounds_played
+	if aggression >= 0.4:
+		try_fire_any("player_aggressive_pattern", 0.45)
+	elif float(_player_folds) / _rounds_played >= 0.45:
+		try_fire_any("player_passive_pattern", 0.40)
+
+func _on_game_ended(final_chips: Array) -> void:
+	if final_chips.is_empty():
+		_reset_stats()
+		return
+	var max_chips: int = final_chips.max()
+	if final_chips[GameManager.HUMAN_IDX] >= max_chips:
+		try_fire_any("game_over_lose", 1.0)
+	else:
+		var winner_idx := final_chips.find(max_chips)
+		if winner_idx > 0:
+			try_fire("game_over_win", winner_idx, 1.0)
+		else:
+			try_fire_any("game_over_win", 1.0)
+	_reset_stats()
+
+func _reset_stats() -> void:
+	_player_raises = 0
+	_player_folds = 0
+	_rounds_played = 0
+	_player_win_streak = 0
+	_ai_win_streak = 0
+	_streak_ai_idx = -1
 
 func _advance_round() -> void:
 	for i in 4:

@@ -28,6 +28,7 @@ signal game_ended(final_chips: Array)
 signal game_log(message: String)
 signal player_bet_changed(player_idx: int, contributed: int)
 signal player_raised(player_idx: int, raise_to: int, prev_bet: int)
+signal ai_bluffing(player_idx: int)
 
 # ---- Internal signals (awaited inside coroutines) ----------------------------
 
@@ -248,6 +249,8 @@ func _phase_bet(g: int) -> void:
 			if g != _game_gen: return
 			var r := AIPlayer.bet(pidx, _current_bet, can_check, contributed.get(pidx, 0), player_raises.get(pidx, 0), raise_count)
 			action = r[0]; amount = r[1]
+			if action == "raise" and r.size() > 2 and r[2]:
+				ai_bluffing.emit(pidx)
 
 		acted[pidx] = true
 

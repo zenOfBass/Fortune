@@ -160,5 +160,41 @@
   "A split. Neither victory nor defeat. Unsatisfying.",
   "The pot is shared. An inefficient outcome.",
   "Half each. I would have preferred a clear result."
+  ],
+  "player_aggressive_pattern": [
+    "You raise often. The pattern is noted.",
+    "Aggression, consistently applied. Predictable. I have adjusted.",
+    "You have raised in the majority of rounds. This tells me something. I will not say what."
+  ],
+  "player_passive_pattern": [
+    "You fold frequently. Caution or limitation. I cannot yet tell which.",
+    "Another fold. You preserve your chips carefully. The question is what for.",
+    "High fold rate. Either you are disciplined or your hands are poor. Perhaps both."
+  ],
+  "player_on_streak": [
+    "You are winning consistently. I am revising my model.",
+    "Consecutive victories. I do not attribute this to luck. I attribute it to something I have not yet identified.",
+    "You have won several rounds. I am watching more carefully now."
+  ],
+  "ai_on_streak": [
+    "I continue to win. The others will adapt. Or they will not.",
+    "Three wins. Not unusual for me, but worth noting for the record.",
+    "The streak continues. I have made no mistakes. This is not a coincidence."
+  ],
+  "game_start": [
+  "We begin. The outcome is not yet determined. That will change.",
+  "The game commences. I have no remarks. That was my remark.",
+  "Cards. Chips. Opponents. All present. Proceed."
+  ],
+  "game_over_win": [
+  "The game is concluded. The result was inevitable. I merely happened to be the one who won.",
+  "Victory. I will not celebrate. Celebration implies surprise.",
+  "I have won. The data supported this outcome from the beginning."
+  ],
+  "game_over_lose": [
+  "You have won the game. I will review the hands. There will be adjustments.",
+  "The player wins. Noted. I will return with a revised model.",
+  "Game over. I lost. The distinction between losing and being defeated is meaningful. This was the former."
   ]
+
 }

@@ -160,5 +160,53 @@
   "A split pot. Half the glory, all of the resentment.",
   "Divided winnings. Someone at this table is relieved they did not have to show.",
   "The pot divides. I would rather lose everything than share, but the arcana disagree."
+  ],
+  "player_aggressive_pattern": [
+    "You raise as though chips are a nuisance you are trying to be rid of. I understand this impulse.",
+    "Always with the raise. Always. You and I are not so different, I think. This disturbs me.",
+    "The player raises again. I would call it recklessness, but it keeps working, so perhaps it is genius.",
+    "You raise more than I do. I am not sure how I feel about this."
+  ],
+  "player_passive_pattern": [
+    "You fold more than the laundress's apprentice. Where has your fire gone?",
+    "Another round, another fold. Are you playing this game or simply watching it?",
+    "I have seen more aggression from the tablecloth. Fight back.",
+    "You fold, and fold, and fold. At this rate the pot will die of old age before you claim it."
+  ],
+  "player_on_streak": [
+    "You keep winning. I have had enough of watching you keep winning.",
+    "Again? The cards are conspiring against me specifically. I feel this in my bones.",
+    "Another win for the player. I am filing a formal complaint with Fortune herself."
+  ],
+  "ai_on_streak": [
+    "Three victories. I am simply better. Someone should write this down.",
+    "The table belongs to me tonight. This is not arrogance. This is arithmetic.",
+    "I cannot stop winning. I have tried. I find I do not actually want to stop."
+  ],
+  "game_start": [
+  "Finally. I was beginning to think the cards had forgotten us. They have not. I can feel it.",
+  "The table is set. The chips are stacked. The brazen have arrived. That would be me.",
+  "A new game. I will try to leave some chips for the rest of you. I said try.",
+  "Deal the cards. I have been patient. I have been SO patient. I am finished being patient."
+  ],
+  "game_over_win": [
+  "MINE. All of it. The chips, the glory, the final word. I will be insufferable about this for WEEKS.",
+  "Victory! I knew this would happen. I did not know when, but I knew. I ALWAYS know.",
+  "The game ends and I am still here. Some of you are not. That is the correct arrangement."
+  ],
+  "game_over_lose": [
+  "You won? YOU? I... need a moment. Possibly several moments. Possibly a drink.",
+  "The player takes the game. I am choosing to view this as a learning experience. For you. You learned that luck is temporary.",
+  "Defeated. The word tastes like copper. I do not enjoy the taste."
+  ],
+  "tarvosk_bluffing": [
+  "My hand is magnificent. I will tell you exactly how magnificent. There are cards. They are good cards. Very good.",
+  "You should fold. I am doing you a favor by saying this. Out of generosity. Which I am known for.",
+  "This hand? Oh, this hand. THIS hand. I would tell you about it but I do not wish to embarrass you.",
+  "I am raising because my cards demand it. They practically raised themselves. I am merely their instrument.",
+  "Look at my face. This is the face of a man with an unbeatable hand. Study it. Memorize it.",
+  "The pot will be mine. I am saying this in advance so there is no confusion later. Clarity is important to me.",
+  "Do not look at my chips. Look at my confidence. The chips are irrelevant. The confidence is REAL.",
+  "I am definitely not bluffing. The fact that I said that means nothing. I always say that. You cannot read me."
   ]
 }

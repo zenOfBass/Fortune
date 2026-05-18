@@ -30,8 +30,10 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 	if hand_type >= 6.0:
 		effective = max(effective, raise_threshold + 0.1)
 
+	var is_bluffing := false
 	if not can_check and hand_type < 3.0 and randf() < profile.bluff_chance:
 		effective = raise_threshold + 0.1
+		is_bluffing = true
 
 	if gm.round_state.hanged_man_active and hand_type < 4.0 and effective >= fold_threshold:
 		var remaining := gm.players[pidx].chips
@@ -50,7 +52,7 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 						if not gm.round_state.raise_must_double \
 						else max(1, current_bet)
 		var raise_to: int = min(current_bet + bump, all_in_level)
-		return ["raise", raise_to]
+		return ["raise", raise_to, is_bluffing]
 	elif effective >= fold_threshold:
 		return ["check", 0] if can_check else ["call", 0]
 	elif can_check:

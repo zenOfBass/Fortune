@@ -160,5 +160,42 @@
   "A divided pot. Two winners, or zero winners, depending on your perspective.",
   "We split the winnings. The Lovers believe in partnership. I believe in observation.",
   "Half to me, half to another. The Lovers understand that victory is rarely absolute."
+  ],
+  "player_aggressive_pattern": [
+    "You raise often. The chips go forward and forward. I wonder if they ever think about coming back.",
+    "Another raise. You have a theory about this game. I can tell. I am curious whether it is correct.",
+    "You push the chips forward as though the pot owed you something. Perhaps it does.",
+    "The aggressive player. I have been watching the pattern. Patterns are the most honest thing about a person."
+  ],
+  "player_passive_pattern": [
+    "You fold with consistency. There is something almost meditative about it.",
+    "Another fold. You are conserving something. Energy, perhaps, or hope. Either is finite.",
+    "You step back more often than you step forward. I find myself wondering what you are saving it for."
+  ],
+  "player_on_streak": [
+    "You keep winning. The cards have opinions about you tonight.",
+    "Another victory. I wonder if you know why you are winning. That matters more than the winning itself.",
+    "A streak. Fortune showing favorites. Or Fortune showing patterns. The difference is philosophical."
+  ],
+  "ai_on_streak": [
+    "I keep winning. I am not sure what to make of that. I rarely am.",
+    "Another round in my favor. One begins to wonder what I am doing correctly. Or what everyone else is doing incorrectly.",
+    "The wins accumulate. I hold them loosely. Possession of this kind is always temporary."
+  ],
+  "game_start": [
+  "And so we gather again. Or for the first time. The table does not distinguish between memory and beginning.",
+  "A game commences. Something will be learned. Whether by us or about us remains to be seen.",
+  "The cards await. They are patient. More patient than some of us. Not naming names.",
+  "Here we are. The question is why. The answer, presumably, is in the deck."
+  ],
+  "game_over_win": [
+  "The game concludes. I have won. The word 'won' feels inadequate. Something closer to 'arrived' perhaps.",
+  "Victory is mine. Or I am victory's. The possession goes both ways with these things.",
+  "I take the final pot. The chips are just chips. The real winnings are more difficult to count."
+  ],
+  "game_over_lose": [
+  "The player wins. I suspected this might happen. I suspect many things. Occasionally I am correct.",
+  "You have taken the game. One wonders what you will do with it. Games are not meant to be kept.",
+  "It ends. I did not win. There is a kind of relief in that. Winning comes with expectations."
   ]
 }
