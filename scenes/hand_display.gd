@@ -36,6 +36,7 @@ func set_back_count(count: int, deal_pos: Vector2 = Vector2.ZERO) -> void:
 		var display: CardDisplayGD = CardDisplayScene.instantiate()
 		add_child(display)
 		display.position = positions[i]
+		display.card_index = i
 		display.set_back()
 		if deal_pos != Vector2.ZERO:
 			display.deal_from(deal_pos, i * 0.10, false)
@@ -70,37 +71,45 @@ func _slot_positions(count: int) -> Array[Vector2]:
 		positions.append(Vector2(i * (_CARD_W + _CARD_GAP), 0.0))
 	return positions
 
-func replace_cards(new_hand: Array, discarded_indices: Array, deal_pos: Vector2) -> void:
-	# Separate kept displays (by card identity) from discarded ones.
+func replace_cards(new_hand: Array, discarded_indices: Array, deal_pos: Vector2, sort_order: Array[int] = []) -> void:
 	var kept: Dictionary = {}   # Card → CardDisplayGD
-	var vacated_x: Array[float] = []
 	var to_remove: Array = []
 	for child in get_children():
 		if child is CardDisplayGD:
 			if discarded_indices.has(child.card_index):
-				vacated_x.append(child.position.x)
 				to_remove.append(child)
 			elif child.card_ref != null:
 				kept[child.card_ref] = child
-	vacated_x.sort()
 	for card in to_remove:
 		remove_child(card)
 		card.queue_free()
-	# Update kept cards' indices and fly in new cards at the vacated slots.
+	var positions := _slot_positions(new_hand.size())
 	var new_slot := 0
-	for i in new_hand.size():
-		var c: Card = new_hand[i] as Card
+	for display_pos in new_hand.size():
+		var orig_idx: int = sort_order[display_pos] if not sort_order.is_empty() else display_pos
+		var c: Card = new_hand[orig_idx] as Card
+		var target_pos := positions[display_pos]
 		if kept.has(c):
-			kept[c].card_index = i
+			kept[c].card_index = orig_idx
+			var t: Tween = kept[c].create_tween()
+			t.tween_property(kept[c], "position", target_pos, 0.25) \
+				.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
 		else:
 			var display: CardDisplayGD = CardDisplayScene.instantiate()
 			add_child(display)
-			display.position = Vector2(vacated_x[new_slot] if new_slot < vacated_x.size() else 0.0, 0.0)
-			display.card_index = i
+			display.position = target_pos
+			display.card_index = orig_idx
 			display.set_card(c, true)
 			display.card_toggled.connect(_on_child_toggled)
 			display.deal_from(deal_pos, new_slot * 0.10, true)
 			new_slot += 1
+
+func flip_card_at_index(idx: int, card: Card) -> void:
+	for child in get_children():
+		if child is CardDisplayGD and child.card_index == idx:
+			child.set_card(card, true)
+			child.animate_in(0.0, true)
+			return
 
 func set_selectable(selectable: bool, max_select: int = 0) -> void:
 	_max_select = max_select

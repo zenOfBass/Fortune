@@ -86,6 +86,7 @@ var _starting_chips: int = 0
 var _colored_label_settings: Dictionary = {}
 var _current_phase: String = ""
 var _pending_discard_indices: Array = []
+var _skip_player_hand_redraw: bool = false
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -320,8 +321,10 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 				GameManager.round_state.king_beats_ace,
 				GameManager.round_state.inverted_values
 			)
-			if not _pending_discard_indices.is_empty():
-				player_hand.replace_cards(hand, _pending_discard_indices, _dealer_screen_pos())
+			if _skip_player_hand_redraw:
+				_skip_player_hand_redraw = false
+			elif not _pending_discard_indices.is_empty():
+				player_hand.replace_cards(hand, _pending_discard_indices, _dealer_screen_pos(), sort_order)
 				_pending_discard_indices.clear()
 			elif _current_phase != "DRAW":
 				player_hand.set_hand(hand, true, sort_order, deal_pos)
@@ -351,6 +354,10 @@ func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array, deal_pos: Vector
 	var revealed: Card = GameManager.round_state.priestess_revealed.get(pidx)
 	if revealed == null:
 		display.set_back_count(hand.size(), deal_pos)
+	elif deal_pos == Vector2.ZERO and display.get_child_count() == hand.size():
+		var idx: int = hand.find(revealed)
+		if idx >= 0:
+			display.flip_card_at_index(idx, revealed)
 	else:
 		var idx: int = hand.find(revealed)
 		display.set_hand_mixed(hand, [idx] if idx >= 0 else [])
@@ -487,6 +494,7 @@ func _on_priestess_confirmed() -> void:
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
 	priestess_panel.visible = false
+	_skip_player_hand_redraw = true
 	GameManager.submit_arcana_choice(selected[0])
 
 func _on_judgement_reenter() -> void:
