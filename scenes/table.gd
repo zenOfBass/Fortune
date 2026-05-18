@@ -363,6 +363,8 @@ func _on_player_folded(player_idx: int) -> void:
 		3: ai3_area.modulate = DIM
 	if player_idx == GameManager.HUMAN_IDX:
 		DialogueManager.try_fire_any("player_folded", 0.70)
+		if randf() < 0.25:
+			DialogueManager.try_fire_exchange("player_folded")
 
 func _on_pot_changed(new_amount: int) -> void:
 	pot_label.text = "Pot: %d" % new_amount
@@ -386,6 +388,8 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	current_arcana_desc.visible = true
 	current_arcana.visible = true
 	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
+	if randf() < 0.25:
+		DialogueManager.try_fire_exchange("arcana_revealed")
 	await get_tree().create_timer(1.5).timeout
 	GameManager.complete_arcana_effect()
 
@@ -395,6 +399,7 @@ func _on_arcana_cancelled(cancelled_id: int) -> void:
 func _on_last_round_announced() -> void:
 	last_round_label.visible = true
 	DialogueManager.try_fire_any("last_round_announced", 1.0)
+	DialogueManager.try_fire_exchange("last_round_announced")
 
 func _on_bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int) -> void:
 	if player_idx == GameManager.HUMAN_IDX:
@@ -552,10 +557,13 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	# Split pot commentary.
 	if split:
 		DialogueManager.try_fire_any("split_pot", 0.80)
+		if randf() < 0.25:
+			DialogueManager.try_fire_exchange("split_pot")
 	# Normal round-end commentary (skipped for split pots).
 	if not split:
+		var exchange_trigger := "player_won_round" if winner_indices.has(GameManager.HUMAN_IDX) else "ai_won_round"
 		if randf() < 0.20:
-			DialogueManager.try_fire_exchange()
+			DialogueManager.try_fire_exchange(exchange_trigger)
 		elif winner_indices.has(GameManager.HUMAN_IDX):
 			var hi := winner_indices.find(GameManager.HUMAN_IDX)
 			var ctx := {"hand_name": hand_names[hi] if hi < hand_names.size() else ""}

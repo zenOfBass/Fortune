@@ -1,0 +1,237 @@
+{
+  "random": [
+    [
+      {"idx": 1, "line": "Still breathing, Haldemar? I thought you had fossilized."},
+      {"idx": 2, "line": "Still here, Tarvosk."}
+    ],
+    [
+      {"idx": 1, "line": "Mercival! You have been quiet. Plotting something, or merely adrift?"},
+      {"idx": 3, "line": "The difference between plotting and adrift is smaller than most people think."},
+      {"idx": 1, "line": "That was not an answer."},
+      {"idx": 3, "line": "Wasn't it?"}
+    ],
+    [
+      {"idx": 3, "line": "Haldemar. You fold with such regularity. One might set a clock by it."},
+      {"idx": 2, "line": "One might."}
+    ],
+    [
+      {"idx": 1, "line": "I have decided that this table needs more conversation. I am carrying this table."},
+      {"idx": 2, "line": ""},
+      {"idx": 1, "line": "Nothing? Not even a twitch?"},
+      {"idx": 2, "line": "You are doing enough for all of us."}
+    ],
+    [
+      {"idx": 1, "line": "Your silence speaks volumes. About very little."},
+      {"idx": 2, "line": "And yet I remain."}
+    ],
+    [
+      {"idx": 1, "line": "I have met doorposts with more personality."},
+      {"idx": 2, "line": "Expected."}
+    ],
+    [
+      {"idx": 1, "line": "Do you enjoy this game, Haldemar, or merely endure it?"},
+      {"idx": 2, "line": "I endure your commentary. The game is fine."}
+    ],
+    [
+      {"idx": 1, "line": "One day you will lose your composure. I intend to be there."},
+      {"idx": 2, "line": "You have been present every round. It has not happened yet."}
+    ]
+  ],
+
+  "player_won_round": [
+    [
+      {"idx": 1, "line": "The player wins again. Haldemar, you are supposed to be the calculating one. Calculate this."},
+      {"idx": 2, "line": "I have. The calculation suggests you lost more chips than I did."},
+      {"idx": 1, "line": "That is NOT the calculation I asked for."}
+    ],
+    [
+      {"idx": 3, "line": "Another round to the player. Tarvosk, your expression is doing something complicated."},
+      {"idx": 1, "line": "My expression is FINE. It is a NORMAL expression."},
+      {"idx": 3, "line": "If you say so."}
+    ],
+    [
+      {"idx": 1, "line": "Haldemar. Did you see what just happened? The player took everything."},
+      {"idx": 2, "line": "I saw."},
+      {"idx": 1, "line": "And?"},
+      {"idx": 2, "line": "And the player took everything. Your summary was accurate."}
+    ],
+    [
+      {"idx": 2, "line": "The player won. Tarvosk, you raised into that hand."},
+      {"idx": 1, "line": "I was applying PRESSURE."},
+      {"idx": 2, "line": "You applied chips. To the player's stack."}
+    ],
+    [
+      {"idx": 1, "line": "Mercival, the player wins while you sit there looking enigmatic. Do you care at all?"},
+      {"idx": 3, "line": "I care precisely as much as the situation warrants."},
+      {"idx": 1, "line": "Which is?"},
+      {"idx": 3, "line": "I haven't decided yet."}
+    ],
+    [
+      {"idx": 2, "line": "The player wins. Mercival, does this surprise you?"},
+      {"idx": 3, "line": "Surprise is a strong word. I am... interested."},
+      {"idx": 2, "line": "That is not an answer."},
+      {"idx": 3, "line": "It is the answer I have."}
+    ]
+  ],
+
+  "ai_won_round": [
+    [
+      {"idx": 1, "line": "Victory! Someone at this table understands how to win. It is me."},
+      {"idx": 2, "line": "You won one round."},
+      {"idx": 1, "line": "And I will speak of it for seven."}
+    ],
+    [
+      {"idx": 3, "line": "A win for one of us. Tarvosk, does it sting when it is not you?"},
+      {"idx": 1, "line": "I am capable of celebrating another's success. When it is deserved."},
+      {"idx": 3, "line": "And when is it deserved?"},
+      {"idx": 1, "line": "Rarely."}
+    ],
+    [
+      {"idx": 1, "line": "Well. Someone at this table has just demonstrated superiority. I will allow you to guess who."},
+      {"idx": 2, "line": "The winner."},
+      {"idx": 1, "line": "You are no fun at all."}
+    ],
+    [
+      {"idx": 2, "line": "A round concludes. Tarvosk, your commentary was notably absent during that hand."},
+      {"idx": 1, "line": "I was concentrating."},
+      {"idx": 2, "line": "You were losing."},
+      {"idx": 1, "line": "The two states are not mutually exclusive."}
+    ],
+    [
+      {"idx": 3, "line": "One of us prevails. Haldemar, does that change the arithmetic?"},
+      {"idx": 2, "line": "The arithmetic is cumulative. One round is one data point."},
+      {"idx": 3, "line": "So many data points. So little conclusion."}
+    ],
+    [
+      {"idx": 1, "line": "Mercival! Did you see how that was done? Because I am not entirely sure I did."},
+      {"idx": 3, "line": "Winning is sometimes a mystery even to the winner."},
+      {"idx": 1, "line": "That was almost profound."},
+      {"idx": 3, "line": "Almost."}
+    ]
+  ],
+
+  "arcana_revealed": [
+    [
+      {"idx": 1, "line": "The arcana speaks! Haldemar, does this change your precious calculations?"},
+      {"idx": 2, "line": "It adjusts them."},
+      {"idx": 1, "line": "Adjusts! He says adjusts. The universe intervenes and he ADJUSTS."}
+    ],
+    [
+      {"idx": 3, "line": "Another arcana. Tarvosk, you seem unsettled when the cards do not favor you directly."},
+      {"idx": 1, "line": "I am never unsettled. I am... recalibrating."},
+      {"idx": 3, "line": "Recalibrating. What a useful word."}
+    ],
+    [
+      {"idx": 2, "line": "Mercival. Your thoughts on this arcana."},
+      {"idx": 3, "line": "You are asking me directly. That is unusual."},
+      {"idx": 2, "line": "You observe. I want the observation."},
+      {"idx": 3, "line": "Then I observe that the arcana has made someone at this table nervous. I will not say who."}
+    ],
+    [
+      {"idx": 1, "line": "The arcana turns everything sideways. Haldemar, surely even you must feel something."},
+      {"idx": 2, "line": ""},
+      {"idx": 1, "line": "No? Still nothing? You are an unnatural creature."},
+      {"idx": 2, "line": "I felt mild irritation. At your question."}
+    ],
+    [
+      {"idx": 3, "line": "Haldemar. The arcana has shifted. Does your model account for this specific disruption?"},
+      {"idx": 2, "line": "My model accounts for disruption in general."},
+      {"idx": 3, "line": "But not this disruption in particular."},
+      {"idx": 2, "line": "It will. Shortly."}
+    ],
+    [
+      {"idx": 1, "line": "Mercival! Interpret the omen for us. You love doing that."},
+      {"idx": 3, "line": "I do not love it. I merely find it unavoidable."},
+      {"idx": 1, "line": "Then unavoidably interpret."},
+      {"idx": 3, "line": "The arcana suggests that someone's plans are about to become irrelevant. I will leave it at that."}
+    ]
+  ],
+
+  "last_round_announced": [
+    [
+      {"idx": 1, "line": "The World arrives. The final hand. Haldemar, any last words before I take everything?"},
+      {"idx": 2, "line": "I will save my words for after the hand."},
+      {"idx": 1, "line": "Because you will have nothing to say when I win?"},
+      {"idx": 2, "line": "Because one of us will. I prefer to wait and see which."}
+    ],
+    [
+      {"idx": 3, "line": "The last round. Everything ends. How does that feel, Tarvosk?"},
+      {"idx": 1, "line": "It feels like an opportunity. The final word is the loudest."},
+      {"idx": 3, "line": "The loudest word is not always the one that is remembered."}
+    ],
+    [
+      {"idx": 2, "line": "Final hand. Mercival, you have been quiet all game."},
+      {"idx": 3, "line": "I have been listening."},
+      {"idx": 2, "line": "And?"},
+      {"idx": 3, "line": "And I have heard enough to know that the last hand tells the truth about a person."}
+    ],
+    [
+      {"idx": 1, "line": "This is it! Haldemar, Mercival — it has been an honor. By which I mean it has been a pleasure to defeat you repeatedly."},
+      {"idx": 2, "line": "The game is not over."},
+      {"idx": 3, "line": "Tarvosk celebrates early. Some things are predictable. Some things are Tarvosk."}
+    ],
+    [
+      {"idx": 3, "line": "The World. Haldemar, do you believe in endings?"},
+      {"idx": 2, "line": "I believe in results."},
+      {"idx": 3, "line": "That is not the same thing."},
+      {"idx": 2, "line": "It is close enough."}
+    ],
+    [
+      {"idx": 1, "line": "Final round! Mercival, any cryptic parting wisdom?"},
+      {"idx": 3, "line": "Wisdom is rarely parting. It tends to linger."},
+      {"idx": 1, "line": "That was not wisdom. That was wordplay."},
+      {"idx": 3, "line": "The line between them is thinner than you think."}
+    ]
+  ],
+
+  "player_folded": [
+    [
+      {"idx": 1, "line": "The player retreats! Haldemar, your influence spreads. Everyone is folding now."},
+      {"idx": 2, "line": "Folding is a decision. Not all decisions are influenced."},
+      {"idx": 1, "line": "You are no fun to blame for things."}
+    ],
+    [
+      {"idx": 3, "line": "The player steps back. Tarvosk, you seem disappointed."},
+      {"idx": 1, "line": "I wanted a fight. I am given a retreat."},
+      {"idx": 3, "line": "Not every dance requires two partners."}
+    ],
+    [
+      {"idx": 2, "line": "The player folded. Mercival, does that change your assessment?"},
+      {"idx": 3, "line": "It confirms part of it. The rest remains to be seen."},
+      {"idx": 2, "line": "You are always withholding."},
+      {"idx": 3, "line": "Withholding implies I have something to give. Perhaps I simply observe."}
+    ],
+    [
+      {"idx": 1, "line": "Folded! Who folds with a pot that size? Haldemar, explain the player to me."},
+      {"idx": 2, "line": "The player assessed the risk and declined."},
+      {"idx": 1, "line": "That is not an explanation. That is a DESCRIPTION."},
+      {"idx": 2, "line": "The description is the explanation."}
+    ]
+  ],
+
+  "split_pot": [
+    [
+      {"idx": 1, "line": "A divided pot. The Lovers make everything complicated. Haldemar, your thoughts?"},
+      {"idx": 2, "line": "A split is mathematically suboptimal but strategically neutral."},
+      {"idx": 1, "line": "Do you ever say anything that is not about mathematics?"},
+      {"idx": 2, "line": "Rarely."}
+    ],
+    [
+      {"idx": 3, "line": "The Lovers insist on partnership. Tarvosk, sharing does not suit you."},
+      {"idx": 1, "line": "Sharing is for people who cannot take everything. I CAN take everything. I simply was not allowed to this time."},
+      {"idx": 3, "line": "A distinction without a difference."}
+    ],
+    [
+      {"idx": 2, "line": "The pot is shared. Mercival, what does the sharing tell you?"},
+      {"idx": 3, "line": "That two people at this table were nearly equal. Nearly is the operative word."},
+      {"idx": 2, "line": "Nearly equal in cards or nearly equal in something else?"},
+      {"idx": 3, "line": "I wonder that myself."}
+    ],
+    [
+      {"idx": 1, "line": "Split! Someone at this table is relieved. Someone else is furious. I will let you guess which is which."},
+      {"idx": 3, "line": "You are the one who spoke first, Tarvosk."},
+      {"idx": 1, "line": "That means nothing."},
+      {"idx": 3, "line": "It means you are the one who needed to speak."}
+    ]
+  ]
+}

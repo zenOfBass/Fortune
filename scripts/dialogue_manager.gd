@@ -10,6 +10,9 @@ const _BASE_CHANCE := 0.80
 # Player index -> trigger_id -> Array[String]
 var _lines: Array = [{}, {}, {}, {}]
 
+# trigger_id -> Array of exchange step-arrays (loaded from exchanges.json)
+var _exchanges: Dictionary = {}
+
 # Player index -> trigger_id -> rounds remaining
 var _cooldowns: Array = [{}, {}, {}, {}]
 
@@ -25,41 +28,28 @@ var _player_win_streak: int = 0
 var _ai_win_streak: int = 0
 var _streak_ai_idx: int = -1
 
-# Hardcoded Tarvosk (idx 1) vs Haldemar (idx 2) exchanges.
-# Each entry is an Array of {idx, line} steps shown in sequence.
-const _EXCHANGES: Array = [
-	[
-		{"idx": 1, "line": "Still breathing, Haldemar? I thought you had fossilized."},
-		{"idx": 2, "line": "Still here, Tarvosk."}
-	],
-	[
-		{"idx": 1, "line": "Your silence speaks volumes. About very little."},
-		{"idx": 2, "line": "And yet I remain."}
-	],
-	[
-		{"idx": 1, "line": "I have met doorposts with more personality."},
-		{"idx": 2, "line": "Expected."}
-	],
-	[
-		{"idx": 1, "line": "Do you enjoy this game, Haldemar, or merely endure it?"},
-		{"idx": 2, "line": "I endure your commentary. The game is fine."}
-	],
-	[
-		{"idx": 1, "line": "One day you will lose your composure. I intend to be there."},
-		{"idx": 2, "line": "You have been present every round. It has not happened yet."}
-	],
-]
 
 func _ready() -> void:
 	_load_character(1, "tarvosk")
 	_load_character(2, "haldemar")
 	_load_character(3, "mercival")
+	_load_exchanges()
 	GameManager.round_ended.connect(_on_round_ended_internal)
 	GameManager.player_raised.connect(func(pidx, _r, _p): if pidx == GameManager.HUMAN_IDX: _player_raises += 1)
 	GameManager.player_folded.connect(func(pidx): if pidx == GameManager.HUMAN_IDX: _player_folds += 1)
 	GameManager.phase_changed.connect(func(phase): if phase == "DEAL" and _rounds_played == 0: try_fire_any("game_start", 1.0))
 	GameManager.ai_bluffing.connect(func(pidx): try_fire("tarvosk_bluffing", pidx, 0.75))
 	GameManager.game_ended.connect(_on_game_ended)
+
+func _load_exchanges() -> void:
+	var path := _DIALOGUE_PATH + "exchanges.json"
+	if not FileAccess.file_exists(path):
+		push_warning("DialogueManager: missing file %s" % path)
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	var parsed = JSON.parse_string(file.get_as_text())
+	if parsed is Dictionary:
+		_exchanges = parsed
 
 func _load_character(pidx: int, filename: String) -> void:
 	var path := _DIALOGUE_PATH + filename + ".json"
@@ -127,17 +117,24 @@ func try_fire_any_except(trigger_id: String, exclude_idx: int, chance: float = _
 		return
 	try_fire(trigger_id, eligible[randi() % eligible.size()], chance, context)
 
-# Fire a scripted Tarvosk/Haldemar exchange (sequential, async).
+# Fire a scripted exchange between AI characters (sequential, async).
+# trigger_id selects from that key in exchanges.json; falls back to "random" if empty.
 # Requires at least 3 players (player + Tarvosk + Haldemar).
-func try_fire_exchange() -> void:
+func try_fire_exchange(trigger_id: String = "random") -> void:
 	if _exchange_cooldown > 0 or GameManager.players.size() < 3:
 		return
+	var pool: Array = _exchanges.get(trigger_id, [])
+	if pool.is_empty() and trigger_id != "random":
+		pool = _exchanges.get("random", [])
+	if pool.is_empty():
+		return
 	_exchange_cooldown = 6
-	var steps: Array = _EXCHANGES[randi() % _EXCHANGES.size()]
+	var steps: Array = pool[randi() % pool.size()]
 	for step in steps:
 		var idx: int = step["idx"]
-		if idx < GameManager.players.size():
-			dialogue_line.emit(idx, GameManager._pname(idx), step["line"])
+		var line: String = step.get("line", "")
+		if idx < GameManager.players.size() and not line.is_empty():
+			dialogue_line.emit(idx, GameManager._pname(idx), line)
 		await get_tree().create_timer(2.5).timeout
 
 func _on_round_ended_internal(winner_indices: Array, _hand_names: Array, _split: bool) -> void:
