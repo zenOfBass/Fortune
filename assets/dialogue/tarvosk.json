@@ -1,0 +1,102 @@
+{
+  "arcana_revealed_0": [
+    "The Fool! Chaos given form. This is my natural terrain.",
+    "A wild card for a wild game. Yes. Good."
+  ],
+  "arcana_revealed_1": [
+    "The Magician. Tricks and misdirection. My natural element.",
+    "Shall I tell you what I hold, or shall you guess wrong on your own?"
+  ],
+  "arcana_revealed_2": [
+    "Secrets exposed. I have nothing to hide. Unlike some.",
+    "Show your cards, whether you want to or not. I enjoy this arcana."
+  ],
+  "arcana_revealed_3": [
+    "The Empress provides. I accept her generosity.",
+    "Keep the best, discard the rest. A philosophy I live by."
+  ],
+  "arcana_revealed_4": [
+    "The King reclaims his throne. As it should be.",
+    "Authority restored. I find this entirely appropriate."
+  ],
+  "arcana_revealed_5": [
+    "Cancelled. The Hierophant robs us of spectacle.",
+    "Rules above mystery? The Hierophant has no imagination."
+  ],
+  "arcana_revealed_6": [
+    "Four is enough when four is perfect. I have four perfect cards.",
+    "The Lovers know when to cut their losses. I know this well."
+  ],
+  "arcana_revealed_7": [
+    "Pass a card? Gladly. I am generous when it costs me nothing.",
+    "The Chariot moves forward. Unlike some at this table."
+  ],
+  "arcana_revealed_8": [
+    "The weak become strong! Strength prefers paradox tonight.",
+    "The lowest rises above the highest. I appreciate the sentiment."
+  ],
+  "arcana_revealed_9": [
+    "One more card. One more opportunity to ruin you.",
+    "The Hermit rewards patience. Tonight I am patient. Briefly."
+  ],
+  "arcana_revealed_10": [
+    "Fortune spins! I love when the floor falls out.",
+    "The Wheel! Everything reshuffled. My favorite kind of round."
+  ],
+  "arcana_revealed_11": [
+    "Justice demands honesty. I find this... limiting.",
+    "Forced to bet what my hand deserves. An unusual constraint for me."
+  ],
+  "arcana_revealed_12": [
+    "Three gone, three new. Refreshing. I was tired of what I had.",
+    "The Hanged Man empties our hands. We start again from beautiful chaos."
+  ],
+  "arcana_revealed_13": [
+    "Death strips away the fantastical. Raw strength wins now.",
+    "No arcana. No tricks. Just the cards. I find I prefer myself that way."
+  ],
+  "arcana_revealed_14": [
+    "Trade what I have for what I might need. Calculated risk.",
+    "Temperance offers exchange. The question is whether you are brave enough."
+  ],
+  "arcana_revealed_15": [
+    "Everything on the table! The Devil understands me perfectly.",
+    "All in or fold. My kind of round. Finally someone speaks my language."
+  ],
+  "arcana_revealed_16": [
+    "The Tower! Good. I thrive in rubble.",
+    "Destruction visits equally. This suits the brazen."
+  ],
+  "arcana_revealed_17": [
+    "A choice between holding and reaching. I always reach.",
+    "The Star offers hope. I prefer certainty, but hope will do."
+  ],
+  "arcana_revealed_18": [
+    "Secrets and shadows. I wonder what you are all hiding from me.",
+    "The Moon obscures. I dislike what I cannot see. Fortunately I can see plenty."
+  ],
+  "arcana_revealed_19": [
+    "Extra chips for the victor! This round matters considerably more.",
+    "The Sun shines on the bold. I intend to be very, very bold."
+  ],
+  "arcana_revealed_20": [
+    "Judgement calls back the fallen. How inconvenient for whoever thought they were safe.",
+    "The dead return. This changes my calculations. Slightly."
+  ],
+  "arcana_revealed_21": [
+    "The World! Double the stakes. Double the glory.",
+    "Everything doubled. Do not fold now. This is precisely what we came for."
+  ],
+  "player_won_round": [
+    "Enjoy it. The arcana will correct this shortly.",
+    "Hmph. The cards favored you this time. Do not grow comfortable."
+  ],
+  "ai_won_round": [
+    "As expected. Shall we discuss your folding strategy?",
+    "Magnificent. I accept my victory with appropriate humility. Which is to say, none."
+  ],
+  "player_folded": [
+    "Wise. The brazen know when to retreat. You are learning.",
+    "The retreat is noted. The pot is not yours."
+  ]
+}

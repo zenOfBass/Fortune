@@ -1,0 +1,112 @@
+extends Node
+
+signal dialogue_line(speaker_idx: int, speaker_name: String, line: String)
+
+const _DIALOGUE_PATH := "res://assets/dialogue/"
+const _COOLDOWN_ROUNDS := 3
+const _RECENT_MEMORY := 3
+const _BASE_CHANCE := 0.80
+
+# Player index -> trigger_id -> Array[String]
+var _lines: Array = [{}, {}, {}, {}]
+
+# Player index -> trigger_id -> rounds remaining
+var _cooldowns: Array = [{}, {}, {}, {}]
+
+# Player index -> Array[String] (last N lines shown)
+var _recent: Array = [[], [], [], []]
+
+var _exchange_cooldown: int = 0
+
+# Hardcoded Tarvosk (idx 1) vs Haldemar (idx 2) exchanges.
+# Each entry is an Array of {idx, line} steps shown in sequence.
+const _EXCHANGES: Array = [
+	[
+		{"idx": 1, "line": "Still breathing, Haldemar? I thought you had fossilized."},
+		{"idx": 2, "line": "Still here, Tarvosk."}
+	],
+	[
+		{"idx": 1, "line": "Your silence speaks volumes. About very little."},
+		{"idx": 2, "line": "And yet I remain."}
+	],
+	[
+		{"idx": 1, "line": "I have met doorposts with more personality."},
+		{"idx": 2, "line": "Expected."}
+	],
+	[
+		{"idx": 1, "line": "Do you enjoy this game, Haldemar, or merely endure it?"},
+		{"idx": 2, "line": "I endure your commentary. The game is fine."}
+	],
+	[
+		{"idx": 1, "line": "One day you will lose your composure. I intend to be there."},
+		{"idx": 2, "line": "You have been present every round. It has not happened yet."}
+	],
+]
+
+func _ready() -> void:
+	_load_character(1, "tarvosk")
+	_load_character(2, "haldemar")
+	_load_character(3, "mercival")
+	GameManager.round_ended.connect(func(_a, _b, _c): _advance_round())
+
+func _load_character(pidx: int, filename: String) -> void:
+	var path := _DIALOGUE_PATH + filename + ".json"
+	if not FileAccess.file_exists(path):
+		push_warning("DialogueManager: missing file %s" % path)
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	var parsed = JSON.parse_string(file.get_as_text())
+	if parsed is Dictionary:
+		_lines[pidx] = parsed
+
+# Fire a line for a specific AI speaker. chance ∈ [0,1].
+func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE) -> void:
+	if speaker_idx == 0 or speaker_idx >= GameManager.players.size():
+		return
+	if randf() > chance:
+		return
+	if _cooldowns[speaker_idx].get(trigger_id, 0) > 0:
+		return
+	var pool: Array = _lines[speaker_idx].get(trigger_id, [])
+	if pool.is_empty():
+		return
+	var recent: Array = _recent[speaker_idx]
+	var candidates: Array = pool.filter(func(l): return not recent.has(l))
+	if candidates.is_empty():
+		candidates = pool
+	var line: String = candidates[randi() % candidates.size()]
+	recent.append(line)
+	if recent.size() > _RECENT_MEMORY:
+		recent.pop_front()
+	_cooldowns[speaker_idx][trigger_id] = _COOLDOWN_ROUNDS
+	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), line)
+
+# Pick one eligible AI at random and fire a trigger for them.
+func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE) -> void:
+	var eligible: Array = []
+	for i in range(1, GameManager.players.size()):
+		if not _lines[i].get(trigger_id, []).is_empty() \
+				and _cooldowns[i].get(trigger_id, 0) == 0:
+			eligible.append(i)
+	if eligible.is_empty():
+		return
+	try_fire(trigger_id, eligible[randi() % eligible.size()], chance)
+
+# Fire a scripted Tarvosk/Haldemar exchange (sequential, async).
+# Requires at least 3 players (player + Tarvosk + Haldemar).
+func try_fire_exchange() -> void:
+	if _exchange_cooldown > 0 or GameManager.players.size() < 3:
+		return
+	_exchange_cooldown = 6
+	var steps: Array = _EXCHANGES[randi() % _EXCHANGES.size()]
+	for step in steps:
+		var idx: int = step["idx"]
+		if idx < GameManager.players.size():
+			dialogue_line.emit(idx, GameManager._pname(idx), step["line"])
+		await get_tree().create_timer(2.5).timeout
+
+func _advance_round() -> void:
+	for i in 4:
+		for key in _cooldowns[i].keys():
+			_cooldowns[i][key] = max(0, _cooldowns[i][key] - 1)
+	_exchange_cooldown = max(0, _exchange_cooldown - 1)

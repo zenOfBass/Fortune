@@ -1,0 +1,102 @@
+{
+  "arcana_revealed_0": [
+    "The card that can be everything is, in a sense, nothing. Fascinating.",
+    "The Fool arrives. I wonder who else here is playing a part."
+  ],
+  "arcana_revealed_1": [
+    "To guess correctly is merely to observe carefully. Or so I am told.",
+    "The Magician asks what you cannot see. I ask what you think you can."
+  ],
+  "arcana_revealed_2": [
+    "Something hidden becomes unhidden. Does it change what was already true?",
+    "The Priestess opens a door. What exits may not be what you expected to see."
+  ],
+  "arcana_revealed_3": [
+    "The best of what you have. One wonders what that actually is, for some of us.",
+    "Keep the good, release the burden. Easier said, as always."
+  ],
+  "arcana_revealed_4": [
+    "Authority reasserts itself. Whether that is justice is a separate question.",
+    "The King reclaims precedence. How institutional."
+  ],
+  "arcana_revealed_5": [
+    "The Hierophant prefers the familiar. I wonder what he is afraid of.",
+    "Cancelled. And yet here we all still are, which is its own kind of revelation."
+  ],
+  "arcana_revealed_6": [
+    "Four instead of five. The one left behind always knows something the others don't.",
+    "Choose four. The unchosen card watches from outside the hand."
+  ],
+  "arcana_revealed_7": [
+    "What we release travels to places we may not want it to go.",
+    "The Chariot asks for passage. The toll is paid in cards."
+  ],
+  "arcana_revealed_8": [
+    "The least becomes the most. I find this arrangement... familiar.",
+    "Strength through inversion. The lowly card now stands tallest. Interesting topology."
+  ],
+  "arcana_revealed_9": [
+    "One more card. One more thing to be uncertain about. Delightful.",
+    "The Hermit extends the search. What are we looking for, exactly?"
+  ],
+  "arcana_revealed_10": [
+    "Fortune reminds us that what we held was borrowed all along.",
+    "The Wheel turns. All those careful plans. How temporary."
+  ],
+  "arcana_revealed_11": [
+    "Justice asks that your bet reflect your hand. A revealing constraint, is it not?",
+    "Honest stakes. One wonders what that looks like for the habitually theatrical."
+  ],
+  "arcana_revealed_12": [
+    "The Hanged Man suggests that suspension has its own kind of clarity.",
+    "Three cards gone. Perhaps the ones that leave us were already finished here."
+  ],
+  "arcana_revealed_13": [
+    "Death brings clarity. No more distractions. No more beautiful exceptions.",
+    "The ordinary game, revealed beneath all the theatre. Somewhat disappointing. Somewhat not."
+  ],
+  "arcana_revealed_14": [
+    "Exchange implies that both parties believe they are improving. Often only one is correct.",
+    "The swap. I am always curious what someone thinks is a fair trade."
+  ],
+  "arcana_revealed_15": [
+    "All or nothing. The Devil simplifies by removing the middle entirely.",
+    "There is a kind of honesty in extremes. It eliminates nuance, which some find refreshing."
+  ],
+  "arcana_revealed_16": [
+    "The Tower falls equally on all of us. That is the closest thing to fairness I have seen tonight.",
+    "Destruction without preference. How democratic."
+  ],
+  "arcana_revealed_17": [
+    "To reach for the new or trust what you hold. The Star leaves the philosophy to you.",
+    "Hope as mechanism. One wonders if the Star knows what it is offering."
+  ],
+  "arcana_revealed_18": [
+    "The Moon reveals by concealing. Or conceals by revealing. I can never quite tell.",
+    "A hidden card. Something that exists without being seen. I understand the appeal."
+  ],
+  "arcana_revealed_19": [
+    "The Sun rewards the winner as if winning were not already sufficient.",
+    "Abundance for the victor. Fortune has opinions about who deserves abundance."
+  ],
+  "arcana_revealed_20": [
+    "Judgement calls back those who thought they were finished. The game, it seems, disagrees.",
+    "Return from elimination. One wonders if Judgement has read the room."
+  ],
+  "arcana_revealed_21": [
+    "The World doubles the reward. One hopes we all appreciate the weight of that.",
+    "Double the pot. The World offers much, but the World also expects something in return."
+  ],
+  "player_won_round": [
+    "A win for you. And yet I find myself unsurprised, which surprises me.",
+    "Well played. Or well fortuned. The distinction matters less than the result."
+  ],
+  "ai_won_round": [
+    "And so it falls to me. I had a feeling.",
+    "Interesting. The cards agreed with me this round."
+  ],
+  "player_folded": [
+    "You step back. The space you leave is already being filled.",
+    "A fold. Something about the hand did not suit you. Or something about the room."
+  ]
+}

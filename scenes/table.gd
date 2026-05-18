@@ -56,6 +56,12 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var temperance_panel = $TemperancePanel
 @onready var judgement_panel = $JudgementPanel
 
+# ---- Dialogue display -------------------------------------------------------
+
+@onready var dialogue_display: PanelContainer = $DialogueDisplay
+@onready var dialogue_speaker: Label = $DialogueDisplay/VBox/SpeakerLabel
+@onready var dialogue_text: Label = $DialogueDisplay/VBox/LineLabel
+
 # ---- Pause panel -------------------------------------------------------------
 
 @onready var pause_panel: PanelContainer = $PausePanel
@@ -65,6 +71,7 @@ var _shuffle_sfx: AudioStreamPlayer
 # ---- Setup -------------------------------------------------------------------
 
 var _log_tween: Tween = null
+var _dialogue_tween: Tween = null
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
 
@@ -83,6 +90,7 @@ func _ready() -> void:
 	_layout_ai_areas(num_players)
 
 	draw_panel.visible = false
+	dialogue_display.visible = false
 	last_round_label.visible = false
 	arcana_panel.visible = false
 	chariot_panel.visible = false
@@ -126,6 +134,7 @@ func _ready() -> void:
 	GameManager.page_bonus.connect(_on_page_bonus)
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.game_log.connect(_on_game_log)
+	DialogueManager.dialogue_line.connect(_on_dialogue_line)
 
 	current_arcana_thumb.custom_minimum_size = Vector2(80, 120)
 	current_arcana_thumb.expand_mode = TextureRect.EXPAND_KEEP_SIZE
@@ -306,6 +315,8 @@ func _on_player_folded(player_idx: int) -> void:
 		1: ai1_area.modulate = DIM
 		2: ai2_area.modulate = DIM
 		3: ai3_area.modulate = DIM
+	if player_idx == GameManager.HUMAN_IDX:
+		DialogueManager.try_fire_any("player_folded", 0.70)
 
 func _on_pot_changed(new_amount: int) -> void:
 	pot_label.text = "Pot: %d" % new_amount
@@ -328,6 +339,7 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	current_arcana_desc.text = MajorArcana.get_desc(arcana_id)
 	current_arcana_desc.visible = true
 	current_arcana.visible = true
+	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85)
 	await get_tree().create_timer(1.5).timeout
 	GameManager.complete_arcana_effect()
 
@@ -480,6 +492,13 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 		if split:
 			parts.insert(0, "Split pot!")
 	phase_label.text = " | ".join(parts)
+	if not split and randf() < 0.20:
+		DialogueManager.try_fire_exchange()
+	elif not split:
+		if winner_indices.has(GameManager.HUMAN_IDX):
+			DialogueManager.try_fire_any("player_won_round", 0.85)
+		else:
+			DialogueManager.try_fire("ai_won_round", winner_indices[0], 0.90)
 	await get_tree().create_timer(4.0).timeout
 	GameManager.confirm_next_round()
 
@@ -519,6 +538,19 @@ func _flash_latest_log(message: String) -> void:
 	_log_tween.tween_property(latest_log_label, "modulate:a", 0.0, 0.10)
 	_log_tween.tween_callback(func(): latest_log_label.text = message)
 	_log_tween.tween_property(latest_log_label, "modulate:a", 1.0, 0.20).set_ease(Tween.EASE_OUT)
+
+func _on_dialogue_line(_speaker_idx: int, speaker_name: String, line: String) -> void:
+	dialogue_speaker.text = speaker_name
+	dialogue_text.text = line
+	if is_instance_valid(_dialogue_tween):
+		_dialogue_tween.kill()
+	dialogue_display.modulate.a = 0.0
+	dialogue_display.visible = true
+	_dialogue_tween = create_tween()
+	_dialogue_tween.tween_property(dialogue_display, "modulate:a", 1.0, 0.3)
+	_dialogue_tween.tween_interval(4.0)
+	_dialogue_tween.tween_property(dialogue_display, "modulate:a", 0.0, 0.5)
+	_dialogue_tween.tween_callback(func(): dialogue_display.visible = false)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

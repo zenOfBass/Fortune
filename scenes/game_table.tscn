@@ -22,6 +22,24 @@ font_size = 11
 outline_size = 2
 outline_color = Color(0, 0, 0, 0.75)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialogue"]
+bg_color = Color(0.15, 0.08, 0.06, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.50, 0.25, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_speaker"]
+font_size = 13
+font_color = Color(0.90, 0.75, 0.40, 1.0)
+outline_size = 2
+outline_color = Color(0, 0, 0, 0.75)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panels"]
 bg_color = Color(0.08, 0.10, 0.18, 0.97)
 border_width_left = 2
@@ -279,3 +297,27 @@ size_flags_horizontal = 3
 [node name="MainMenuButton" type="Button" parent="PausePanel/VBox"]
 text = "Main Menu"
 size_flags_horizontal = 3
+
+[node name="DialogueDisplay" type="PanelContainer" parent="."]
+anchor_left = 0.22
+anchor_right = 0.78
+offset_top = 5.0
+offset_bottom = 68.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialogue")
+visible = false
+
+[node name="VBox" type="VBoxContainer" parent="DialogueDisplay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="SpeakerLabel" type="Label" parent="DialogueDisplay/VBox"]
+text = ""
+horizontal_alignment = 1
+size_flags_horizontal = 3
+label_settings = SubResource("LabelSettings_speaker")
+
+[node name="LineLabel" type="Label" parent="DialogueDisplay/VBox"]
+text = ""
+horizontal_alignment = 1
+size_flags_horizontal = 3
+autowrap_mode = 3

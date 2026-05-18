@@ -1,0 +1,102 @@
+{
+  "arcana_revealed_0": [
+    "Unpredictable. Adjust.",
+    "The Fool. Expected disruption."
+  ],
+  "arcana_revealed_1": [
+    "Guessing games.",
+    "You reveal more than you intend."
+  ],
+  "arcana_revealed_2": [
+    "Exposure changes nothing I intend to do.",
+    "What is shown changes little."
+  ],
+  "arcana_revealed_3": [
+    "Reasonable.",
+    "The strong survive. As usual."
+  ],
+  "arcana_revealed_4": [
+    "Authority asserted.",
+    "A small adjustment."
+  ],
+  "arcana_revealed_5": [
+    "Sensible.",
+    "Stability. I approve."
+  ],
+  "arcana_revealed_6": [
+    "One fewer variable.",
+    "Optimization. Acceptable."
+  ],
+  "arcana_revealed_7": [
+    "Movement costs something.",
+    "What you give away reveals you."
+  ],
+  "arcana_revealed_8": [
+    "Inversion. Adapt.",
+    "The smallest becomes the largest. Noted."
+  ],
+  "arcana_revealed_9": [
+    "More information.",
+    "Deliberation rewarded."
+  ],
+  "arcana_revealed_10": [
+    "All previous calculations: void.",
+    "Chance reasserts itself. Expected."
+  ],
+  "arcana_revealed_11": [
+    "Honesty imposed.",
+    "This limits the reckless. Good."
+  ],
+  "arcana_revealed_12": [
+    "Begin again.",
+    "Three fewer illusions to hold."
+  ],
+  "arcana_revealed_13": [
+    "Finally.",
+    "Clarity."
+  ],
+  "arcana_revealed_14": [
+    "Exchange without guarantee.",
+    "A calculated risk. Perhaps."
+  ],
+  "arcana_revealed_15": [
+    "High variance. Acceptable.",
+    "Commitment or nothing. I can respect that."
+  ],
+  "arcana_revealed_16": [
+    "Destruction. Accommodate it.",
+    "Disruption. I will adapt faster than most."
+  ],
+  "arcana_revealed_17": [
+    "A choice. I have already made mine.",
+    "Options. I prefer fewer of them."
+  ],
+  "arcana_revealed_18": [
+    "Uncertainty changes nothing I intend to do.",
+    "Hidden things surface eventually."
+  ],
+  "arcana_revealed_19": [
+    "Additional stakes. Noted.",
+    "Worth winning more this round."
+  ],
+  "arcana_revealed_20": [
+    "The eliminated, returned.",
+    "Judgement complicates the ledger."
+  ],
+  "arcana_revealed_21": [
+    "Significant. Do not squander it.",
+    "The stakes justify full attention."
+  ],
+  "player_won_round": [
+    "You won. Noted.",
+    "Expected. This round."
+  ],
+  "ai_won_round": [
+    "Sufficient.",
+    "The outcome was determined some time ago."
+  ],
+  "player_folded": [
+    "Expected.",
+    "Fold. The only sensible move, apparently."
+  ]
+}
