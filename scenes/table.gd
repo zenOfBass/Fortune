@@ -393,6 +393,9 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 		DialogueManager.try_fire_exchange("arcana_revealed")
 	await get_tree().create_timer(1.5).timeout
 	GameManager.complete_arcana_effect()
+	if arcana_id in [8, 11, 13, 16, 19]:
+		await get_tree().create_timer(2.0).timeout
+		DialogueManager.try_fire_any("arcana_aftermath_%d" % arcana_id, 0.70)
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:
 	phase_label.text = "Hierophant cancelled: " + MajorArcana.arcana_name(cancelled_id)

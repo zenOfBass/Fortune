@@ -90,6 +90,31 @@
     "Significant. Do not squander it.",
     "The stakes justify full attention."
   ],
+  "arcana_aftermath_8": [
+    "Values are inverted. Two is now the highest card. The hierarchy has reversed. I have adjusted.",
+    "The deck is upside down. The mathematics remain consistent. The inputs have changed. I have accounted for this.",
+    "Inversion complete. Low cards are now high. The probability distributions shift accordingly."
+  ],
+  "arcana_aftermath_11": [
+    "Raises are capped. Bluffing is not possible. The round will be determined by cards alone.",
+    "Betting is constrained to the call amount. This eliminates a variable. I prefer fewer variables.",
+    "Justice enforces parity. The reckless cannot overextend. This improves the information quality of each bet."
+  ],
+  "arcana_aftermath_13": [
+    "No draw phase. No second betting round. The hand I am holding is the hand I will show.",
+    "Death eliminates further decisions. The current hand is the final hand. I am ready.",
+    "Showdown is immediate. Further calculation is unnecessary. The outcome is already determined."
+  ],
+  "arcana_aftermath_16": [
+    "The Tower has destroyed half the pot. The remaining half is still worth pursuing.",
+    "Chips have been removed from play. The expected value of winning has decreased. I have recalculated.",
+    "Half the pot is gone. The loss is distributed across all players. The distribution is irrelevant to my strategy."
+  ],
+  "arcana_aftermath_19": [
+    "The Sun divides the pot equally. Victory and defeat produce the same outcome this round.",
+    "All active players receive an equal share. The incentive to win is temporarily removed.",
+    "Equal distribution. The pot is no longer a reward for the best hand. It is a baseline."
+  ],
   "player_won_round": [
     "You won. Noted.",
     "Expected. This round.",

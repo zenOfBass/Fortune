@@ -101,7 +101,7 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	# Exclude lines whose placeholders would substitute to empty string.
 	var _would_blank := func(l: String) -> bool:
 		for key in context:
-			if context[key] == "" and l.contains("{%s}" % key):
+			if context[key] is String and context[key] == "" and l.contains("{%s}" % key):
 				return true
 		return false
 	var candidates: Array = pool.filter(func(l): return not recent.has(l) and not _would_blank.call(l))
