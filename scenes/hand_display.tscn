@@ -2,6 +2,5 @@
 
 [ext_resource type="Script" path="res://scenes/hand_display.gd" id="1_hd"]
 
-[node name="HandDisplay" type="HBoxContainer"]
+[node name="HandDisplay" type="Control"]
 script = ExtResource("1_hd")
-alignment = 1

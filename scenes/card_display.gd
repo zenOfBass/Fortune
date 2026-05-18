@@ -4,6 +4,7 @@ extends TextureRect
 signal card_toggled(index: int, selected: bool)
 
 var card_index: int = -1
+var card_ref: Card = null
 var _selected: bool = false
 var _selectable: bool = false
 var _tween: Tween = null
@@ -15,6 +16,7 @@ func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_PASS
 
 func set_card(card: Card, face_up: bool) -> void:
+	card_ref = card
 	if face_up:
 		texture = load(card.texture_path())
 	else:
@@ -30,6 +32,26 @@ func set_back() -> void:
 func _exit_tree() -> void:
 	if is_instance_valid(_tween):
 		_tween.kill()
+
+func deal_from(from_global: Vector2, delay: float, flip: bool = false) -> void:
+	if is_instance_valid(_tween):
+		_tween.kill()
+	var target_pos := position
+	position = get_parent().get_global_transform().affine_inverse() * from_global
+	modulate.a = 0.0
+	var face_tex: Texture2D = null
+	if flip:
+		face_tex = texture
+		texture = load(SettingsManager.card_back_path())
+	_tween = create_tween()
+	_tween.tween_interval(delay)
+	_tween.tween_property(self, "modulate:a", 1.0, 0.06)
+	_tween.parallel().tween_property(self, "position", target_pos, 0.40) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	if flip:
+		_tween.tween_property(self, "scale:x", 0.0, 0.07)
+		_tween.tween_callback(func(): texture = face_tex)
+		_tween.tween_property(self, "scale:x", 1.0, 0.07)
 
 func animate_in(delay: float, flip: bool = false) -> void:
 	if is_instance_valid(_tween):

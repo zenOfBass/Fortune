@@ -84,6 +84,8 @@ var _skip_flip := false
 var _bet_contributed: Dictionary = {}
 var _starting_chips: int = 0
 var _colored_label_settings: Dictionary = {}
+var _current_phase: String = ""
+var _pending_discard_indices: Array = []
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -251,7 +253,24 @@ func _on_player_raised(player_idx: int, raise_to: int, prev_bet: int) -> void:
 	if prev_bet > 0 and raise_to >= prev_bet * 3:
 		DialogueManager.try_fire_any("player_raised_aggressively", 0.50)
 
+func _dealer_screen_pos() -> Vector2:
+	var vp := get_viewport_rect().size
+	var num := GameManager.players.size()
+	match GameManager.dealer_idx:
+		0:
+			return Vector2(vp.x * 0.50, vp.y * 0.90)
+		1:
+			return Vector2(vp.x * 0.07, vp.y * 0.50) if num == 3 \
+				else Vector2(vp.x * 0.50, vp.y * 0.21)
+		2:
+			return Vector2(vp.x * 0.93, vp.y * 0.50) if num == 3 \
+				else Vector2(vp.x * 0.07, vp.y * 0.50)
+		3:
+			return Vector2(vp.x * 0.93, vp.y * 0.50)
+	return vp / 2.0
+
 func _on_phase_changed(phase_name: String) -> void:
+	_current_phase = phase_name
 	_bet_contributed.clear()
 	_refresh_player_labels()
 	if phase_name == "DEAL":
@@ -293,6 +312,7 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 			1: ai1_area.modulate = Color.WHITE
 			2: ai2_area.modulate = Color.WHITE
 			3: ai3_area.modulate = Color.WHITE
+	var deal_pos := _dealer_screen_pos() if _current_phase == "DEAL" else Vector2.ZERO
 	match player_idx:
 		0:
 			var sort_order := HandEvaluator.sort_order_for_display(
@@ -300,14 +320,18 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 				GameManager.round_state.king_beats_ace,
 				GameManager.round_state.inverted_values
 			)
-			player_hand.set_hand(hand, true, sort_order)
+			if not _pending_discard_indices.is_empty():
+				player_hand.replace_cards(hand, _pending_discard_indices, _dealer_screen_pos())
+				_pending_discard_indices.clear()
+			elif _current_phase != "DRAW":
+				player_hand.set_hand(hand, true, sort_order, deal_pos)
 			if not hand.is_empty():
 				var opts := GameManager.round_state.eval_options()
 				var score := HandEvaluator.score(hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
 				hand_rank_label.text = HandEvaluator.hand_type_name(score)
-		1: _set_ai_hand(ai1_hand, player_idx, hand)
-		2: _set_ai_hand(ai2_hand, player_idx, hand)
-		3: _set_ai_hand(ai3_hand, player_idx, hand)
+		1: _set_ai_hand(ai1_hand, player_idx, hand, deal_pos)
+		2: _set_ai_hand(ai2_hand, player_idx, hand, deal_pos)
+		3: _set_ai_hand(ai3_hand, player_idx, hand, deal_pos)
 
 func _on_player_hand_revealed(player_idx: int, hand: Array) -> void:
 	if player_idx == GameManager.HUMAN_IDX or hand.is_empty():
@@ -323,10 +347,10 @@ func _on_player_hand_revealed(player_idx: int, hand: Array) -> void:
 		2: ai2_hand.set_hand(hand, true, sort_order)
 		3: ai3_hand.set_hand(hand, true, sort_order)
 
-func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array) -> void:
+func _set_ai_hand(display: HandDisplay, pidx: int, hand: Array, deal_pos: Vector2 = Vector2.ZERO) -> void:
 	var revealed: Card = GameManager.round_state.priestess_revealed.get(pidx)
 	if revealed == null:
-		display.set_back_count(hand.size())
+		display.set_back_count(hand.size(), deal_pos)
 	else:
 		var idx: int = hand.find(revealed)
 		display.set_hand_mixed(hand, [idx] if idx >= 0 else [])
@@ -531,6 +555,7 @@ func _on_chariot_confirmed() -> void:
 
 func _on_confirm_discard() -> void:
 	var indices := player_hand.get_selected_indices()
+	_pending_discard_indices = indices.duplicate()
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
 	draw_panel.visible = false
