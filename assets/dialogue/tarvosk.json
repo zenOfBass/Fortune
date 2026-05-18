@@ -24,8 +24,10 @@
     "Rules above mystery? The Hierophant has no imagination."
   ],
   "arcana_revealed_6": [
-    "Four is enough when four is perfect. I have four perfect cards.",
-    "The Lovers know when to cut their losses. I know this well."
+    "The Lovers! Someone will share my victory. I will try not to resent them for it.",
+    "The Lovers know when to cut their losses. I know this well.",
+    "The Lovers demand partnership. I am not the partnering kind. But I will take the chips.",
+    "We share? The Lovers make everything awkward."
   ],
   "arcana_revealed_7": [
     "Pass a card? Gladly. I am generous when it costs me nothing.",
@@ -91,75 +93,75 @@
     "Everything doubled. Do not fold now. This is precisely what we came for."
   ],
   "player_won_round": [
-    "Enjoy it. The arcana will correct this shortly.",
-    "Hmph. The cards favored you this time. Do not grow comfortable.",
-    "A {hand_name}? That is what defeated me? I refuse to be impressed.",
-    "You won with {hand_name}. I have lost to worse. Once. Possibly.",
-    "That {hand_name} of yours. Luck dressed in borrowed clothes."
+      "Enjoy it. The arcana will correct this shortly.",
+      "Hmph. The cards favored you this time. Do not grow comfortable.",
+      "A {hand_name}? That is what defeated me? I refuse to be impressed.",
+      "You won with {hand_name}. I have lost to worse. Once. Possibly.",
+      "That {hand_name} of yours. Luck dressed in borrowed clothes."
   ],
   "ai_won_round": [
-  "As expected. Shall we discuss your folding strategy?",
-  "Magnificent. I accept my victory with appropriate humility. Which is to say, none.",
-  "{hand_name}! I could have won with less, but I prefer to win with more.",
-  "You see that {hand_name}? That is what conviction looks like.",
-  "I held {hand_name} and you held... something else. The universe is just."
+    "As expected. Shall we discuss your folding strategy?",
+    "Magnificent. I accept my victory with appropriate humility. Which is to say, none.",
+    "{hand_name}! I could have won with less, but I prefer to win with more.",
+    "You see that {hand_name}? That is what conviction looks like.",
+    "I held {hand_name} and you held... something else. The universe is just."
   ],
   "player_folded": [
-    "Wise. The brazen know when to retreat. You are learning.",
-    "The retreat is noted. The pot is not yours."
+      "Wise. The brazen know when to retreat. You are learning.",
+      "The retreat is noted. The pot is not yours."
   ],
   "player_went_all_in": [
-  "All of it! Now we are playing properly.",
-  "Everything on the line. I respect this. I do not respect you, but I respect this.",
-  "You push all in? Finally. I was growing bored of your caution.",
-  "The full stack. Either very brave or very foolish. I know which I am betting on."
+    "All of it! Now we are playing properly.",
+    "Everything on the line. I respect this. I do not respect you, but I respect this.",
+    "You push all in? Finally. I was growing bored of your caution.",
+    "The full stack. Either very brave or very foolish. I know which I am betting on."
   ],
   "ai_went_all_in": [
-  "All of it. Because half-measures are for half-people.",
-  "I commit everything. Let the arcana sort out the worthy.",
-  "My entire stack. I dare you to match it. I double-dare you.",
-  "This is the moment where you discover whether your hand is worth your pride."
+    "All of it. Because half-measures are for half-people.",
+    "I commit everything. Let the arcana sort out the worthy.",
+    "My entire stack. I dare you to match it. I double-dare you.",
+    "This is the moment where you discover whether your hand is worth your pride."
   ],
   "player_raised_aggressively": [
-  "Oh ho! The quiet one finds their voice!",
-  "That is a raise with volume. I approve of the volume if not the target.",
-  "You push hard. I have pushed harder. But I am watching now.",
-  "Aggression! From you! This table has finally become interesting."
+    "Oh ho! The quiet one finds their voice!",
+    "That is a raise with volume. I approve of the volume if not the target.",
+    "You push hard. I have pushed harder. But I am watching now.",
+    "Aggression! From you! This table has finally become interesting."
   ],
   "strong_hand_shown": [
-  "{player_name} reveals {hand_name}. I am disgusted. Impressed, but disgusted.",
-  "A {hand_name}? Who dealt this round? I want names.",
-  "That {hand_name} is an insult to probability. And to me, specifically.",
-  "Show me {hand_name} and expect me to sit quietly? You do not know me at all."
+    "{player_name} reveals {hand_name}. I am disgusted. Impressed, but disgusted.",
+    "A {hand_name}? Who dealt this round? I want names.",
+    "That {hand_name} is an insult to probability. And to me, specifically.",
+    "Show me {hand_name} and expect me to sit quietly? You do not know me at all."
   ],
   "five_of_a_kind_shown": [
-  "Five of a kind. Five! The Page has chosen favorites and I am not among them.",
-  "Five matching cards. I did not think the universe capable of such concentrated injustice.",
-  "FIVE. That is not a hand, that is a declaration of war."
+    "Five of a kind. Five! The Page has chosen favorites and I am not among them.",
+    "Five matching cards. I did not think the universe capable of such concentrated injustice.",
+    "FIVE. That is not a hand, that is a declaration of war."
   ],
   "last_round_announced": [
-  "The World has spoken. Everything ends. Everything is decided. Now.",
-  "Final round! No more time for caution. Not that I ever had any.",
-  "This is it. The last chance to prove you were worth the seat you occupy.",
-  "The end approaches. I intend to meet it with a very large stack of chips."
+    "The World has spoken. Everything ends. Everything is decided. Now.",
+    "Final round! No more time for caution. Not that I ever had any.",
+    "This is it. The last chance to prove you were worth the seat you occupy.",
+    "The end approaches. I intend to meet it with a very large stack of chips."
   ],
   "player_low_chips": [
-  "{chips} chips. That is not a stack, that is a suggestion.",
-  "Down to {chips}. You are one bad decision from irrelevance.",
-  "Only {chips} left? I have tipped servants more than that.",
-  "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful."
+    "{chips} chips. That is not a stack, that is a suggestion.",
+    "Down to {chips}. You are one bad decision from irrelevance.",
+    "Only {chips} left? I have tipped servants more than that.",
+    "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful."
   ],
   "ai_low_chips": [
-  "My stack is {chips}. Do not mistake scarcity for weakness.",
-  "Down to {chips}? A temporary condition. I have clawed back from less.",
-  "Only {chips} chips remain to me. The universe tests my resolve. It will fail.",
-  "{chips}. I have built empires from less. Metaphorically."
+    "My stack is {chips}. Do not mistake scarcity for weakness.",
+    "Down to {chips}? A temporary condition. I have clawed back from less.",
+    "Only {chips} chips remain to me. The universe tests my resolve. It will fail.",
+    "{chips}. I have built empires from less. Metaphorically."
   ],
   "split_pot": [
-  "We share? The Lovers make everything awkward.",
-  "A split pot. Half the glory, all of the resentment.",
-  "Divided winnings. Someone at this table is relieved they did not have to show.",
-  "The pot divides. I would rather lose everything than share, but the arcana disagree."
+    "A split pot. Half the glory, all of the resentment.",
+    "Divided winnings. Someone at this table is relieved they did not have to show.",
+    "A split pot. Two winners. I intend to be the one who wins more.",
+    "The pot divides. I would rather lose everything than share, but the arcana disagree."
   ],
   "player_aggressive_pattern": [
     "You raise as though chips are a nuisance you are trying to be rid of. I understand this impulse.",
@@ -184,29 +186,29 @@
     "I cannot stop winning. I have tried. I find I do not actually want to stop."
   ],
   "game_start": [
-  "Finally. I was beginning to think the cards had forgotten us. They have not. I can feel it.",
-  "The table is set. The chips are stacked. The brazen have arrived. That would be me.",
-  "A new game. I will try to leave some chips for the rest of you. I said try.",
-  "Deal the cards. I have been patient. I have been SO patient. I am finished being patient."
+    "Finally. I was beginning to think the cards had forgotten us. They have not. I can feel it.",
+    "The table is set. The chips are stacked. The brazen have arrived. That would be me.",
+    "A new game. I will try to leave some chips for the rest of you. I said try.",
+    "Deal the cards. I have been patient. I have been SO patient. I am finished being patient."
   ],
   "game_over_win": [
-  "MINE. All of it. The chips, the glory, the final word. I will be insufferable about this for WEEKS.",
-  "Victory! I knew this would happen. I did not know when, but I knew. I ALWAYS know.",
-  "The game ends and I am still here. Some of you are not. That is the correct arrangement."
+    "MINE. All of it. The chips, the glory, the final word. I will be insufferable about this for WEEKS.",
+    "Victory! I knew this would happen. I did not know when, but I knew. I ALWAYS know.",
+    "The game ends and I am still here. Some of you are not. That is the correct arrangement."
   ],
   "game_over_lose": [
-  "You won? YOU? I... need a moment. Possibly several moments. Possibly a drink.",
-  "The player takes the game. I am choosing to view this as a learning experience. For you. You learned that luck is temporary.",
-  "Defeated. The word tastes like copper. I do not enjoy the taste."
+    "You won? YOU? I... need a moment. Possibly several moments. Possibly a drink.",
+    "The player takes the game. I am choosing to view this as a learning experience. For you. You learned that luck is temporary.",
+    "Defeated. The word tastes like copper. I do not enjoy the taste."
   ],
   "tarvosk_bluffing": [
-  "My hand is magnificent. I will tell you exactly how magnificent. There are cards. They are good cards. Very good.",
-  "You should fold. I am doing you a favor by saying this. Out of generosity. Which I am known for.",
-  "This hand? Oh, this hand. THIS hand. I would tell you about it but I do not wish to embarrass you.",
-  "I am raising because my cards demand it. They practically raised themselves. I am merely their instrument.",
-  "Look at my face. This is the face of a man with an unbeatable hand. Study it. Memorize it.",
-  "The pot will be mine. I am saying this in advance so there is no confusion later. Clarity is important to me.",
-  "Do not look at my chips. Look at my confidence. The chips are irrelevant. The confidence is REAL.",
-  "I am definitely not bluffing. The fact that I said that means nothing. I always say that. You cannot read me."
+    "My hand is magnificent. I will tell you exactly how magnificent. There are cards. They are good cards. Very good.",
+    "You should fold. I am doing you a favor by saying this. Out of generosity. Which I am known for.",
+    "This hand? Oh, this hand. THIS hand. I would tell you about it but I do not wish to embarrass you.",
+    "I am raising because my cards demand it. They practically raised themselves. I am merely their instrument.",
+    "Look at my face. This is the face of a man with an unbeatable hand. Study it. Memorize it.",
+    "The pot will be mine. I am saying this in advance so there is no confusion later. Clarity is important to me.",
+    "Do not look at my chips. Look at my confidence. The chips are irrelevant. The confidence is REAL.",
+    "I am definitely not bluffing. The fact that I said that means nothing. I always say that. You cannot read me."
   ]
 }

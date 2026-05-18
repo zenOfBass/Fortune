@@ -96,7 +96,9 @@ static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool,
 	# ---- Three of a Kind ------------------------------------------------------
 	if cnt_vals[0] == 3:
 		var kickers := _all_with_count(counts, 1)
-		return _pack(THREE_OF_A_KIND, [_first_with_count(counts, 3), kickers[0], kickers[1], 0, 0])
+		return _pack(THREE_OF_A_KIND, [_first_with_count(counts, 3),
+				kickers[0] if kickers.size() > 0 else 0,
+				kickers[1] if kickers.size() > 1 else 0, 0, 0])
 
 	# ---- Two Pair -------------------------------------------------------------
 	if cnt_vals.count(2) == 2:
@@ -106,7 +108,10 @@ static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool,
 	# ---- One Pair -------------------------------------------------------------
 	if cnt_vals[0] == 2:
 		var kickers := _all_with_count(counts, 1)
-		return _pack(ONE_PAIR, [_first_with_count(counts, 2), kickers[0], kickers[1], kickers[2], 0])
+		return _pack(ONE_PAIR, [_first_with_count(counts, 2),
+				kickers[0] if kickers.size() > 0 else 0,
+				kickers[1] if kickers.size() > 1 else 0,
+				kickers[2] if kickers.size() > 2 else 0, 0])
 
 	# ---- High Card ------------------------------------------------------------
 	return _pack(HIGH_CARD, sorted_cvals)

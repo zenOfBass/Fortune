@@ -84,9 +84,17 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	if pool.is_empty():
 		return
 	var recent: Array = _recent[speaker_idx]
-	var candidates: Array = pool.filter(func(l): return not recent.has(l))
+	# Exclude lines whose placeholders would substitute to empty string.
+	var _would_blank := func(l: String) -> bool:
+		for key in context:
+			if context[key] == "" and l.contains("{%s}" % key):
+				return true
+		return false
+	var candidates: Array = pool.filter(func(l): return not recent.has(l) and not _would_blank.call(l))
 	if candidates.is_empty():
-		candidates = pool
+		candidates = pool.filter(func(l): return not _would_blank.call(l))
+	if candidates.is_empty():
+		return
 	var line: String = candidates[randi() % candidates.size()]
 	recent.append(line)
 	if recent.size() > _RECENT_MEMORY:
