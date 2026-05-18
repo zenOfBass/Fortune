@@ -33,7 +33,8 @@
   ],
   "arcana_revealed_8": [
     "The weak become strong! Strength prefers paradox tonight.",
-    "The lowest rises above the highest. I appreciate the sentiment."
+    "The lowest rises above the highest. I appreciate the sentiment.",
+    "Inversion! My mediocre hand is suddenly terrifying. To you, I mean."
   ],
   "arcana_revealed_9": [
     "One more card. One more opportunity to ruin you.",
@@ -49,7 +50,8 @@
   ],
   "arcana_revealed_12": [
     "Three gone, three new. Refreshing. I was tired of what I had.",
-    "The Hanged Man empties our hands. We start again from beautiful chaos."
+    "The Hanged Man empties our hands. We start again from beautiful chaos.",
+    "Suspended, then released. Three cards I no longer have to pretend I wanted."
   ],
   "arcana_revealed_13": [
     "Death strips away the fantastical. Raw strength wins now.",
@@ -65,7 +67,8 @@
   ],
   "arcana_revealed_16": [
     "The Tower! Good. I thrive in rubble.",
-    "Destruction visits equally. This suits the brazen."
+    "Destruction visits equally. This suits the brazen.",
+    "Half the pot to oblivion. A worthy sacrifice to the spectacle."
   ],
   "arcana_revealed_17": [
     "A choice between holding and reaching. I always reach.",
@@ -89,14 +92,73 @@
   ],
   "player_won_round": [
     "Enjoy it. The arcana will correct this shortly.",
-    "Hmph. The cards favored you this time. Do not grow comfortable."
+    "Hmph. The cards favored you this time. Do not grow comfortable.",
+    "A {hand_name}? That is what defeated me? I refuse to be impressed.",
+    "You won with {hand_name}. I have lost to worse. Once. Possibly.",
+    "That {hand_name} of yours. Luck dressed in borrowed clothes."
   ],
   "ai_won_round": [
-    "As expected. Shall we discuss your folding strategy?",
-    "Magnificent. I accept my victory with appropriate humility. Which is to say, none."
+  "As expected. Shall we discuss your folding strategy?",
+  "Magnificent. I accept my victory with appropriate humility. Which is to say, none.",
+  "{hand_name}! I could have won with less, but I prefer to win with more.",
+  "You see that {hand_name}? That is what conviction looks like.",
+  "I held {hand_name} and you held... something else. The universe is just."
   ],
   "player_folded": [
     "Wise. The brazen know when to retreat. You are learning.",
     "The retreat is noted. The pot is not yours."
+  ],
+  "player_went_all_in": [
+  "All of it! Now we are playing properly.",
+  "Everything on the line. I respect this. I do not respect you, but I respect this.",
+  "You push all in? Finally. I was growing bored of your caution.",
+  "The full stack. Either very brave or very foolish. I know which I am betting on."
+  ],
+  "ai_went_all_in": [
+  "All of it. Because half-measures are for half-people.",
+  "I commit everything. Let the arcana sort out the worthy.",
+  "My entire stack. I dare you to match it. I double-dare you.",
+  "This is the moment where you discover whether your hand is worth your pride."
+  ],
+  "player_raised_aggressively": [
+  "Oh ho! The quiet one finds their voice!",
+  "That is a raise with volume. I approve of the volume if not the target.",
+  "You push hard. I have pushed harder. But I am watching now.",
+  "Aggression! From you! This table has finally become interesting."
+  ],
+  "strong_hand_shown": [
+  "{player_name} reveals {hand_name}. I am disgusted. Impressed, but disgusted.",
+  "A {hand_name}? Who dealt this round? I want names.",
+  "That {hand_name} is an insult to probability. And to me, specifically.",
+  "Show me {hand_name} and expect me to sit quietly? You do not know me at all."
+  ],
+  "five_of_a_kind_shown": [
+  "Five of a kind. Five! The Page has chosen favorites and I am not among them.",
+  "Five matching cards. I did not think the universe capable of such concentrated injustice.",
+  "FIVE. That is not a hand, that is a declaration of war."
+  ],
+  "last_round_announced": [
+  "The World has spoken. Everything ends. Everything is decided. Now.",
+  "Final round! No more time for caution. Not that I ever had any.",
+  "This is it. The last chance to prove you were worth the seat you occupy.",
+  "The end approaches. I intend to meet it with a very large stack of chips."
+  ],
+  "player_low_chips": [
+  "{chips} chips. That is not a stack, that is a suggestion.",
+  "Down to {chips}. You are one bad decision from irrelevance.",
+  "Only {chips} left? I have tipped servants more than that.",
+  "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful."
+  ],
+  "ai_low_chips": [
+  "My stack is {chips}. Do not mistake scarcity for weakness.",
+  "Down to {chips}? A temporary condition. I have clawed back from less.",
+  "Only {chips} chips remain to me. The universe tests my resolve. It will fail.",
+  "{chips}. I have built empires from less. Metaphorically."
+  ],
+  "split_pot": [
+  "We share? The Lovers make everything awkward.",
+  "A split pot. Half the glory, all of the resentment.",
+  "Divided winnings. Someone at this table is relieved they did not have to show.",
+  "The pot divides. I would rather lose everything than share, but the arcana disagree."
   ]
 }

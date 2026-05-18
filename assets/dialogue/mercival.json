@@ -1,7 +1,8 @@
 {
   "arcana_revealed_0": [
-    "The card that can be everything is, in a sense, nothing. Fascinating.",
-    "The Fool arrives. I wonder who else here is playing a part."
+  "The card that can be everything is, in a sense, nothing. Fascinating.",
+  "The Fool arrives. I wonder who else here is playing a part.",
+  "A wild card. The Fool asks: what is wildness but possibility wearing a mask?"
   ],
   "arcana_revealed_1": [
     "To guess correctly is merely to observe carefully. Or so I am told.",
@@ -32,8 +33,9 @@
     "The Chariot asks for passage. The toll is paid in cards."
   ],
   "arcana_revealed_8": [
-    "The least becomes the most. I find this arrangement... familiar.",
-    "Strength through inversion. The lowly card now stands tallest. Interesting topology."
+  "The least becomes the most. I find this arrangement... familiar.",
+  "Strength through inversion. The lowly card now stands tallest. Interesting topology.",
+  "The bottom rises. I have always suspected the bottom knew something the top did not."
   ],
   "arcana_revealed_9": [
     "One more card. One more thing to be uncertain about. Delightful.",
@@ -64,8 +66,9 @@
     "There is a kind of honesty in extremes. It eliminates nuance, which some find refreshing."
   ],
   "arcana_revealed_16": [
-    "The Tower falls equally on all of us. That is the closest thing to fairness I have seen tonight.",
-    "Destruction without preference. How democratic."
+  "The Tower falls equally on all of us. That is the closest thing to fairness I have seen tonight.",
+  "Destruction without preference. How democratic.",
+  "Half the pot, returned to wherever chips go when they are no longer wanted. Which is nowhere, I suppose."
   ],
   "arcana_revealed_17": [
     "To reach for the new or trust what you hold. The Star leaves the philosophy to you.",
@@ -88,15 +91,74 @@
     "Double the pot. The World offers much, but the World also expects something in return."
   ],
   "player_won_round": [
-    "A win for you. And yet I find myself unsurprised, which surprises me.",
-    "Well played. Or well fortuned. The distinction matters less than the result."
+  "A win for you. And yet I find myself unsurprised, which surprises me.",
+  "Well played. Or well fortuned. The distinction matters less than the result.",
+  "You take the pot with {hand_name}. Was it the hand or the handling?",
+  "Victory, and with {hand_name}. The cards have opinions about who should win. Tonight they favor you.",
+  "Your {hand_name} prevails. I wonder what you learned from it. I wonder what I learned."
   ],
   "ai_won_round": [
-    "And so it falls to me. I had a feeling.",
-    "Interesting. The cards agreed with me this round."
+  "And so it falls to me. I had a feeling.",
+  "Interesting. The cards agreed with me this round.",
+  "I win with {hand_name}. The hand itself is merely the messenger.",
+  "My {hand_name} takes the pot. Some victories are louder than others. This one whispers.",
+  "The round is mine. {hand_name}. I suspected as much, but suspecting and knowing are different countries."
   ],
   "player_folded": [
     "You step back. The space you leave is already being filled.",
     "A fold. Something about the hand did not suit you. Or something about the room."
+  ],
+  "player_went_all_in": [
+  "Everything. You have removed the safety net. I admire the gesture if not the timing.",
+  "All in. The word 'all' is doing considerable work in that sentence.",
+  "You commit your entire stack. One wonders what you see that I do not. Or perhaps one does not wonder at all.",
+  "Total commitment. The space between caution and abandon is where interesting things happen."
+  ],
+  "ai_went_all_in": [
+  "I am all in. The gesture is more informative than the number.",
+  "Everything I have. Which is, admittedly, not everything. But it is everything here.",
+  "My stack joins the pot. I had been meaning to part with it.",
+  "All in. There is a freedom in having no further decisions to make."
+  ],
+  "player_raised_aggressively": [
+  "A bold raise. Boldness tells stories. I am listening.",
+  "You push more chips forward. The chips themselves have no opinion, but I do.",
+  "That is a substantial increase. One might call it a statement. One might call it a question.",
+  "Aggression from the player. The table takes notes in its own way."
+  ],
+  "strong_hand_shown": [
+  "{player_name} reveals {hand_name}. The cards have been keeping secrets again.",
+  "A {hand_name} from {player_name}. Some hands announce themselves. This one declaims.",
+  "That is a {hand_name}. Probability suggests this should not have happened. Probability is often wrong about people.",
+  "{hand_name}. {player_name} held that the entire time. What else are we all holding that no one knows about?"
+  ],
+  "five_of_a_kind_shown": [
+  "Five of a kind. The Page has favorites. I have long suspected this.",
+  "All five. The deck has run out of ways to distinguish one card from another. Poetic, in its way.",
+  "Five identical. The universe occasionally abandons subtlety entirely."
+  ],
+  "last_round_announced": [
+  "The World. How appropriate. We began in possibility and end in certainty.",
+  "The final round. Everything after this is memory. Everything before was preparation.",
+  "So this is where it ends. Or begins. The World is ambiguous about such things.",
+  "One last hand. The World asks: what will you do when there is no 'next time'?"
+  ],
+  "player_low_chips": [
+  "You have {chips} chips. Scarcity has its own kind of clarity.",
+  "Only {chips} left. The interesting decisions are the ones made from disadvantage.",
+  "Your stack is {chips}. I have been there. The view is different from the bottom. More honest.",
+  "{chips} chips. The question is not how many you have, but what you will become when they are gone."
+  ],
+  "ai_low_chips": [
+  "My stack is {chips}. I find low numbers aesthetically pleasing. They have nowhere to go but interesting directions.",
+  "Down to {chips}. The margin between presence and absence grows thin. Thin places are where things happen.",
+  "{chips} chips remain to me. Enough for one more story. Perhaps two.",
+  "I hold {chips}. The amount is almost philosophical at this point."
+  ],
+  "split_pot": [
+  "The Lovers insist we share. Intimacy enforced by arcana. How modern.",
+  "A divided pot. Two winners, or zero winners, depending on your perspective.",
+  "We split the winnings. The Lovers believe in partnership. I believe in observation.",
+  "Half to me, half to another. The Lovers understand that victory is rarely absolute."
   ]
 }

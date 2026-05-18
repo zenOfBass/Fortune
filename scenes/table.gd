@@ -70,10 +70,13 @@ var _shuffle_sfx: AudioStreamPlayer
 
 # ---- Setup -------------------------------------------------------------------
 
+const _STRONG_HANDS := ["Royal Flush", "Straight Flush", "Four of a Kind"]
+
 var _log_tween: Tween = null
 var _dialogue_tween: Tween = null
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
+var _starting_chips: int = 0
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -150,6 +153,8 @@ func _ready() -> void:
 	draw_panel.offset_top = -95.0
 	draw_panel.offset_bottom = -5.0
 	GameManager.start_game()
+	if GameManager.players.size() > 0:
+		_starting_chips = GameManager.players[0].chips
 
 # ---- Layout ------------------------------------------------------------------
 
@@ -207,6 +212,11 @@ func _place_side(area: Control, vp: Vector2, is_left: bool) -> void:
 func _on_player_bet_changed(player_idx: int, contributed: int) -> void:
 	_bet_contributed[player_idx] = contributed
 	_set_player_label(player_idx, GameManager.players[player_idx].chips)
+	if GameManager.players[player_idx].chips == 0:
+		if player_idx == GameManager.HUMAN_IDX:
+			DialogueManager.try_fire_any("player_went_all_in", 0.90)
+		else:
+			DialogueManager.try_fire("ai_went_all_in", player_idx, 0.85)
 
 func _on_phase_changed(phase_name: String) -> void:
 	_bet_contributed.clear()
@@ -307,6 +317,13 @@ func _refresh_player_labels() -> void:
 
 func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 	_set_player_label(player_idx, chips)
+	if _starting_chips > 0 and chips > 0:
+		var threshold := max(10, _starting_chips / 5)
+		if chips <= threshold:
+			if player_idx == GameManager.HUMAN_IDX:
+				DialogueManager.try_fire_any("player_low_chips", 0.75, {"chips": chips})
+			else:
+				DialogueManager.try_fire("ai_low_chips", player_idx, 0.70, {"chips": chips})
 
 func _on_player_folded(player_idx: int) -> void:
 	const DIM = Color(0.45, 0.45, 0.45)
@@ -339,7 +356,7 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	current_arcana_desc.text = MajorArcana.get_desc(arcana_id)
 	current_arcana_desc.visible = true
 	current_arcana.visible = true
-	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85)
+	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
 	await get_tree().create_timer(1.5).timeout
 	GameManager.complete_arcana_effect()
 
@@ -348,6 +365,7 @@ func _on_arcana_cancelled(cancelled_id: int) -> void:
 
 func _on_last_round_announced() -> void:
 	last_round_label.visible = true
+	DialogueManager.try_fire_any("last_round_announced", 1.0)
 
 func _on_bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int) -> void:
 	if player_idx == GameManager.HUMAN_IDX:
@@ -492,13 +510,30 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 		if split:
 			parts.insert(0, "Split pot!")
 	phase_label.text = " | ".join(parts)
-	if not split and randf() < 0.20:
-		DialogueManager.try_fire_exchange()
-	elif not split:
-		if winner_indices.has(GameManager.HUMAN_IDX):
-			DialogueManager.try_fire_any("player_won_round", 0.85)
+	# Rare hand reactions — always use a reactor (not the winner themselves).
+	for i in hand_names.size():
+		var w := winner_indices[i]
+		var ctx := {"hand_name": hand_names[i], "player_name": GameManager._pname(w)}
+		if hand_names[i] == "Five of a Kind":
+			DialogueManager.try_fire_any_except("five_of_a_kind_shown", w, 1.0)
+			break
+		elif hand_names[i] in _STRONG_HANDS:
+			DialogueManager.try_fire_any_except("strong_hand_shown", w, 0.95, ctx)
+			break
+	# Split pot commentary.
+	if split:
+		DialogueManager.try_fire_any("split_pot", 0.80)
+	# Normal round-end commentary (skipped for split pots).
+	if not split:
+		if randf() < 0.20:
+			DialogueManager.try_fire_exchange()
+		elif winner_indices.has(GameManager.HUMAN_IDX):
+			var hi := winner_indices.find(GameManager.HUMAN_IDX)
+			var ctx := {"hand_name": hand_names[hi] if hi < hand_names.size() else ""}
+			DialogueManager.try_fire_any("player_won_round", 0.85, ctx)
 		else:
-			DialogueManager.try_fire("ai_won_round", winner_indices[0], 0.90)
+			var ctx := {"hand_name": hand_names[0] if not hand_names.is_empty() else ""}
+			DialogueManager.try_fire("ai_won_round", winner_indices[0], 0.90, ctx)
 	await get_tree().create_timer(4.0).timeout
 	GameManager.confirm_next_round()
 

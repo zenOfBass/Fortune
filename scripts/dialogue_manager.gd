@@ -60,7 +60,8 @@ func _load_character(pidx: int, filename: String) -> void:
 		_lines[pidx] = parsed
 
 # Fire a line for a specific AI speaker. chance ∈ [0,1].
-func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE) -> void:
+# context keys (e.g. {"hand_name": "Flush"}) are substituted into the line via String.format().
+func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
 	if speaker_idx == 0 or speaker_idx >= GameManager.players.size():
 		return
 	if randf() > chance:
@@ -79,10 +80,11 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	if recent.size() > _RECENT_MEMORY:
 		recent.pop_front()
 	_cooldowns[speaker_idx][trigger_id] = _COOLDOWN_ROUNDS
-	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), line)
+	var formatted := line.format(context) if not context.is_empty() else line
+	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), formatted)
 
 # Pick one eligible AI at random and fire a trigger for them.
-func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE) -> void:
+func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
 	var eligible: Array = []
 	for i in range(1, GameManager.players.size()):
 		if not _lines[i].get(trigger_id, []).is_empty() \
@@ -90,7 +92,18 @@ func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE) -> void:
 			eligible.append(i)
 	if eligible.is_empty():
 		return
-	try_fire(trigger_id, eligible[randi() % eligible.size()], chance)
+	try_fire(trigger_id, eligible[randi() % eligible.size()], chance, context)
+
+# Like try_fire_any but excludes one speaker index (e.g. a winner reacting to their own hand).
+func try_fire_any_except(trigger_id: String, exclude_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
+	var eligible: Array = []
+	for i in range(1, GameManager.players.size()):
+		if i != exclude_idx and not _lines[i].get(trigger_id, []).is_empty() \
+				and _cooldowns[i].get(trigger_id, 0) == 0:
+			eligible.append(i)
+	if eligible.is_empty():
+		return
+	try_fire(trigger_id, eligible[randi() % eligible.size()], chance, context)
 
 # Fire a scripted Tarvosk/Haldemar exchange (sequential, async).
 # Requires at least 3 players (player + Tarvosk + Haldemar).

@@ -10,7 +10,7 @@ The tarot/arcane setting is a major asset here. Unlike a game set in a generic p
 
 ## The Characters
 
-These are Jack Vance's *Dying Earth* characters, which sets a strong tonal baseline: archaic, darkly comic, verbose when it suits them, cryptic when it doesn't.
+These are character in the style of Jack Vance's *Dying Earth*, which sets a strong tonal baseline: archaic, darkly comic, verbose when it suits them, cryptic when it doesn't.
 
 ### Tarvosk the Brazen
 - **Play style**: Aggressive, high bluff rate, folds rarely
