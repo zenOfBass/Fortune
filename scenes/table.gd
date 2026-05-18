@@ -325,7 +325,7 @@ func _refresh_player_labels() -> void:
 func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 	_set_player_label(player_idx, chips)
 	if _starting_chips > 0 and chips > 0:
-		var threshold := max(10, _starting_chips / 5)
+		var threshold: int = maxi(10, int(_starting_chips * 0.2))
 		if chips <= threshold:
 			if player_idx == GameManager.HUMAN_IDX:
 				DialogueManager.try_fire_any("player_low_chips", 0.75, {"chips": chips})
@@ -519,7 +519,7 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	phase_label.text = " | ".join(parts)
 	# Rare hand reactions — always use a reactor (not the winner themselves).
 	for i in hand_names.size():
-		var w := winner_indices[i]
+		var w: int = winner_indices[i]
 		var ctx := {"hand_name": hand_names[i], "player_name": GameManager._pname(w)}
 		if hand_names[i] == "Five of a Kind":
 			DialogueManager.try_fire_any_except("five_of_a_kind_shown", w, 1.0)

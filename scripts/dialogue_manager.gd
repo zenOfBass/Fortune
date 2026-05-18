@@ -171,7 +171,7 @@ func _on_game_ended(final_chips: Array) -> void:
 	if final_chips.is_empty():
 		_reset_stats()
 		return
-	var max_chips: int = final_chips.max()
+	var max_chips: int = int(final_chips.max())
 	if final_chips[GameManager.HUMAN_IDX] >= max_chips:
 		try_fire_any("game_over_lose", 1.0)
 	else:
