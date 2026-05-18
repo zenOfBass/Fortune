@@ -38,7 +38,9 @@
   "arcana_revealed_8": [
     "The weak become strong! Strength prefers paradox tonight.",
     "The lowest rises above the highest. I appreciate the sentiment.",
-    "Inversion! My mediocre hand is suddenly terrifying. To you, I mean."
+    "Inversion! My mediocre hand is suddenly terrifying. To you, I mean.",
+    "The world turns upside down! Finally, my collection of garbage is worth a fortune!",
+    "Twos are kings? I feel like a god of the gutter!"
   ],
   "arcana_revealed_9": [
     "One more card. One more opportunity to ruin you.",
@@ -131,7 +133,15 @@
     "That {hand_name} of yours. Luck dressed in borrowed clothes.",
     "A {hand_name}? I've seen better hands on a clock!",
     "Robbery! Plain and simple! I shall be demanding a recount from the universe!",
-    "Take your chips. They'll look better when I win them back in five minutes."
+    "Take your chips. They'll look better when I win them back in five minutes.",
+    "A {hand_name}? I’ve seen better displays of skill from a common street-magician!",
+    "Luck! Pure, unadulterated, offensive luck! I spit on the probability!",
+    "Take the chips! They were weighing me down anyway! My posture is already improving!",
+    "A fluke! A cosmic hiccup! You’ll find the next round far less accommodating!",
+    "LUCK! I smell the foul stench of unearned fortune!",
+    "Enjoy those chips! They'll be coming back to their rightful owner shortly!",
+    "A {hand_name}? I’ve seen better things pulled out of a gutter!",
+    "Keep them warm for me, guest! I'm just letting you hold them for the interest!"
   ],
   "ai_won_round": [
     "As expected. Shall we discuss your folding strategy?",
@@ -143,7 +153,10 @@
   "player_folded": [
     "Wise. The brazen know when to retreat. You are learning.",
     "The retreat is noted. The pot is not yours.",
-    "Fold. The only sensible move, really. I am surprised you did not do it sooner."
+    "Fold. The only sensible move, really. I am surprised you did not do it sooner.",
+    "Cowardice! It’s a color that doesn't suit you!",
+    "Running away? And I haven't even started my victory speech!",
+    "The sound of a folding hand is the most pathetic noise in the world!"
   ],
   "player_went_all_in": [
     "All of it! Now we are playing properly.",
@@ -190,7 +203,10 @@
     "{chips} chips remaining. The arcana enjoy a desperate player. You should be grateful.",
     "{chips} chips left? That's not a stack, that's a cry for help!",
     "You're circling the drain, friend. Try not to splash on the way down.",
-    "I've got more lint in my pocket than you have chips in that pile!"
+    "I've got more lint in my pocket than you have chips in that pile!",
+    "Is that a chip stack or a single pebble? I can't tell from this height!",
+    "Someone call a medic! This bankroll is in critical condition!",
+    "I've seen more wealth in a beggar's tin! Pathetic!"
   ],
   "ai_low_chips": [
     "My stack is {chips}. Do not mistake scarcity for weakness.",

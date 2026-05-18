@@ -3,6 +3,8 @@
     "Unpredictable. Adjust.",
     "The Fool. Expected disruption.",
     "Chaos introduced. I have already accounted for it.",
+    "Another distortion in the field. How tiresome.",
+    "The Fool has invited chaos to the table. I shall wait for it to leave.",
     "The Fool. Entropy as a strategy. Irritating.",
     "A wild variable. I have adjusted the weights accordingly."
   ],
@@ -39,6 +41,7 @@
   "arcana_revealed_8": [
     "Inversion. Adapt.",
     "The smallest becomes the largest. Noted.",
+    "I have adjusted my weights for the new ruleset. Proceed.",
     "Values reversed. The mathematics remain the same. Only the inputs change."
   ],
   "arcana_revealed_9": [
@@ -65,7 +68,7 @@
   "arcana_revealed_14": [
     "Exchange without guarantee.",
     "A calculated risk. Perhaps.",
-    "The Wheel turns. The outcome is uncertain. Yet I know the odds."
+    "A trade. The value differential is rarely neutral. I have already assessed mine."
   ],
   "arcana_revealed_15": [
     "High variance. Acceptable.",
@@ -122,7 +125,9 @@
   "arcana_aftermath_16": [
     "The Tower has destroyed half the pot. The remaining half is still worth pursuing.",
     "Chips have been removed from play. The expected value of winning has decreased. I have recalculated.",
-    "Half the pot is gone. The loss is distributed across all players. The distribution is irrelevant to my strategy."
+    "Half the pot is gone. The loss is distributed across all players. The distribution is irrelevant to my strategy.",
+    "Total destruction of half the equity. A pointless waste of capital.",
+    "The Tower remains the most inefficient card in the deck. Irritating."
   ],
   "arcana_aftermath_19": [
     "The Sun divides the pot equally. Victory and defeat produce the same outcome this round.",
@@ -132,12 +137,18 @@
   "player_won_round": [
     "You won. Noted.",
     "Expected. This round.",
-    "My hand: {hand_name}. Sufficient to win. Barely, perhaps.",
     "Your {hand_name} prevailed. I will adjust my model.",
     "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong.",
     "Statistical noise often favors the unprepared.",
     "You have the pot. I have the data. We shall see which lasts longer.",
-    "A {hand_name}. The distribution was in your favor. Noted."
+    "A {hand_name}. The distribution has favored you. It will not last.",
+    "Your success is a temporary deviation from the mean.",
+    "You have maximized your utility this round. Efficient.",
+    "I have adjusted my estimation of your threat level. It is now... non-zero.",
+    "A predictable outcome, given your recent betting density.",
+    "The pot migrates to you. Physics is satisfied.",
+    "I have factored this loss into my long-term projections. It is a minor irritation.",
+    "Variance is a cruel master to those who don't understand it."
   ],
   "ai_won_round": [
     "Sufficient.",
@@ -149,7 +160,13 @@
   "player_folded": [
     "Expected.",
     "Fold. The only sensible move, apparently.",
-    "You fold. I have noted the pattern."
+    "You fold. I have noted the pattern.",
+    "A rational concession. Preservation is the only logical path here.",
+    "You exit the hand. Correct. The math was not in your favor.",
+    "A quiet retreat. Wise. I would have done the same, had I your cards.",
+    "A rare moment of lucidity from our guest.",
+    "You have preserved your remaining capital. Wise, if uninspired.",
+    "The probability of your success had dipped below the threshold of logic. Good exit."
   ],
   "player_went_all_in": [
     "All in. Your conviction is noted.",
@@ -190,7 +207,10 @@
     "You have {chips} chips. The situation is clear.",
     "{chips}. You are approaching elimination.",
     "Only {chips} remaining. I would offer advice, but you would not take it.",
-    "Your stack is {chips}. Mathematically, your options are limited."
+    "Your stack is {chips}. Mathematically, your options are limited.",
+    "You are approaching the minimum viable position.",
+    "You are currently a rounding error at this table.",
+    "I suggest a more... frugal approach to the next ante."
   ],
   "ai_low_chips": [
     "I hold {chips} chips. This is not a problem. It is a condition.",

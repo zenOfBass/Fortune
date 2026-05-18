@@ -2,7 +2,10 @@
   "arcana_revealed_0": [
     "The card that can be everything is, in a sense, nothing. Fascinating.",
     "The Fool arrives. I wonder who else here is playing a part.",
-    "A wild card. The Fool asks: what is wildness but possibility wearing a mask?"
+    "A wild card. The Fool asks: what is wildness but possibility wearing a mask?",
+    "The Fool walks the precipice. Shall we join him, or simply watch the fall?",
+    "Chaos is the only honest dealer. Let us see what it brings.",
+    "The Fool refuses to be defined. Of all the cards, it is the one I understand best."
   ],
   "arcana_revealed_1": [
     "To guess correctly is merely to observe carefully. Or so I am told.",
@@ -100,7 +103,8 @@
   "arcana_aftermath_8": [
     "The two sits at the top now. I have always wondered what the bottom thinks about while it waits. Now I know.",
     "Everything is reversed. The strong are weak and the weak are strong. One wonders which category one falls into.",
-    "Inversion. The deck has turned itself inside out. The cards that were hiding in plain sight are suddenly visible."
+    "Inversion. The deck has turned itself inside out. The cards that were hiding in plain sight are suddenly visible.",
+    "The rules are melting. I've always preferred them in liquid form."
   ],
   "arcana_aftermath_11": [
     "Justice removes deception from the betting. Some at this table will find that suffocating. Others will find it liberating.",
@@ -130,7 +134,15 @@
     "Your {hand_name} prevails. I wonder what you learned from it. I wonder what I learned.",
     "The cards whispered to you this time. I hope they didn't tell you any lies.",
     "A {hand_name}. It has a certain aesthetic symmetry, doesn't it?",
-    "Victory. A heavy burden to carry into the next round."
+    "Victory. A heavy burden to carry into the next round.",
+    "The Page has smiled upon you. Be careful—his smile often turns into a grimace.",
+    "A {hand_name}. How very... theatrical of you to reveal it now.",
+    "You harvest the gold. I hope it doesn't scream too loudly in your pockets.",
+    "A triumph of the will. Or perhaps just a very lucky seat at the table.",
+    "The stars seem to find your hand particularly luminous tonight.",
+    "A {hand_name}. It has the texture of a well-executed heist.",
+    "Take the gold. It was beginning to look bored in the center of the table anyway.",
+    "You play as if you've already seen the end of the book. Fascinating."
   ],
   "ai_won_round": [
     "And so it falls to me. I had a feeling.",
@@ -143,7 +155,10 @@
     "You step back. The space you leave is already being filled.",
     "A fold. Something about the hand did not suit you. Or something about the room.",
     "A quiet exit. The air feels lighter where you were standing.",
-    "You surrender the future to protect the present. A classic choice."
+    "You surrender the future to protect the present. A classic choice.",
+    "The shadow of a retreat. How very tactical.",
+    "You vanish just as the scene was getting interesting. A shame.",
+    "A wise man knows when the air in the room has turned against him."
   ],
   "player_went_all_in": [
     "Everything. You have removed the safety net. I admire the gesture if not the timing.",
@@ -184,7 +199,13 @@
     "You have {chips} chips. Scarcity has its own kind of clarity.",
     "Only {chips} left. The interesting decisions are the ones made from disadvantage.",
     "Your stack is {chips}. I have been there. The view is different from the bottom. More honest.",
-    "{chips} chips. The question is not how many you have, but what you will become when they are gone."
+    "{chips} chips. The question is not how many you have, but what you will become when they are gone.",
+    "The tide is going out, friend. I see many sharp rocks in your future.",
+    "Your stack is a fading sunset. Beautiful, in a tragic sort of way.",
+    "The abyss is looking back at you. I suggest you don't blink.",
+    "Your pile of chips is looking rather... skeletal. Can you hear the bones rattling?",
+    "A dwindling flame. Shall we see if it flickers out or burns the house down?",
+    "The abyss is looking at your purse, friend. It seems hungry."
   ],
   "ai_low_chips": [
     "My stack is {chips}. I find low numbers aesthetically pleasing. They have nowhere to go but interesting directions.",

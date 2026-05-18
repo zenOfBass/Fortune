@@ -306,6 +306,26 @@
       {"idx": 1, "line": "Nothing? No rebuttal?"},
       {"idx": 2, "line": "Everyone intends to win. Stating it is redundant."},
       {"idx": 3, "line": "Not everyone states it so loudly. That part is not redundant. That part is Tarvosk."}
+    ],
+    [
+      {"idx": 1, "line": "Behold! The table is set, the spirits are restless, and my purse is feeling dangerously light!"},
+      {"idx": 3, "line": "A dangerous state for you, Tarvosk. Hunger usually makes you... loud."},
+      {"idx": 2, "line": "Hunger is a biological urge. This is merely a fiscal redistribution. Let us begin."}
+    ],
+    [
+      {"idx": 3, "line": "The guest looks capable. I wonder which Arcana will be the one to break their spirit?"},
+      {"idx": 1, "line": "Break them? I intend to buy them a drink with their own money!"},
+      {"idx": 2, "line": "A statistically improbable outcome given your history, Tarvosk."}
+    ],
+    [
+      {"idx": 1, "line": "New game, new fortunes, and the same two miserable faces across the table!"},
+      {"idx": 2, "line": "And the same oversized mouth. Let us begin."},
+      {"idx": 3, "line": "I wonder who the Page will choose to ruin first? The suspense is almost... edible."}
+    ],
+    [
+      {"idx": 3, "line": "The guest looks ready. Do you see that spark in their eye?"},
+      {"idx": 1, "line": "That's not a spark, it's the reflection of my gold! They're mesmerized!"},
+      {"idx": 2, "line": "It is likely just a minor ocular twitch. Deal the cards."}
     ]
   ],
 
@@ -341,6 +361,11 @@
       {"idx": 1, "line": "Everything the player has is in the pot. This is the moment where games become LEGENDS."},
       {"idx": 2, "line": "This is the moment where the player either doubles their stack or is eliminated."},
       {"idx": 1, "line": "That is what I SAID. Legends."}
+    ],
+    [
+      {"idx": 1, "line": "HE DID IT! THE ABSOLUTE MADMAN!"},
+      {"idx": 2, "line": "It is a desperate gambit. A final shriek of a dying bankroll."},
+      {"idx": 3, "line": "Or a very quiet trap. I find the silence of this bet... deafening."}
     ]
   ],
 
@@ -442,6 +467,16 @@
       {"idx": 1, "line": "I have lost to the player. I am choosing to view this as a compliment to my teaching."},
       {"idx": 2, "line": "You did not teach the player anything."},
       {"idx": 3, "line": "The player learned despite Tarvosk. That may be the more impressive achievement."}
+    ],
+    [
+      {"idx": 3, "line": "The guest departs with the gold. A fascinating subversion of the expected ending."},
+      {"idx": 1, "line": "I demand a recount of the stars! This is cosmic negligence!"},
+      {"idx": 2, "line": "The stars are indifferent to your debt. Well played, traveler."}
+    ],
+    [
+      {"idx": 3, "line": "The guest stands alone. The dust settles. How... poetic."},
+      {"idx": 1, "line": "Poetic? It's a robbery! I demand a sequel! I demand a refund!"},
+      {"idx": 2, "line": "You demand attention, Tarvosk. The player simply demanded the pot. They were more successful."}
     ]
   ],
 
