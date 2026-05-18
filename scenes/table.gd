@@ -79,6 +79,7 @@ const _SPEAKER_COLORS: Dictionary = {
 
 var _log_tween: Tween = null
 var _dialogue_tween: Tween = null
+var _dialogue_queue: Array = []
 var _skip_flip := false
 var _bet_contributed: Dictionary = {}
 var _starting_chips: int = 0
@@ -626,12 +627,12 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 	if center.x < vp.x * 0.3:
 		# Left-side speaker — box starts just inside their right edge
 		box_w = vp.x * 0.35
-		left = center.x + vp.x * 0.10
-		top = center.y - box_h * 0.5
+		left = center.x + vp.x * 0.02
+		top = center.y + box_h * 0.3
 	elif center.x > vp.x * 0.7:
 		# Right-side speaker — box ends just inside their left edge
 		box_w = vp.x * 0.35
-		left = center.x - box_w - vp.x * 0.05
+		left = center.x - box_w - vp.x * 0.10
 		top = vp.y * 0.45
 	else:
 		# Top-center speaker — box below their area
@@ -646,21 +647,31 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 	dialogue_display.offset_bottom = top + box_h
 
 func _on_dialogue_line(speaker_idx: int, speaker_name: String, line: String) -> void:
+	_dialogue_queue.append({speaker_idx = speaker_idx, speaker_name = speaker_name, line = line})
+	if not (is_instance_valid(_dialogue_tween) and _dialogue_tween.is_running()):
+		_show_next_dialogue()
+
+func _show_next_dialogue() -> void:
+	if _dialogue_queue.is_empty():
+		return
+	var msg: Dictionary = _dialogue_queue.pop_front()
+	var speaker_idx: int = msg.speaker_idx
 	var ls: LabelSettings = _colored_label_settings.get(speaker_idx)
 	if ls != null:
 		dialogue_speaker.label_settings = ls
-	dialogue_speaker.text = speaker_name
-	dialogue_text.text = line
+	dialogue_speaker.text = msg.speaker_name
+	dialogue_text.text = msg.line
 	_reposition_dialogue(speaker_idx)
-	if is_instance_valid(_dialogue_tween):
-		_dialogue_tween.kill()
 	dialogue_display.modulate.a = 0.0
 	dialogue_display.visible = true
 	_dialogue_tween = create_tween()
 	_dialogue_tween.tween_property(dialogue_display, "modulate:a", 1.0, 0.3)
 	_dialogue_tween.tween_interval(4.0)
 	_dialogue_tween.tween_property(dialogue_display, "modulate:a", 0.0, 0.5)
-	_dialogue_tween.tween_callback(func(): dialogue_display.visible = false)
+	_dialogue_tween.tween_callback(func():
+		dialogue_display.visible = false
+		_show_next_dialogue()
+	)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
