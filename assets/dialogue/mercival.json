@@ -26,16 +26,17 @@
   ],
   "arcana_revealed_6": [
     "Four instead of five. The one left behind always knows something the others don't.",
-    "Choose four. The unchosen card watches from outside the hand."
+    "Choose four. The unchosen card watches from outside the hand.",
+    "The Lovers insist we share. Intimacy enforced by arcana. How modern."
   ],
   "arcana_revealed_7": [
     "What we release travels to places we may not want it to go.",
     "The Chariot asks for passage. The toll is paid in cards."
   ],
   "arcana_revealed_8": [
-  "The least becomes the most. I find this arrangement... familiar.",
-  "Strength through inversion. The lowly card now stands tallest. Interesting topology.",
-  "The bottom rises. I have always suspected the bottom knew something the top did not."
+    "The least becomes the most. I find this arrangement... familiar.",
+    "Strength through inversion. The lowly card now stands tallest. Interesting topology.",
+    "The bottom rises. I have always suspected the bottom knew something the top did not."
   ],
   "arcana_revealed_9": [
     "One more card. One more thing to be uncertain about. Delightful.",
@@ -181,7 +182,6 @@
     "I hold {chips}. The amount is almost philosophical at this point."
   ],
   "split_pot": [
-    "The Lovers insist we share. Intimacy enforced by arcana. How modern.",
     "A divided pot. Two winners, or zero winners, depending on your perspective.",
     "We split the winnings. The Lovers believe in partnership. I believe in observation.",
     "Half to me, half to another. The Lovers understand that victory is rarely absolute."

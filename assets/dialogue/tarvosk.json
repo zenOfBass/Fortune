@@ -118,11 +118,11 @@
     "Everyone gets a share. This is not poker. This is a commune. I did not agree to a commune."
   ],
   "player_won_round": [
-      "Enjoy it. The arcana will correct this shortly.",
-      "Hmph. The cards favored you this time. Do not grow comfortable.",
-      "A {hand_name}? That is what defeated me? I refuse to be impressed.",
-      "You won with {hand_name}. I have lost to worse. Once. Possibly.",
-      "That {hand_name} of yours. Luck dressed in borrowed clothes."
+    "Enjoy it. The arcana will correct this shortly.",
+    "Hmph. The cards favored you this time. Do not grow comfortable.",
+    "A {hand_name}? That is what defeated me? I refuse to be impressed.",
+    "You won with {hand_name}. I have lost to worse. Once. Possibly.",
+    "That {hand_name} of yours. Luck dressed in borrowed clothes."
   ],
   "ai_won_round": [
     "As expected. Shall we discuss your folding strategy?",
@@ -132,8 +132,9 @@
     "Mine was {hand_name}, yours was something else. The universe is just."
   ],
   "player_folded": [
-      "Wise. The brazen know when to retreat. You are learning.",
-      "The retreat is noted. The pot is not yours."
+    "Wise. The brazen know when to retreat. You are learning.",
+    "The retreat is noted. The pot is not yours.",
+    "Fold. The only sensible move, really. I am surprised you did not do it sooner."
   ],
   "player_went_all_in": [
     "All of it! Now we are playing properly.",

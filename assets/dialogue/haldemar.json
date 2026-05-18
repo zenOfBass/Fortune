@@ -30,7 +30,8 @@
   ],
   "arcana_revealed_7": [
     "Movement costs something.",
-    "What you give away reveals you."
+    "What you give away reveals you.",
+    "The Chariot demands a toll. I pay it."
   ],
   "arcana_revealed_8": [
     "Inversion. Adapt.",
@@ -43,7 +44,8 @@
   ],
   "arcana_revealed_10": [
     "All previous calculations: void.",
-    "Chance reasserts itself. Expected."
+    "Chance reasserts itself. Expected.",
+    "Fortune's favor is fickle."
   ],
   "arcana_revealed_11": [
     "Honesty imposed.",
@@ -59,11 +61,13 @@
   ],
   "arcana_revealed_14": [
     "Exchange without guarantee.",
-    "A calculated risk. Perhaps."
+    "A calculated risk. Perhaps.",
+    "The Wheel turns. The outcome is uncertain. Yet I know the odds."
   ],
   "arcana_revealed_15": [
     "High variance. Acceptable.",
-    "Commitment or nothing. I can respect that."
+    "Commitment or nothing. I can respect that.",
+    "The Devil demands a price. I have determined that it is worth paying."
   ],
   "arcana_revealed_16": [
     "Destruction. Accommodate it.",
@@ -72,23 +76,28 @@
   ],
   "arcana_revealed_17": [
     "A choice. I have already made mine.",
-    "Options. I prefer fewer of them."
+    "Options. I prefer fewer of them.",
+    "The Star offers hope. I have no use for hope. I have my calculations."
   ],
   "arcana_revealed_18": [
     "Uncertainty changes nothing I intend to do.",
-    "Hidden things surface eventually."
+    "Hidden things surface eventually.",
+    "The Moon's secrets are revealed. They were not hidden from me."
   ],
   "arcana_revealed_19": [
     "Additional stakes. Noted.",
-    "Worth winning more this round."
+    "Worth winning more this round.",
+    "The Sun shines, on us and on our pot."
   ],
   "arcana_revealed_20": [
     "The eliminated, returned.",
-    "Judgement complicates the ledger."
+    "Judgement complicates the ledger.",
+    "The past is not past. But it is accounted for."
   ],
   "arcana_revealed_21": [
     "Significant. Do not squander it.",
-    "The stakes justify full attention."
+    "The stakes justify full attention.",
+    "The World. The final card. The final variable. I have accounted for it."
   ],
   "arcana_aftermath_8": [
     "Values are inverted. Two is now the highest card. The hierarchy has reversed. I have adjusted.",
@@ -131,7 +140,8 @@
   ],
   "player_folded": [
     "Expected.",
-    "Fold. The only sensible move, apparently."
+    "Fold. The only sensible move, apparently.",
+    "You fold. I have noted the pattern."
   ],
   "player_went_all_in": [
     "All in. Your conviction is noted.",
