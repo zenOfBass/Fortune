@@ -429,7 +429,7 @@ func _phase_showdown(g: int) -> void:
 
 	if active_players.size() == 1:
 		var solo := active_players[0]
-		game_log.emit("%s wins %d uncontested." % [_pname(solo), pot])
+		game_log.emit("%s %s %d uncontested." % [_pname(solo), "win" if solo == HUMAN_IDX else "wins", pot])
 		_award_pot(active_players)
 		round_ended.emit([solo], [], false)
 		if players[solo].has_page:
@@ -503,7 +503,7 @@ func _phase_showdown(g: int) -> void:
 		for w in winners:
 			hand_names.append(HandEvaluator.hand_type_name(scores[w]))
 		if winners.size() == 1:
-			game_log.emit("%s wins %d with %s!" % [_pname(winners[0]), won, hand_names[0]])
+			game_log.emit("%s %s %d with %s!" % [_pname(winners[0]), "win" if winners[0] == HUMAN_IDX else "wins", won, hand_names[0]])
 		else:
 			var names := ", ".join(winners.map(func(w): return _pname(w)))
 			@warning_ignore("integer_division")

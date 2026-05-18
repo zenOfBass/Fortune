@@ -244,8 +244,8 @@ func _on_player_bet_changed(player_idx: int, contributed: int) -> void:
 func _on_player_raised(player_idx: int, raise_to: int, prev_bet: int) -> void:
 	if player_idx != GameManager.HUMAN_IDX:
 		return
-	if prev_bet <= 0 or raise_to >= prev_bet * 2:
-		DialogueManager.try_fire_any("player_raised_aggressively", 0.65)
+	if prev_bet > 0 and raise_to >= prev_bet * 3:
+		DialogueManager.try_fire_any("player_raised_aggressively", 0.50)
 
 func _on_phase_changed(phase_name: String) -> void:
 	_bet_contributed.clear()
@@ -625,8 +625,8 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 			top = vp.y * 0.30
 		2:  # Haldemar — left
 			box_w = vp.x * 0.35
-			left = vp.x * 0.13
-			top = vp.y * 0.45
+			left = vp.x * 0.09
+			top = vp.y * 0.52
 		3:  # Mercival — right
 			box_w = vp.x * 0.35
 			left = vp.x * 0.62
@@ -643,6 +643,8 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 	dialogue_display.offset_bottom = top + box_h
 
 func _on_dialogue_line(speaker_idx: int, speaker_name: String, line: String) -> void:
+	if _dialogue_queue.any(func(m): return m.speaker_idx == speaker_idx):
+		return
 	_dialogue_queue.append({speaker_idx = speaker_idx, speaker_name = speaker_name, line = line})
 	if not (is_instance_valid(_dialogue_tween) and _dialogue_tween.is_running()):
 		_show_next_dialogue()

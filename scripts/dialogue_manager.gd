@@ -76,6 +76,8 @@ func _load_character(pidx: int, filename: String) -> void:
 func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
 	if speaker_idx == 0 or speaker_idx >= GameManager.players.size():
 		return
+	if GameManager.players[speaker_idx].chips == 0:
+		return
 	if randf() > chance:
 		return
 	if _cooldowns[speaker_idx].get(trigger_id, 0) > 0:
