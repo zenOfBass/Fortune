@@ -126,7 +126,7 @@ func _run_round(g: int) -> void:
 	await _phase_deal(g)
 	if g != _game_gen: return
 
-	if round_state.death_end or round_state.sun_end:
+	if round_state.death_end:
 		if not round_state.moon_secret.is_empty():
 			await _phase_moon_swap(g)
 			if g != _game_gen: return
