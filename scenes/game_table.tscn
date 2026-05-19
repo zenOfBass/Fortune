@@ -188,17 +188,19 @@ size_flags_horizontal = 3
 [node name="CurrentArcana" type="VBoxContainer" parent="."]
 anchor_left = 0.38
 anchor_right = 0.62
-anchor_top = 0.36
-anchor_bottom = 0.65
-alignment = 1
+anchor_top = 0.41
+anchor_bottom = 0.68
 visible = false
 
-[node name="ArcanaThumb" type="TextureRect" parent="CurrentArcana"]
-custom_minimum_size = Vector2(60, 90)
+[node name="ArcanaCardContainer" type="Control" parent="CurrentArcana"]
+custom_minimum_size = Vector2(80, 128)
+size_flags_horizontal = 4
+
+[node name="ArcanaThumb" type="TextureRect" parent="CurrentArcana/ArcanaCardContainer"]
+offset_right = 80.0
+offset_bottom = 120.0
 stretch_mode = 5
 expand_mode = 3
-size_flags_horizontal = 3
-size_flags_vertical = 3
 
 [node name="ArcanaNameLabel" type="Label" parent="CurrentArcana"]
 text = ""
@@ -216,9 +218,8 @@ visible = false
 [node name="ArcanaDeck" type="VBoxContainer" parent="."]
 anchor_left = 0.63
 anchor_right = 0.74
-anchor_top = 0.36
+anchor_top = 0.41
 anchor_bottom = 0.65
-alignment = 1
 
 [node name="CardStack" type="Control" parent="ArcanaDeck"]
 custom_minimum_size = Vector2(88, 128)
@@ -254,9 +255,8 @@ size_flags_horizontal = 3
 [node name="ArcanaDiscard" type="VBoxContainer" parent="."]
 anchor_left = 0.26
 anchor_right = 0.37
-anchor_top = 0.36
+anchor_top = 0.41
 anchor_bottom = 0.65
-alignment = 1
 
 [node name="CardStack" type="Control" parent="ArcanaDiscard"]
 custom_minimum_size = Vector2(88, 128)
@@ -303,8 +303,8 @@ visible = false
 [node name="LatestLogLabel" type="Label" parent="."]
 anchor_left = 0.22
 anchor_right = 0.78
-anchor_top = 0.62
-anchor_bottom = 0.71
+anchor_top = 0.65
+anchor_bottom = 0.73
 text = ""
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -36,7 +36,7 @@ var _shuffle_sfx: AudioStreamPlayer
 # ---- Center arcana display ---------------------------------------------------
 
 @onready var current_arcana: Control = $CurrentArcana
-@onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaThumb
+@onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaCardContainer/ArcanaThumb
 @onready var current_arcana_name: Label = $CurrentArcana/ArcanaNameLabel
 @onready var current_arcana_desc: Label = $CurrentArcana/ArcanaDescLabel
 
@@ -165,11 +165,6 @@ func _ready() -> void:
 	GameManager.game_log.connect(_on_game_log)
 	DialogueManager.dialogue_line.connect(_on_dialogue_line)
 	DialogueManager.tell_read.connect(func(): GameManager.game_log.emit("You read Tarvosk's tell."))
-
-	current_arcana_thumb.custom_minimum_size = Vector2(80, 120)
-	current_arcana_thumb.expand_mode = TextureRect.EXPAND_KEEP_SIZE
-	current_arcana_thumb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	current_arcana_thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
 	bet_panel.anchor_top = 1.0
 	bet_panel.anchor_bottom = 1.0
