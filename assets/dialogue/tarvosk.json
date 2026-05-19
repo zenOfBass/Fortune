@@ -129,7 +129,7 @@
     "Enjoy it. The arcana will correct this shortly.",
     "Hmph. The cards favored you this time. Do not grow comfortable.",
     "A {hand_name}? That is what defeated me? I refuse to be impressed.",
-    "You won with {hand_name}. I have lost to worse. Once. Possibly.",
+    "You won with {hand_name_a}. I have lost to worse. Once. Possibly.",
     "That {hand_name} of yours. Luck dressed in borrowed clothes.",
     "A {hand_name}? I've seen better hands on a clock!",
     "Robbery! Plain and simple! I shall be demanding a recount from the universe!",
@@ -148,7 +148,7 @@
     "Magnificent. I accept my victory with appropriate humility. Which is to say, none.",
     "A {hand_name}! I could have won with less, but I prefer to win with more.",
     "You see that {hand_name}? That is what conviction looks like.",
-    "Mine was {hand_name}, yours was something else. The universe is just."
+    "Mine was {hand_name_a}, yours was something else. The universe is just."
   ],
   "player_folded": [
     "Wise. The brazen know when to retreat. You are learning.",

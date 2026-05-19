@@ -129,8 +129,8 @@
   "player_won_round": [
     "A win for you. And yet I find myself unsurprised, which surprises me.",
     "Well played. Or well fortuned. The distinction matters less than the result.",
-    "You take the pot with {hand_name}. Was it the hand or the handling?",
-    "Victory, and with {hand_name}. The cards have opinions about who should win. Tonight they favor you.",
+    "You take the pot with {hand_name_a}. Was it the hand or the handling?",
+    "Victory, and with {hand_name_a}. The cards have opinions about who should win. Tonight they favor you.",
     "Your {hand_name} prevails. I wonder what you learned from it. I wonder what I learned.",
     "The cards whispered to you this time. I hope they didn't tell you any lies.",
     "A {hand_name}. It has a certain aesthetic symmetry, doesn't it?",
@@ -147,9 +147,9 @@
   "ai_won_round": [
     "And so it falls to me. I had a feeling.",
     "Interesting. The cards agreed with me this round.",
-    "I win with {hand_name}. The hand itself is merely the messenger.",
+    "I win with {hand_name_a}. The hand itself is merely the messenger.",
     "My {hand_name} takes the pot. Some victories are louder than others. This one whispers.",
-    "The round is mine. {hand_name}. I suspected as much, but suspecting and knowing are different countries."
+    "The round is mine. {hand_name_a}. I suspected as much, but suspecting and knowing are different countries."
   ],
   "player_folded": [
     "You step back. The space you leave is already being filled.",

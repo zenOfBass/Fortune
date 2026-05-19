@@ -7,6 +7,7 @@ const _DIALOGUE_PATH := "res://assets/dialogue/"
 const _COOLDOWN_ROUNDS := 3
 const _RECENT_MEMORY := 3
 const _BASE_CHANCE := 0.80
+const _HAND_NEEDS_ARTICLE: Array = ["pair", "straight", "flush", "full house", "straight flush", "royal flush", "high card"]
 
 # Player index -> trigger_id -> Array[String]
 var _lines: Array = [{}, {}, {}, {}]
@@ -18,9 +19,10 @@ var _exchanges: Dictionary = {}
 var _cooldowns: Array = [{}, {}, {}, {}]
 
 # Player index -> Array[String] (last N lines shown)
-var _recent: Array = [[], [], [], []]
+var _recent: Array = [{}, {}, {}, {}]
 
 var _exchange_cooldown: int = 0
+var _exchange_running: bool = false
 
 var _player_raises: int = 0
 var _player_folds: int = 0
@@ -53,8 +55,8 @@ func _ready() -> void:
 
 func _on_first_deal(phase: String) -> void:
 	if phase == "DEAL" and _rounds_played == 0:
-		try_fire_any("game_start", 1.0)
 		try_fire_exchange("game_start")
+		try_fire_any("game_start", 1.0)
 
 func _load_exchanges() -> void:
 	var path := _DIALOGUE_PATH + "exchanges.json"
@@ -90,6 +92,8 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		return
 	if require_chips and GameManager.players[speaker_idx].chips == 0:
 		return
+	if _exchange_running:
+		return
 	if randf() > chance:
 		return
 	if _cooldowns[speaker_idx].get(trigger_id, 0) > 0:
@@ -102,7 +106,9 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 	var pool: Array = _lines[speaker_idx].get(pool_key, [])
 	if pool.is_empty():
 		return
-	var recent: Array = _recent[speaker_idx]
+	if not _recent[speaker_idx].has(trigger_id):
+		_recent[speaker_idx][trigger_id] = []
+	var recent: Array = _recent[speaker_idx][trigger_id]
 	# Exclude lines whose placeholders would substitute to empty string.
 	var _would_blank := func(l: String) -> bool:
 		for key in context:
@@ -125,6 +131,7 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		if hn == "one pair":
 			hn = "pair"
 		ctx["hand_name"] = hn
+		ctx["hand_name_a"] = ("a " + hn) if hn in _HAND_NEEDS_ARTICLE else hn
 	var formatted := line.format(ctx) if not ctx.is_empty() else line
 	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), formatted)
 	if trigger_id == "tarvosk_bluffing":
@@ -165,6 +172,7 @@ func try_fire_exchange(trigger_id: String = "random") -> void:
 	if pool.is_empty():
 		return
 	_exchange_cooldown = 6
+	_exchange_running = true
 	var steps: Array = pool[randi() % pool.size()]
 	for step in steps:
 		var idx: int = step["idx"]
@@ -172,6 +180,7 @@ func try_fire_exchange(trigger_id: String = "random") -> void:
 		if idx < GameManager.players.size() and not line.is_empty():
 			dialogue_line.emit(idx, GameManager._pname(idx), line)
 		await get_tree().create_timer(2.5).timeout
+	_exchange_running = false
 
 func _on_round_ended_internal(winner_indices: Array, hand_names: Array, split: bool) -> void:
 	if _tarvosk_bluff_announced and winner_indices.has(GameManager.HUMAN_IDX):
@@ -208,13 +217,13 @@ func _fire_pattern_triggers_deferred() -> void:
 	if _rounds_played < 3:
 		return
 	if _player_win_streak >= 2:
-		try_fire_any("player_on_streak", 0.60)
 		if randf() < 0.25:
 			try_fire_exchange("player_on_streak")
+		try_fire_any("player_on_streak", 0.60)
 	if _ai_win_streak >= 2 and _streak_ai_idx > 0:
-		try_fire("ai_on_streak", _streak_ai_idx, 0.65)
 		if randf() < 0.25:
 			try_fire_exchange("ai_on_streak")
+		try_fire("ai_on_streak", _streak_ai_idx, 0.65)
 	var aggression := float(_player_raises) / _rounds_played
 	if aggression >= 0.4:
 		try_fire_any("player_aggressive_pattern", 0.45)
@@ -222,6 +231,8 @@ func _fire_pattern_triggers_deferred() -> void:
 		try_fire_any("player_passive_pattern", 0.40)
 
 func _on_game_ended(final_chips: Array) -> void:
+	_exchange_running = false
+	_exchange_cooldown = 0
 	if final_chips.is_empty():
 		_reset_stats()
 		return

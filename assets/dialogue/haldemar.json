@@ -138,7 +138,7 @@
     "You won. Noted.",
     "Expected. This round.",
     "Your {hand_name} prevailed. I will adjust my model.",
-    "Victory with {hand_name}. I had calculated a different outcome. The calculation was wrong.",
+    "Victory with {hand_name_a}. I had calculated a different outcome. The calculation was wrong.",
     "Statistical noise often favors the unprepared.",
     "You have the pot. I have the data. We shall see which lasts longer.",
     "A {hand_name}. The distribution has favored you. It will not last.",
@@ -187,7 +187,7 @@
     "That raise exceeds the pot. Information received."
   ],
   "strong_hand_shown": [
-    "{player_name} has {hand_name}. The probability was low. And yet.",
+    "{player_name} has {hand_name_a}. The probability was low. And yet.",
     "A {hand_name}. Impressive. I had assigned that outcome a 2% likelihood.",
     "A {hand_name} from {player_name}. My model requires updating.",
     "That is a {hand_name}. I do not say this often: well played."
@@ -253,7 +253,7 @@
     "We begin. The outcome is not yet determined. That will change.",
     "The game commences. I have no remarks. That was my remark.",
     "Cards. Chips. Opponents. All present. Proceed."
-    ],
+  ],
   "game_over_win": [
     "The game is concluded. The result was inevitable. I merely happened to be the one who won.",
     "Victory. I will not celebrate. Celebration implies surprise.",

@@ -408,13 +408,13 @@ func _on_player_chips_changed(player_idx: int, chips: int) -> void:
 		var threshold: int = maxi(10, int(_starting_chips * 0.2))
 		if chips <= threshold:
 			if player_idx == GameManager.HUMAN_IDX:
-				DialogueManager.try_fire_any("player_low_chips", 0.75, {"chips": chips})
 				if randf() < 0.25:
 					DialogueManager.try_fire_exchange("player_low_chips")
+				DialogueManager.try_fire_any("player_low_chips", 0.75, {"chips": chips})
 			else:
-				DialogueManager.try_fire("ai_low_chips", player_idx, 0.70, {"chips": chips})
 				if randf() < 0.25:
 					DialogueManager.try_fire_exchange("ai_low_chips")
+				DialogueManager.try_fire("ai_low_chips", player_idx, 0.70, {"chips": chips})
 
 func _on_player_folded(player_idx: int) -> void:
 	const DIM = Color(0.45, 0.45, 0.45)
@@ -424,9 +424,9 @@ func _on_player_folded(player_idx: int) -> void:
 		2: ai2_area.modulate = DIM
 		3: ai3_area.modulate = DIM
 	if player_idx == GameManager.HUMAN_IDX:
-		DialogueManager.try_fire_any("player_folded", 0.70)
 		if randf() < 0.25:
 			DialogueManager.try_fire_exchange("player_folded")
+		DialogueManager.try_fire_any("player_folded", 0.70)
 
 func _on_pot_changed(new_amount: int) -> void:
 	pot_label.text = "Pot: %d" % new_amount
@@ -454,9 +454,9 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	current_arcana_desc.visible = true
 	await _fly_arcana_from_deck(face_tex)
 	current_arcana.visible = true
-	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
 	if randf() < 0.25:
 		DialogueManager.try_fire_exchange("arcana_revealed")
+	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
 	await get_tree().create_timer(1.5).timeout
 	GameManager.complete_arcana_effect()
 	if arcana_id in [8, 11, 13, 16, 19]:
@@ -473,8 +473,8 @@ func _on_arcana_cancelled(cancelled_id: int) -> void:
 
 func _on_last_round_announced() -> void:
 	last_round_label.visible = true
-	DialogueManager.try_fire_any("last_round_announced", 1.0)
 	DialogueManager.try_fire_exchange("last_round_announced")
+	DialogueManager.try_fire_any("last_round_announced", 1.0)
 
 func _on_bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int) -> void:
 	if player_idx == GameManager.HUMAN_IDX:
@@ -627,19 +627,19 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 		var w: int = winner_indices[i]
 		var ctx := {"hand_name": hand_names[i], "player_name": GameManager._pname(w)}
 		if hand_names[i] == "Five of a Kind":
-			DialogueManager.try_fire_any_except("five_of_a_kind_shown", w, 1.0)
 			DialogueManager.try_fire_exchange("five_of_a_kind_shown")
+			DialogueManager.try_fire_any_except("five_of_a_kind_shown", w, 1.0)
 			break
 		elif hand_names[i] in _STRONG_HANDS:
-			DialogueManager.try_fire_any_except("strong_hand_shown", w, 0.95, ctx)
 			if randf() < 0.25:
 				DialogueManager.try_fire_exchange("strong_hand_shown")
+			DialogueManager.try_fire_any_except("strong_hand_shown", w, 0.95, ctx)
 			break
 	# Split pot commentary.
 	if split:
-		DialogueManager.try_fire_any("split_pot", 0.80)
 		if randf() < 0.25:
 			DialogueManager.try_fire_exchange("split_pot")
+		DialogueManager.try_fire_any("split_pot", 0.80)
 	# Normal round-end commentary (skipped for split pots).
 	if not split:
 		var exchange_trigger := "player_won_round" if winner_indices.has(GameManager.HUMAN_IDX) else "ai_won_round"
@@ -675,7 +675,7 @@ func _on_game_ended(final_chips: Array) -> void:
 		var pname := GameManager._pname(i)
 		log_label.append_text("%s: %d chips\n" % [pname, final_chips[i]])
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
-	await get_tree().create_timer(5.0).timeout
+	await get_tree().create_timer(10.0).timeout
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _update_arcana_deck_display() -> void:
