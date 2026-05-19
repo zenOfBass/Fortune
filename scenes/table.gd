@@ -39,6 +39,18 @@ var _shuffle_sfx: AudioStreamPlayer
 @onready var current_arcana_thumb: TextureRect = $CurrentArcana/ArcanaThumb
 @onready var current_arcana_name: Label = $CurrentArcana/ArcanaNameLabel
 @onready var current_arcana_desc: Label = $CurrentArcana/ArcanaDescLabel
+
+# ---- Arcana deck / discard pile ----------------------------------------------
+
+@onready var arcana_deck_card: TextureRect = $ArcanaDeck/CardStack/DeckCard
+@onready var arcana_deck_stack1: TextureRect = $ArcanaDeck/CardStack/StackCard1
+@onready var arcana_deck_stack2: TextureRect = $ArcanaDeck/CardStack/StackCard2
+@onready var arcana_deck_label: Label = $ArcanaDeck/DeckCountLabel
+@onready var arcana_discard_card: TextureRect = $ArcanaDiscard/CardStack/DiscardCard
+@onready var arcana_discard_stack1: TextureRect = $ArcanaDiscard/CardStack/StackCard1
+@onready var arcana_discard_stack2: TextureRect = $ArcanaDiscard/CardStack/StackCard2
+@onready var arcana_discard_label: Label = $ArcanaDiscard/DiscardCountLabel
+@onready var flying_arcana_card: TextureRect = $FlyingArcanaCard
 @onready var latest_log_label: Label = $LatestLogLabel
 
 # ---- Action panels -----------------------------------------------------------
@@ -87,6 +99,9 @@ var _colored_label_settings: Dictionary = {}
 var _current_phase: String = ""
 var _pending_discard_indices: Array = []
 var _skip_player_hand_redraw: bool = false
+var _arcana_remaining: int = 22
+var _arcana_discard_count: int = 0
+var _current_arcana_id: int = -1
 
 func _ready() -> void:
 	_flip_sfx = AudioStreamPlayer.new()
@@ -178,6 +193,14 @@ func _ready() -> void:
 			var ls: LabelSettings = base_ls.duplicate()
 			ls.font_color = _SPEAKER_COLORS[pidx]
 			_colored_label_settings[pidx] = ls
+
+	var back_tex := load(SettingsManager.card_back_path()) as Texture2D
+	arcana_deck_card.texture = back_tex
+	arcana_deck_stack1.texture = back_tex
+	arcana_deck_stack2.texture = back_tex
+	arcana_discard_stack1.texture = back_tex
+	arcana_discard_stack2.texture = back_tex
+	flying_arcana_card.pivot_offset = Vector2(40.0, 60.0)
 
 	GameManager.start_game()
 	if GameManager.players.size() > 0:
@@ -289,7 +312,10 @@ func _on_phase_changed(phase_name: String) -> void:
 		ai1_area.modulate = Color.WHITE
 		ai2_area.modulate = Color.WHITE
 		ai3_area.modulate = Color.WHITE
-		current_arcana.visible = false
+		if _current_arcana_id >= 0:
+			_fly_arcana_to_discard()
+		else:
+			current_arcana.visible = false
 		current_arcana_thumb.texture = null
 		current_arcana_name.text = ""
 		current_arcana_desc.text = ""
@@ -420,11 +446,16 @@ func _hide_all_overlays() -> void:
 
 func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 	_hide_all_overlays()
+	_current_arcana_id = arcana_id
+	_arcana_remaining = maxi(0, _arcana_remaining - 1)
+	_update_arcana_deck_display()
 	var tex_path := MajorArcana.texture_path(arcana_id)
-	current_arcana_thumb.texture = load(tex_path) if ResourceLoader.exists(tex_path) else null
+	var face_tex: Texture2D = load(tex_path) if ResourceLoader.exists(tex_path) else null
+	current_arcana_thumb.texture = face_tex
 	current_arcana_name.text = MajorArcana.arcana_name(arcana_id)
 	current_arcana_desc.text = MajorArcana.get_desc(arcana_id)
 	current_arcana_desc.visible = true
+	await _fly_arcana_from_deck(face_tex)
 	current_arcana.visible = true
 	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
 	if randf() < 0.25:
@@ -437,6 +468,11 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:
 	phase_label.text = "Hierophant cancelled: " + MajorArcana.arcana_name(cancelled_id)
+	_arcana_remaining = maxi(0, _arcana_remaining - 1)
+	_update_arcana_deck_display()
+	var tex_path := MajorArcana.texture_path(cancelled_id)
+	var face_tex: Texture2D = load(tex_path) if ResourceLoader.exists(tex_path) else null
+	_fly_arcana_deck_to_discard(face_tex)
 
 func _on_last_round_announced() -> void:
 	last_round_label.visible = true
@@ -643,6 +679,78 @@ func _on_game_ended(final_chips: Array) -> void:
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
 	await get_tree().create_timer(5.0).timeout
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _update_arcana_deck_display() -> void:
+	arcana_deck_label.text = str(_arcana_remaining)
+	arcana_deck_card.visible = _arcana_remaining > 0
+	arcana_deck_stack1.visible = _arcana_remaining > 1
+	arcana_deck_stack2.visible = _arcana_remaining > 2
+
+func _update_arcana_discard_display() -> void:
+	arcana_discard_label.text = str(_arcana_discard_count)
+	arcana_discard_card.visible = _arcana_discard_count > 0
+	arcana_discard_stack1.visible = _arcana_discard_count > 1
+	arcana_discard_stack2.visible = _arcana_discard_count > 2
+
+func _fly_arcana_from_deck(face_tex: Texture2D) -> void:
+	flying_arcana_card.texture = load(SettingsManager.card_back_path())
+	flying_arcana_card.scale = Vector2.ONE
+	flying_arcana_card.position = arcana_deck_card.get_global_rect().position
+	flying_arcana_card.visible = true
+	# Show current_arcana invisibly for one frame so its layout is computed.
+	current_arcana.modulate.a = 0.0
+	current_arcana.visible = true
+	await get_tree().process_frame
+	var to_pos := current_arcana_thumb.get_global_rect().position
+	current_arcana.visible = false
+	current_arcana.modulate.a = 1.0
+	var t: Tween = create_tween()
+	t.tween_property(flying_arcana_card, "position", to_pos, 0.45) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	await t.finished
+	if face_tex != null:
+		t = create_tween()
+		t.tween_property(flying_arcana_card, "scale:x", 0.0, 0.09)
+		t.tween_callback(func(): flying_arcana_card.texture = face_tex)
+		t.tween_property(flying_arcana_card, "scale:x", 1.0, 0.09)
+		await t.finished
+	flying_arcana_card.visible = false
+
+func _fly_arcana_to_discard() -> void:
+	var id := _current_arcana_id
+	_current_arcana_id = -1
+	var tex_path := MajorArcana.texture_path(id)
+	var face_tex: Texture2D = load(tex_path) if ResourceLoader.exists(tex_path) else null
+	var from_pos := current_arcana_thumb.get_global_rect().position
+	flying_arcana_card.texture = face_tex
+	flying_arcana_card.scale = Vector2.ONE
+	flying_arcana_card.position = from_pos
+	flying_arcana_card.visible = true
+	current_arcana.visible = false
+	var to_pos := arcana_discard_card.get_global_rect().position
+	var t: Tween = create_tween()
+	t.tween_property(flying_arcana_card, "position", to_pos, 0.40) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	await t.finished
+	flying_arcana_card.visible = false
+	_arcana_discard_count += 1
+	arcana_discard_card.texture = face_tex
+	_update_arcana_discard_display()
+
+func _fly_arcana_deck_to_discard(face_tex: Texture2D) -> void:
+	flying_arcana_card.texture = load(SettingsManager.card_back_path())
+	flying_arcana_card.scale = Vector2.ONE
+	flying_arcana_card.position = arcana_deck_card.get_global_rect().position
+	flying_arcana_card.visible = true
+	var to_pos := arcana_discard_card.get_global_rect().position
+	var t: Tween = create_tween()
+	t.tween_property(flying_arcana_card, "position", to_pos, 0.40) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	await t.finished
+	flying_arcana_card.visible = false
+	_arcana_discard_count += 1
+	arcana_discard_card.texture = face_tex
+	_update_arcana_discard_display()
 
 func _on_game_log(message: String) -> void:
 	print(message)
