@@ -119,6 +119,8 @@ func _run_round(g: int) -> void:
 	pot = 0
 	round_num += 1
 	dealer_idx = (dealer_idx + 1) % players.size()
+	while players[dealer_idx].chips == 0:
+		dealer_idx = (dealer_idx + 1) % players.size()
 
 	_phase_ante()
 	await _phase_deal(g)
