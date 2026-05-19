@@ -299,7 +299,7 @@ func _on_phase_changed(phase_name: String) -> void:
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
-	hand_rank_label.visible = (phase_name == "BET")
+	hand_rank_label.modulate.a = 1.0 if phase_name == "BET" else 0.0
 	if not arcana_panel.is_interactive():
 		arcana_panel.visible = false
 	if phase_name == "ANTE":
@@ -334,7 +334,9 @@ func _on_player_hand_updated(player_idx: int, hand: Array) -> void:
 			1: ai1_area.modulate = Color.WHITE
 			2: ai2_area.modulate = Color.WHITE
 			3: ai3_area.modulate = Color.WHITE
-	var deal_pos := _dealer_screen_pos() if _current_phase == "DEAL" else Vector2.ZERO
+	var deal_pos := _dealer_screen_pos() \
+		if (_current_phase == "DEAL" and (_current_arcana_id < 0 or _current_arcana_id == 10)) \
+		else Vector2.ZERO
 	match player_idx:
 		0:
 			var sort_order := HandEvaluator.sort_order_for_display(
@@ -543,6 +545,7 @@ func _on_temperance_confirmed(flop_idx: int) -> void:
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
 	temperance_panel.visible = false
+	_pending_discard_indices = [hand_selected[0]]
 	GameManager.submit_arcana_choice_pair(hand_selected[0], flop_idx)
 
 func _on_moon_phase1_confirmed() -> void:
@@ -780,7 +783,7 @@ func _reposition_dialogue(speaker_idx: int) -> void:
 		1:  # Tarvosk — top-center
 			box_w = vp.x * 0.45
 			left = (vp.x - box_w) * 0.5
-			top = vp.y * 0.30
+			top = vp.y * 0.20
 		2:  # Haldemar — left
 			box_w = vp.x * 0.35
 			left = vp.x * 0.09

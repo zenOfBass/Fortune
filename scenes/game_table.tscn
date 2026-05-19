@@ -139,20 +139,20 @@ anchor_bottom = 1.0
 offset_top = -235.0
 offset_bottom = -10.0
 
+[node name="HandDisplay" parent="PlayerArea" instance=ExtResource("2_hd")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="ChipsLabel" type="Label" parent="PlayerArea"]
 text = "You"
 horizontal_alignment = 1
 size_flags_horizontal = 3
 
-[node name="HandDisplay" parent="PlayerArea" instance=ExtResource("2_hd")]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
 [node name="HandRankLabel" type="Label" parent="PlayerArea"]
 text = ""
 horizontal_alignment = 1
 size_flags_horizontal = 3
-visible = false
+modulate = Color(1, 1, 1, 0)
 
 [node name="BetPanel" parent="." instance=ExtResource("3_bp")]
 anchor_right = 0.22
@@ -303,8 +303,8 @@ visible = false
 [node name="LatestLogLabel" type="Label" parent="."]
 anchor_left = 0.22
 anchor_right = 0.78
-anchor_top = 0.65
-anchor_bottom = 0.73
+anchor_top = 0.36
+anchor_bottom = 0.41
 text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
