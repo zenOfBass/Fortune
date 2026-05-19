@@ -85,10 +85,10 @@ func _mood_suffix(speaker_idx: int) -> String:
 
 # Fire a line for a specific AI speaker. chance ∈ [0,1].
 # context keys (e.g. {"hand_name": "Flush"}) are substituted into the line via String.format().
-func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
+func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}, require_chips: bool = true) -> void:
 	if speaker_idx == 0 or speaker_idx >= GameManager.players.size():
 		return
-	if GameManager.players[speaker_idx].chips == 0:
+	if require_chips and GameManager.players[speaker_idx].chips == 0:
 		return
 	if randf() > chance:
 		return
@@ -131,15 +131,16 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		_tarvosk_bluff_announced = true
 
 # Pick one eligible AI at random and fire a trigger for them.
-func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
+func try_fire_any(trigger_id: String, chance: float = _BASE_CHANCE, context: Dictionary = {}, require_chips: bool = true) -> void:
 	var eligible: Array = []
 	for i in range(1, GameManager.players.size()):
 		if not _lines[i].get(trigger_id, []).is_empty() \
-				and _cooldowns[i].get(trigger_id, 0) == 0:
+				and _cooldowns[i].get(trigger_id, 0) == 0 \
+				and (not require_chips or GameManager.players[i].chips > 0):
 			eligible.append(i)
 	if eligible.is_empty():
 		return
-	try_fire(trigger_id, eligible[randi() % eligible.size()], chance, context)
+	try_fire(trigger_id, eligible[randi() % eligible.size()], chance, context, require_chips)
 
 # Like try_fire_any but excludes one speaker index (e.g. a winner reacting to their own hand).
 func try_fire_any_except(trigger_id: String, exclude_idx: int, chance: float = _BASE_CHANCE, context: Dictionary = {}) -> void:
@@ -226,15 +227,15 @@ func _on_game_ended(final_chips: Array) -> void:
 		return
 	var max_chips: int = int(final_chips.max())
 	if final_chips[GameManager.HUMAN_IDX] >= max_chips:
-		try_fire_any("game_over_lose", 1.0)
+		try_fire_any("game_over_lose", 1.0, {}, false)
 		try_fire_exchange("game_over_lose")
 	else:
 		var winner_idx := final_chips.find(max_chips)
 		if winner_idx > 0:
-			try_fire("game_over_win", winner_idx, 1.0)
+			try_fire("game_over_win", winner_idx, 1.0, {}, false)
 			try_fire_exchange("ai_won_game_%d" % winner_idx)
 		else:
-			try_fire_any("game_over_win", 1.0)
+			try_fire_any("game_over_win", 1.0, {}, false)
 	_reset_stats()
 
 func _reset_stats() -> void:
