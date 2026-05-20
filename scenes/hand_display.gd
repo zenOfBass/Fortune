@@ -9,6 +9,8 @@ const _CARD_H := 120
 const _CARD_GAP := 8
 
 var _max_select: int = 0
+var _show_moon_secret: bool = false
+var _moon_card: TextureRect = null
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -28,6 +30,8 @@ func set_hand(hand: Array, face_up: bool, sort_order: Array[int] = [], deal_pos:
 			display.deal_from(deal_pos, display_pos * 0.10, face_up)
 		else:
 			display.animate_in(display_pos * 0.12, face_up)
+	if _show_moon_secret:
+		_add_moon_card()
 
 func set_back_count(count: int, deal_pos: Vector2 = Vector2.ZERO) -> void:
 	_clear()
@@ -42,6 +46,8 @@ func set_back_count(count: int, deal_pos: Vector2 = Vector2.ZERO) -> void:
 			display.deal_from(deal_pos, i * 0.10, false)
 		else:
 			display.animate_in(i * 0.10)
+	if _show_moon_secret:
+		_add_moon_card()
 
 func set_hand_mixed(hand: Array, face_up_indices: Array) -> void:
 	_clear()
@@ -58,6 +64,8 @@ func set_hand_mixed(hand: Array, face_up_indices: Array) -> void:
 			display.set_back()
 		display.card_toggled.connect(_on_child_toggled)
 		display.animate_in(i * 0.12, is_face_up)
+	if _show_moon_secret:
+		_add_moon_card()
 
 func _slot_positions(count: int) -> Array[Vector2]:
 	var positions: Array[Vector2] = []
@@ -136,6 +144,29 @@ func clear_selection() -> void:
 		if child is CardDisplayGD:
 			child.deselect()
 
+func show_moon_secret() -> void:
+	_show_moon_secret = true
+	_add_moon_card()
+
+func hide_moon_secret() -> void:
+	_show_moon_secret = false
+	if is_instance_valid(_moon_card):
+		_moon_card.queue_free()
+	_moon_card = null
+
+func _add_moon_card() -> void:
+	if is_instance_valid(_moon_card) or custom_minimum_size == Vector2.ZERO:
+		return
+	_moon_card = TextureRect.new()
+	_moon_card.texture = load(SettingsManager.card_back_path())
+	_moon_card.custom_minimum_size = Vector2(_CARD_W, _CARD_H)
+	_moon_card.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_moon_card.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+	_moon_card.position = Vector2(custom_minimum_size.x + _CARD_GAP, 0)
+	_moon_card.rotation_degrees = 8.0
+	_moon_card.modulate = Color(0.7, 0.7, 1.0, 0.8)
+	add_child(_moon_card)
+
 func mark_priestess_card(idx: int) -> void:
 	for child in get_children():
 		if child is CardDisplayGD and child.card_index == idx:
@@ -146,3 +177,4 @@ func _clear() -> void:
 	for child in get_children():
 		remove_child(child)
 		child.queue_free()
+	_moon_card = null

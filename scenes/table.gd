@@ -456,6 +456,8 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 		DialogueManager.try_fire_exchange("arcana_revealed")
 	DialogueManager.try_fire_any("arcana_revealed_%d" % arcana_id, 0.85, {"arcana_name": MajorArcana.arcana_name(arcana_id)})
 	await get_tree().create_timer(1.5).timeout
+	if arcana_id == 18:
+		_show_moon_secrets()
 	GameManager.complete_arcana_effect()
 	if arcana_id in [8, 11, 13, 16, 19]:
 		await get_tree().create_timer(2.0).timeout
@@ -557,13 +559,29 @@ func _on_moon_swap() -> void:
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
 	moon_panel.visible = false
+	_hide_moon_secrets()
 	GameManager.submit_arcana_choice(selected[0])
 
 func _on_moon_keep() -> void:
 	player_hand.set_selectable(false)
 	player_hand.clear_selection()
 	moon_panel.visible = false
+	_hide_moon_secrets()
 	GameManager.submit_arcana_choice(-1)
+
+func _show_moon_secrets() -> void:
+	for i in GameManager.active_players:
+		match i:
+			0: player_hand.show_moon_secret()
+			1: ai1_hand.show_moon_secret()
+			2: ai2_hand.show_moon_secret()
+			3: ai3_hand.show_moon_secret()
+
+func _hide_moon_secrets() -> void:
+	player_hand.hide_moon_secret()
+	ai1_hand.hide_moon_secret()
+	ai2_hand.hide_moon_secret()
+	ai3_hand.hide_moon_secret()
 
 func _on_magician_suit_chosen(suit_idx: int) -> void:
 	magician_panel.visible = false
