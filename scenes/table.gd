@@ -525,6 +525,7 @@ func _on_priestess_confirmed() -> void:
 	player_hand.clear_selection()
 	priestess_panel.visible = false
 	_skip_player_hand_redraw = true
+	player_hand.mark_priestess_card(selected[0])
 	GameManager.submit_arcana_choice(selected[0])
 
 func _on_judgement_reenter() -> void:

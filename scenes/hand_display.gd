@@ -136,6 +136,12 @@ func clear_selection() -> void:
 		if child is CardDisplayGD:
 			child.deselect()
 
+func mark_priestess_card(idx: int) -> void:
+	for child in get_children():
+		if child is CardDisplayGD and child.card_index == idx:
+			child.modulate = Color(1.0, 0.85, 0.3)
+			child.position.y -= 8
+
 func _clear() -> void:
 	for child in get_children():
 		remove_child(child)
