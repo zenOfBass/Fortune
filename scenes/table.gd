@@ -7,8 +7,7 @@ var _shuffle_sfx: AudioStreamPlayer
 
 # ---- Top bar -----------------------------------------------------------------
 
-@onready var phase_label: Label = $TopBar/PhaseLabel
-@onready var pot_label: Label = $TopBar/PotLabel
+@onready var pot_label: Label = $BetPanel/VBox/PotLabel
 @onready var last_round_label: Label = $LastRoundLabel
 
 # ---- AI areas ----------------------------------------------------------------
@@ -294,7 +293,6 @@ func _on_phase_changed(phase_name: String) -> void:
 	_refresh_player_labels()
 	if phase_name == "DEAL":
 		_shuffle_sfx.play()
-	phase_label.text = "Phase: " + phase_name
 	bet_panel.hide_betting()
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
@@ -464,7 +462,6 @@ func _on_arcana_revealed(arcana_id: int, _arcana_name: String) -> void:
 		DialogueManager.try_fire_any("arcana_aftermath_%d" % arcana_id, 0.70)
 
 func _on_arcana_cancelled(cancelled_id: int) -> void:
-	phase_label.text = "Hierophant cancelled: " + MajorArcana.arcana_name(cancelled_id)
 	_arcana_remaining = maxi(0, _arcana_remaining - 1)
 	_update_arcana_deck_display()
 	var tex_path := MajorArcana.texture_path(cancelled_id)
@@ -621,7 +618,6 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 			parts.append("%s %s with %s" % [player_name, verb, hand_name])
 		if split:
 			parts.insert(0, "Split pot!")
-	phase_label.text = " | ".join(parts)
 	# Rare hand reactions — always use a reactor (not the winner themselves).
 	for i in hand_names.size():
 		var w: int = winner_indices[i]
@@ -655,9 +651,8 @@ func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> v
 	await get_tree().create_timer(4.0).timeout
 	GameManager.confirm_next_round()
 
-func _on_page_bonus(winner_idx: int, bonus_per_player: int) -> void:
-	var player_name := GameManager._pname(winner_idx)
-	phase_label.text = "%s gets Page bonus: +%d per player!" % [player_name, bonus_per_player]
+func _on_page_bonus(_winner_idx: int, _bonus_per_player: int) -> void:
+	pass
 
 func _on_game_ended(final_chips: Array) -> void:
 	_hide_all_overlays()
@@ -666,9 +661,6 @@ func _on_game_ended(final_chips: Array) -> void:
 	for i in final_chips.size():
 		if final_chips[i] == max_chips:
 			winners.append(GameManager._pname(i))
-	var header := "%s wins!" % " & ".join(winners) if winners.size() < final_chips.size() \
-		else "It's a tie!"
-	phase_label.text = "Game Over — " + header
 	var standings: Array = range(final_chips.size())
 	standings.sort_custom(func(a, b): return final_chips[a] > final_chips[b])
 	for i in standings:

@@ -8,6 +8,11 @@ script = ExtResource("1_bp")
 [node name="VBox" type="VBoxContainer" parent="."]
 theme_override_constants/separation = 4
 
+[node name="PotLabel" type="Label" parent="VBox"]
+text = "Pot: 0"
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
 [node name="InfoLabel" type="Label" parent="VBox"]
 text = "Current bet: 0"
 size_flags_horizontal = 3
