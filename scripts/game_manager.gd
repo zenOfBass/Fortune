@@ -51,7 +51,9 @@ var pot:            int = 0
 var ante_amount:    int = 1
 var last_round:     bool = false
 var round_num:      int = 0
-var _game_gen: int = 0          # incremented by setup_game(); stale coroutines self-exit on mismatch
+var _game_gen: int = 0  # incremented by setup_game(); every async phase captures a local g=_game_gen
+                        # and checks "if g != _game_gen: return" after each await to exit if a new
+                        # game started while the coroutine was suspended.
 var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana every round
 var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
 var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (Temperance)

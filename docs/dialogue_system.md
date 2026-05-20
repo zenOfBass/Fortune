@@ -1,32 +1,28 @@
-# Fortune — Dialogue System Design Plan
+# Fortune — Dialogue System Reference
 
-## Vision
-
-Give the three AI characters a persistent, living presence at the table — not just opponents who bet and fold, but personalities who comment on the game, react to the player, and occasionally bicker with each other. The reference point is *Poker Night at the Inventory*: characters feel like they have opinions, history, and a stake in what's happening beyond their chip count.
-
-The tarot/arcane setting is a major asset here. Unlike a game set in a generic poker room, Fortune has built-in thematic richness every round — a new arcana, strange rules, occult stakes. The characters should feel like they *belong* in that world.
+*All three phases of the dialogue system are complete as of 2026-05-19.*
 
 ---
 
 ## The Characters
 
-These are character in the style of Jack Vance's *Dying Earth*, which sets a strong tonal baseline: archaic, darkly comic, verbose when it suits them, cryptic when it doesn't.
+In the style of Jack Vance's *Dying Earth*: archaic, darkly comic, verbose when it suits them, cryptic when it doesn't.
 
 ### Tarvosk the Brazen
 - **Play style**: Aggressive, high bluff rate, folds rarely
-- **Voice**: Loud, boastful, quick to taunt. Genuinely enjoys chaos. Probably loves the Fool arcana. Bad at hiding when he has a strong hand.
+- **Voice**: Loud, boastful, quick to taunt. Genuinely enjoys chaos. Bad at hiding a strong hand.
 - **Relationship to losing**: Blames luck, the arcana, the universe — never himself.
 - **Sample line**: *"The Tower? Good. I thrive in rubble."*
 
 ### Haldemar the Still
 - **Play style**: Rock-solid, never bluffs, folds aggressively on weak hands
-- **Voice**: Dry, sparse, slightly contemptuous. Speaks as if dialogue itself is beneath him. Long silences are part of his character — he shouldn't talk often, but when he does it lands.
+- **Voice**: Dry, sparse, slightly contemptuous. Long silences are part of his character — rare lines land hard.
 - **Relationship to losing**: Accepts it without visible emotion. Describes it philosophically.
 - **Sample line**: *"Expected."*
 
 ### Mercival the Oblique
 - **Play style**: Ghost — middle thresholds, moderate bluffing, unpredictable
-- **Voice**: Indirect, allusive, never says what he means directly. Possibly delighted by things others find threatening. The arcana fascinate him.
+- **Voice**: Indirect, allusive, never says what he means directly. The arcana fascinate him.
 - **Relationship to losing**: Treats it as interesting data.
 - **Sample line**: *"The Hanged Man. How appropriate for some of us."* *(glances at no one in particular)*
 
@@ -34,141 +30,163 @@ These are character in the style of Jack Vance's *Dying Earth*, which sets a str
 
 ## Design Pillars
 
-1. **Personality-driven, not generic.** Every line should feel like it could only come from that specific character. No filler like "Nice hand."
-2. **Game-state-aware.** Lines reference what's actually happening — the current arcana, who's winning, whether the player just went all-in.
-3. **Non-repetitive.** A cooldown + no-repeat system prevents the same line playing twice in a row or too frequently.
-4. **Thematically grounded.** The arcana are a natural dialogue hook every single round. Each of the 22 arcana is an opportunity for character-specific reactions.
-5. **Optional depth.** The system should work with a small line set and get richer as more content is added — not require hundreds of lines to feel good.
+1. **Personality-driven, not generic.** Every line should feel like it could only come from that specific character.
+2. **Game-state-aware.** Lines reference the current arcana, who's winning, recent player behavior.
+3. **Non-repetitive.** Cooldown + no-repeat system prevents the same line playing twice in a row or too often.
+4. **Thematically grounded.** The arcana are a natural hook every round — 22 × 3 characters = 66 arcana reactions.
+5. **Optional depth.** Works with a small line set and grows richer as content is added.
 
 ---
 
-## Trigger Taxonomy
+## Architecture
 
-Events that can fire dialogue, roughly in order of importance:
+### Files
 
-### High priority (fire often, should have good coverage)
-| Trigger | Notes |
+| File | Purpose |
 |---|---|
-| `arcana_revealed` | Per-arcana reactions per character. 22 arcana × 3 characters = 66 lines. High value. |
-| `player_won_round` | Character reactions to losing to the player |
-| `ai_won_round` | Winner gloats (or doesn't, in Haldemar's case) |
-| `player_folded` | Taunt or comment |
-| `player_went_all_in` | Reactions to the bet |
-| `ai_went_all_in` | Self-commentary when the character goes all-in |
-| `split_pot` | Rare, worth a line |
+| `scripts/dialogue_manager.gd` | Autoload Node — all selection logic, behavior tracking, mood system |
+| `assets/dialogue/tarvosk.json` | Tarvosk's lines (~210 lines across all triggers) |
+| `assets/dialogue/haldemar.json` | Haldemar's lines (~200 lines) |
+| `assets/dialogue/mercival.json` | Mercival's lines (~200 lines) |
+| `assets/dialogue/exchanges.json` | Scripted multi-character exchanges |
 
-### Medium priority (flavor, fire less often)
-| Trigger | Notes |
-|---|---|
-| `player_raised_aggressively` | Raise significantly above current bet |
-| `ai_bluffing` | Internal — could fire a tell line for Tarvosk specifically |
-| `strong_hand_shown` | Royal Flush, Straight Flush, Four of a Kind at showdown |
-| `five_of_a_kind_shown` | Rare enough to always deserve a line |
-| `last_round_announced` | Tension acknowledgment |
-| `player_low_chips` | Comments on the player's stack |
-| `ai_low_chips` | Self-aware stack commentary |
+### JSON line format
 
-### Low priority (Phase 2+)
-| Trigger | Notes |
-|---|---|
-| `inter_character` | One AI reacts to another's action |
-| `player_behavior_pattern` | "You always raise on the draw phase" |
-| `specific_arcana_outcome` | Chariot card passed, Magician guess correct/wrong |
-| `game_start` | Opening remarks |
-| `game_over` | Closing remarks |
+Each character file is a flat dictionary keyed by trigger ID:
 
----
-
-## Dialogue Architecture
-
-### Data format (proposed)
-
-Each character gets a dialogue file (`scripts/dialogue/voivode.gd`, etc.) with a dictionary keyed by trigger ID:
-
-```gdscript
-const LINES := {
-    "arcana_revealed_7":  # The Chariot
-        ["Pass a card? Gladly — I have nothing worth keeping.",
-         "The Chariot moves forward. Unlike some at this table."],
-    "player_won_round":
-        ["Enjoy it. The arcana will correct this shortly.",
-         "Beginner's fortune. It won't last."],
-    # ...
+```json
+{
+    "arcana_revealed_18": [
+        "The Moon. Someone here is hiding something.",
+        "We all carry secrets. The question is whether they're worth anything."
+    ],
+    "player_won_round": [
+        "Enjoy it. The arcana will correct this shortly.",
+        "Beginner's fortune. It won't last."
+    ],
+    "player_won_round_humiliated": [
+        "Again. Again you beat me. There must be sorcery at work.",
+        "Fine. Fine. We'll see how long this holds."
+    ]
 }
 ```
 
-Multiple lines per trigger allow random selection. This format is easy to author and extend without touching engine code.
+Multiple lines per trigger allow random selection. The `_humiliated` / `_impressed` / `_curious` suffix variants unlock alternate pools when a character's session mood counter reaches the threshold (see Mood System below).
 
-### Selection system
+Lines support `{placeholder}` substitution via GDScript's `String.format()`:
+- `{hand_name}` — e.g. "flush", "pair" (auto-converted to lowercase; articles handled)
+- `{hand_name_a}` — "a flush", "pair" (with or without "a" depending on the hand)
+- `{arcana_name}` — e.g. "The Moon"
+- `{chips}` — a chip count
 
-A `DialogueManager` autoload handles:
-- **Cooldown per trigger**: same trigger can't fire within N rounds
-- **No-repeat**: tracks last N lines shown, won't repeat them
-- **Priority queue**: high-priority triggers preempt low-priority ones if both fire at once
-- **Chance roll**: not every trigger fires every time (prevents overwhelming the player)
+Lines containing a placeholder that would substitute to an empty string are skipped automatically.
 
 ### Display
 
-**Resolved.** Each character gets a `DialogueDisplay` panel (speaker name + dialogue text) that:
-- Is positioned near their side of the table (`_reposition_dialogue()` in `table.gd`)
-- Renders the speaker name in a distinct signature color via a per-character `LabelSettings` duplicate
+`DialogueDisplay` is a PanelContainer (dark parchment background, gold border) positioned near each character's side of the table. It fades in (0.3s), holds for 4s, then fades out (0.5s).
 
-| Character | Screen position | Color |
+Each speaker's name is rendered in a distinct signature color via a per-character `LabelSettings` duplicate:
+
+| Character | Position | Color |
 |---|---|---|
-| Tarvosk the Brazen | top-center | Burnt orange `#ED7521` |
-| Haldemar the Still | left | Steel blue `#6BA6D9` |
-| Mercival the Oblique | right | Violet `#B36BE6` |
-
-The box fades in (0.3s), holds for 4s, then fades out (0.5s).
+| Tarvosk the Brazen | Top-center | Burnt orange `#ED7521` |
+| Haldemar the Still | Left | Steel blue `#6BA6D9` |
+| Mercival the Oblique | Right | Violet `#B36BE6` |
 
 ---
 
-## Phased Implementation Plan
+## DialogueManager API
 
-### Phase 1 — Foundation *(start here)*
-**Goal**: Characters feel alive. Every round has at least one voiced moment.
+```gdscript
+# Fire a line for a specific AI speaker. chance ∈ [0,1].
+try_fire(trigger_id, speaker_idx, chance, context, require_chips)
 
-- `DialogueManager` autoload with cooldown + no-repeat logic
-- Dialogue files for all three characters
-- Coverage: `arcana_revealed` (all 22), `player_won_round`, `ai_won_round`, `player_folded`, `player_went_all_in`
-- Basic display UI (portrait + text, auto-dismiss after a few seconds)
-- ~15–20 lines per character to start
+# Pick one eligible AI at random and fire.
+try_fire_any(trigger_id, chance, context, require_chips)
 
-**Deliverable**: The table never feels silent. Every arcana has a reaction. Wins and folds get commentary.
+# Like try_fire_any but excludes one index — use for reactor triggers so winner doesn't react to themselves.
+try_fire_any_except(trigger_id, exclude_idx, chance, context)
 
-### Phase 2 — Context awareness
-**Goal**: Lines reference what's actually happening, not just the event type.
+# Play a scripted multi-character exchange (async coroutine, 2.5s between steps).
+# trigger_id selects from exchanges.json; falls back to "random" pool if not found.
+try_fire_exchange(trigger_id)
+```
 
-- Lines that embed game state: arcana name, chip counts, hand names, "last round" flag
-- Medium-priority triggers: strong hands at showdown, stack commentary, specific arcana outcomes
-- Expand line count to ~40–50 per character
-
-**Deliverable**: Characters feel like they're watching the same game you are.
-
-### Phase 3 — Dynamic behavior
-**Goal**: Characters react to patterns, not just events.
-
-- Player behavior tracking: aggression score, fold frequency, bluff detection
-- Inter-character dialogue (Tarvosk taunts Haldemar; Haldemar ignores him)
-- Character-to-character relationships that evolve across a session
-- Potentially: "tells" — Tarvosk drops hints when bluffing, Mercival says something cryptic before a big win
-
-**Deliverable**: The table has a social dynamic. Feels like *Poker Night*.
+All `try_fire*` calls silently no-op if:
+- The trigger is on cooldown for that speaker (3-round default)
+- The selected line was among the last 3 shown for that trigger
+- `require_chips=true` and the speaker is eliminated
+- An exchange is currently running (exchanges block single-line triggers while active)
 
 ---
 
-1. **Inter-character dialogue in Phase 1?** Even one or two exchanges between Tarvosk and Haldemar in Phase 1 would do a lot. Low technical cost if the trigger system is built right.
+## Implemented Triggers
 
-2. **Arcana commentary scope**: Should characters have lines for all 22 arcana in Phase 1, or just the most common/impactful ones? Full coverage is the high-value play but requires more writing upfront.
+| Trigger | Fire site | Notes |
+|---|---|---|
+| `game_start` | `DialogueManager` on first DEAL phase | 100%, also fires a scripted exchange |
+| `arcana_revealed_N` | `table.gd _on_arcana_revealed` | 85% per arcana, `{arcana_name}` context |
+| `player_won_round` | `table.gd _on_round_ended` | 85%, `{hand_name}` context |
+| `ai_won_round` | `table.gd _on_round_ended` | 90%, `{hand_name}` context |
+| `strong_hand_shown` | `table.gd _on_round_ended` | 95%, reactor only (Royal/Straight Flush, Four of a Kind) |
+| `five_of_a_kind_shown` | `table.gd _on_round_ended` | 100%, reactor only |
+| `split_pot` | `table.gd _on_round_ended` | 80% |
+| `exchange` | `table.gd _on_round_ended` | 20% chance instead of normal round-end commentary |
+| `last_round_announced` | `table.gd _on_last_round_announced` | 100% |
+| `player_folded` | `table.gd _on_player_folded` | 70% |
+| `player_went_all_in` | `table.gd _on_player_bet_changed` | 90% |
+| `ai_went_all_in` | `table.gd _on_player_bet_changed` | 85%, that specific AI |
+| `player_raised_aggressively` | `table.gd _on_player_raised` | 65%, raise ≥ 2× previous bet |
+| `player_low_chips` | `table.gd _on_player_chips_changed` | 75%, human ≤ 20% starting chips, `{chips}` |
+| `ai_low_chips` | `table.gd _on_player_chips_changed` | 70%, that AI, `{chips}` |
+| `tarvosk_bluffing` | `DialogueManager` via `ai_bluffing` signal | 75%, Tarvosk only |
+| `player_aggressive_pattern` | `DialogueManager` deferred 5.2s post-round | 45%, rate ≥ 0.4 raises/round, ≥ 3 rounds |
+| `player_passive_pattern` | `DialogueManager` deferred 5.2s post-round | 40%, rate ≥ 0.45 folds/round, ≥ 3 rounds |
+| `player_on_streak` | `DialogueManager` deferred 5.2s post-round | 60%, ≥ 2 consecutive player wins |
+| `ai_on_streak` | `DialogueManager` deferred 5.2s post-round | 65%, ≥ 2 consecutive wins by same AI |
+| `game_over_win` | `DialogueManager _on_game_ended` | 100%, winning AI speaks |
+| `game_over_lose` | `DialogueManager _on_game_ended` | 100%, any AI reacts to player winning |
 
 ---
 
-## Content Scope Reference
+## Mood System
 
-| Phase | Lines per character | Total lines | Estimated writing effort |
-|---|---|---|---|
-| Phase 1 | ~40 | ~120 | A few focused sessions |
-| Phase 2 | +30 | ~210 | Ongoing, add as you play |
-| Phase 3 | +20 + dynamic | ~270+ | Ongoing |
+Each character accumulates a session mood counter that unlocks alternate dialogue pools when it hits 3:
 
-Poker Night at the Inventory had roughly 300–500 lines per character including VO. 120 lines across three characters is a comfortable Phase 1 target that feels rich without being overwhelming to write.
+| Character | Counter | What increments it |
+|---|---|---|
+| Tarvosk | `_tarvosk_humiliation` | Player wins at showdown |
+| Haldemar | `_haldemar_impressed` | Player wins at showdown |
+| Mercival | `_mercival_curiosity` | Unusual arcana (Tower/Moon/Judgement/World), split pots |
+
+When a character's counter is at or above the threshold, `try_fire` appends a suffix to the trigger lookup before falling back to the base pool. For example, a humiliated Tarvosk will draw from `player_won_round_humiliated` instead of `player_won_round` if that key exists in his JSON file.
+
+Counters and cooldowns reset at game end.
+
+---
+
+## Bluff Tell System
+
+When Tarvosk bluffs, `ai_bluffing` fires and `try_fire("tarvosk_bluffing")` has a 75% chance to play a tell line. The flag `_tarvosk_bluff_announced` is set when a tell fires. If the player beats Tarvosk in that round's showdown, `tell_read` is emitted — reserved for future use (e.g. a UI wink, a Tarvosk reaction line).
+
+---
+
+## Scripted Exchanges
+
+`exchanges.json` holds multi-character scripted sequences keyed by context:
+
+```json
+{
+    "game_start": [
+        [
+            {"idx": 1, "line": "Another evening. Another opportunity to take your chips."},
+            {"idx": 2, "line": "Indeed."}
+        ]
+    ],
+    "random": [ ... ]
+}
+```
+
+Each exchange is an array of step-objects with `idx` (speaker, 1–3) and `line`. Steps play with 2.5s gaps. While an exchange runs, all single-line `try_fire*` calls are suppressed.
+
+Exchange cooldown: 6 rounds. Falls back to `"random"` pool if the specific trigger key is not found.

@@ -32,6 +32,9 @@ var _ai_win_streak: int = 0
 var _streak_ai_idx: int = -1
 
 const _MOOD_THRESHOLD := 3
+# Per-session mood counters. Once a counter hits _MOOD_THRESHOLD, try_fire() appends a suffix
+# (e.g. "_humiliated") to the trigger lookup before falling back to the base pool. This lets
+# each character's JSON define alternate lines that unlock as the session progresses.
 var _tarvosk_humiliation: int = 0  # increments on player showdown wins
 var _haldemar_impressed: int = 0   # increments on player showdown wins
 var _mercival_curiosity: int = 0   # increments on unusual arcana + split pots

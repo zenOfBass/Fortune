@@ -63,4 +63,6 @@ One arcana can fire per round. Its effect lasts until the next ante phase. There
 - Video poker-style betting panel with +1/+5/+10/+25 increment buttons
 - Chip tracking, bust detection, and final standings screen
 - Dealer rotation and game log
+- Three selectable card backs (chosen in the main menu)
+- Visual indicators for active arcana effects: gold-tinted card shows which card the High Priestess revealed; a face-down card floats next to each player's hand while the Moon's secret is in play
 - Character dialogue — Tarvosk, Haldemar, and Mercival comment on arcana, bets, wins, and patterns; each has a signature color and their dialogue box appears near their side of the table

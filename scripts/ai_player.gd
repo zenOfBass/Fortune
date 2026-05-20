@@ -11,6 +11,8 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 		gm.round_state.inverted_values,
 		gm.round_state.fool_active
 	)
+	# Normalize packed score to 0.0–11.0 where floor ≈ hand rank constant (HIGH_CARD=1 … FIVE_OF_A_KIND=11).
+	# 1048576 == 16^5 (_b5()) — the multiplier used to pack hand type into the high bits.
 	var hand_type: float = hand_score / 1048576.0
 
 	var noise_base: float = clamp(1.4 - (hand_type - 1.0) * 0.13, 0.2, 1.4)
