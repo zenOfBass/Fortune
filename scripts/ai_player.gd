@@ -29,11 +29,26 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 		if total_chips > 0 and float(gm.players[pidx].chips) / total_chips > 0.6:
 			raise_threshold -= 0.3
 
+	# ---- Opponent reads --------------------------------------------------------
+	# Memory-driven adjustments. Each delta capped at ~0.5 so personality dominates
+	# early and reads only nudge play once a sample has built up.
+	var memory: OpponentMemory = gm.players[pidx].memory
+	var bluff_chance_eff := profile.bluff_chance
+	if memory != null and profile.memory_weight > 0.0:
+		var w := profile.memory_weight
+		# Human folds to raises a lot → raise lighter against them.
+		var fold_to_raise_signal := memory.fold_to_raise_rate() - 0.5
+		raise_threshold -= clampf(fold_to_raise_signal * w * 1.4, -0.5, 0.5)
+		# Human bluffs a lot → call lighter (don't fold to their aggression).
+		fold_threshold -= clampf(memory.bluff_propensity() * w * 1.6, 0.0, 0.5)
+		# Human is generally aggressive → tighten our own bluffs (they'll call us).
+		bluff_chance_eff = clampf(bluff_chance_eff - memory.aggression() * w * 0.15, 0.0, 1.0)
+
 	if hand_type >= 6.0:
 		effective = max(effective, raise_threshold + 0.1)
 
 	var is_bluffing := false
-	if not can_check and hand_type < 3.0 and randf() < profile.bluff_chance:
+	if not can_check and hand_type < 3.0 and randf() < bluff_chance_eff:
 		effective = raise_threshold + 0.1
 		is_bluffing = true
 

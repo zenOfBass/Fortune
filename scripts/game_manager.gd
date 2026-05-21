@@ -58,6 +58,10 @@ var debug_arcana_id: int = -1  # -1 = normal random; 0-21 = force this arcana ev
 var arcana_choice: int = -1   # scratch var; set by UI before complete_arcana_effect()
 var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (Temperance)
 
+# Per-round journal of the human's behavior. Reset each round, committed into each
+# AI's OpponentMemory at round end. See _reset_journal() / _commit_journal().
+var _human_journal: Dictionary = {}
+
 const HUMAN_IDX := 0  # player 0 is always the human
 
 # ---- Public API (called by the game setup scene) -----------------------------
@@ -72,6 +76,7 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 		var p := Player.new(starting_chips)
 		if i > 0:
 			p.profile = ai_profiles[i - 1]
+			p.memory  = OpponentMemory.new()  # AI's read of the human; reset per game
 		players.append(p)
 	ante_amount = ante
 	round_num = 0
@@ -80,6 +85,7 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	deck.shuffle()
 	_setup_arcana_deck()
 	round_state = RoundState.new()
+	_reset_journal()
 
 func start_game() -> void:
 	var g := _game_gen
@@ -113,6 +119,8 @@ func _run_round(g: int) -> void:
 	for p in players:
 		deck.add_cards(p.hand)
 		p.clear_for_new_round()
+	_reset_journal()
+	_human_journal["human_active"] = active_players.has(HUMAN_IDX)
 
 	if deck.size() < players.size() * 6:
 		deck.build()
@@ -260,6 +268,10 @@ func _phase_bet(g: int) -> void:
 
 		match action:
 			"fold":
+				if pidx == HUMAN_IDX:
+					_human_journal["human_folded"] = true
+					if _current_bet > 0:
+						_human_journal["human_folded_to_raise"] = true
 				players[pidx].fold()
 				active_players.erase(pidx)
 				player_folded.emit(pidx)
@@ -275,6 +287,11 @@ func _phase_bet(g: int) -> void:
 				var paid   := players[pidx].bet(to_pay)
 				contributed[pidx] = contributed.get(pidx, 0) + paid
 				_add_to_pot(paid, pidx)
+				if pidx == HUMAN_IDX:
+					if _current_bet > 0:
+						_human_journal["human_called_raise"] = true
+					if players[pidx].chips == 0:
+						_human_journal["human_all_in"] = true
 				var call_suffix := " (all in)" if players[pidx].chips == 0 else ""
 				game_log.emit("%s calls %d.%s" % [_pname(pidx), paid, call_suffix])
 				player_bet_changed.emit(pidx, contributed[pidx])
@@ -290,6 +307,10 @@ func _phase_bet(g: int) -> void:
 					player_bet_changed.emit(pidx, contributed[pidx])
 				var prev_bet := _current_bet
 				_current_bet = max(_current_bet, raise_to)
+				if pidx == HUMAN_IDX:
+					_human_journal["human_raises"] = int(_human_journal.get("human_raises", 0)) + 1
+					if players[pidx].chips == 0:
+						_human_journal["human_all_in"] = true
 				var raise_suffix := " (all in)" if players[pidx].chips == 0 else ""
 				game_log.emit("%s raises to %d.%s" % [_pname(pidx), _current_bet, raise_suffix])
 				player_raised.emit(pidx, raise_to, prev_bet)
@@ -455,6 +476,7 @@ func _phase_showdown(g: int) -> void:
 		var solo := active_players[0]
 		game_log.emit("%s %s %d uncontested." % [_pname(solo), "win" if solo == HUMAN_IDX else "wins", pot])
 		_award_pot(active_players)
+		_commit_journal(false, false, 0.0)
 		round_ended.emit([solo], [], false)
 		if players[solo].has_page:
 			var bonus_total := 0
@@ -480,6 +502,9 @@ func _phase_showdown(g: int) -> void:
 			player_chips_changed.emit(pidx, players[pidx].chips)
 		pot = 0
 		pot_changed.emit(pot)
+		# Sun splits the pot regardless of hand strength, so it doesn't qualify
+		# as a "showdown" for bluff detection — count the round but skip showdown stats.
+		_commit_journal(false, false, 0.0)
 		round_ended.emit(active_players, [], true)
 		return
 
@@ -532,6 +557,10 @@ func _phase_showdown(g: int) -> void:
 			var names := ", ".join(winners.map(func(w): return _pname(w)))
 			@warning_ignore("integer_division")
 			game_log.emit("Tie! %s each win %d (%s)." % [names, won / winners.size(), hand_names[0]])
+
+	var human_reached := active_players.has(HUMAN_IDX)
+	var human_hand_type := (float(scores.get(HUMAN_IDX, 0)) / 1048576.0) if human_reached else 0.0
+	_commit_journal(human_reached, winners.has(HUMAN_IDX), human_hand_type)
 
 	round_ended.emit(winners, hand_names, split)
 
@@ -929,6 +958,24 @@ func _act_order_from(dealer: int) -> Array[int]:
 
 func _only_one_solvent() -> bool:
 	return players.filter(func(p): return p.chips > 0).size() <= 1
+
+func _reset_journal() -> void:
+	_human_journal = {
+		"human_active":          false,
+		"human_folded":          false,
+		"human_folded_to_raise": false,
+		"human_called_raise":    false,
+		"human_raises":          0,
+		"human_all_in":          false,
+	}
+
+func _commit_journal(human_reached_showdown: bool, human_won: bool, human_hand_type: float) -> void:
+	for i in range(players.size()):
+		if i == HUMAN_IDX:
+			continue
+		var mem: OpponentMemory = players[i].memory
+		if mem != null:
+			mem.note_round_outcome(_human_journal, human_hand_type, human_won, human_reached_showdown)
 
 # ---- Public API (UI calls these) ---------------------------------------------
 
