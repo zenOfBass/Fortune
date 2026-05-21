@@ -87,6 +87,20 @@ func aggression() -> float:
 		return 0.5
 	return clampf(float(times_raised) / float(hands_observed * 2), 0.0, 1.0)
 
+# Single-phrase descriptor for UI. Ordered so the most distinctive read wins.
+func read_descriptor() -> String:
+	if hands_observed < MIN_SAMPLES:
+		return "still learning your tells"
+	if bluff_propensity() > 0.2:
+		return "an unrepentant bluffer"
+	if fold_to_raise_rate() > 0.7:
+		return "folds to pressure"
+	if aggression() > 0.55:
+		return "aggressive"
+	if current_fold_streak >= 4:
+		return "currently passive"
+	return "balanced"
+
 
 # ---- Persistence (used by Stage 2 RunManager) ----
 

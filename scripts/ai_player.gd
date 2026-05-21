@@ -42,7 +42,8 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 		# Human bluffs a lot → call lighter (don't fold to their aggression).
 		fold_threshold -= clampf(memory.bluff_propensity() * w * 1.6, 0.0, 0.5)
 		# Human is generally aggressive → tighten our own bluffs (they'll call us).
-		bluff_chance_eff = clampf(bluff_chance_eff - memory.aggression() * w * 0.15, 0.0, 1.0)
+		# Capped so Tarvosk doesn't drop to ~0 and stop bluffing entirely.
+		bluff_chance_eff = clampf(bluff_chance_eff - memory.aggression() * w * 0.10, 0.02, 1.0)
 
 	if hand_type >= 6.0:
 		effective = max(effective, raise_threshold + 0.1)

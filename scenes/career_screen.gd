@@ -5,6 +5,8 @@ extends Control
 @onready var match_label:    Label  = $VBox/MatchLabel
 @onready var opponents_label: Label = $VBox/OpponentsLabel
 @onready var status_label:   Label  = $VBox/StatusLabel
+@onready var reads_title:    Label  = $VBox/ReadsTitle
+@onready var reads_label:    Label  = $VBox/ReadsLabel
 @onready var primary_button: Button = $VBox/PrimaryButton
 @onready var abandon_button: Button = $VBox/AbandonButton
 @onready var back_button:    Button = $VBox/BackButton
@@ -38,6 +40,7 @@ func _refresh() -> void:
 		status_label.text = "You took every table. The Page bows to you."
 		primary_button.text = "Start a New Run"
 		abandon_button.visible = false
+		_refresh_reads()
 		return
 
 	if RunManager.run_failed:
@@ -48,6 +51,7 @@ func _refresh() -> void:
 		status_label.text = "The cards turned against you. The deck remembers."
 		primary_button.text = "Start a New Run"
 		abandon_button.visible = false
+		_refresh_reads()
 		return
 
 	if not RunManager.run_active:
@@ -61,6 +65,30 @@ func _refresh() -> void:
 	status_label.text = ""
 	primary_button.text = "Continue" if RunManager.run_active else "Begin Run"
 	abandon_button.visible = RunManager.run_active
+	_refresh_reads()
+
+func _refresh_reads() -> void:
+	# Show what each opponent already knows about the player. Only meaningful
+	# mid-run; hidden before a run starts (no memory yet) and after it ends.
+	var memories: Dictionary = RunManager.opponent_memories
+	if not RunManager.run_active or memories.is_empty():
+		reads_title.visible = false
+		reads_label.visible = false
+		return
+	var lines: Array[String] = []
+	for persona in memories:
+		var mem: OpponentMemory = memories[persona]
+		var caught := ""
+		if mem.bluffs_caught == 1:
+			caught = " — caught you bluffing once"
+		elif mem.bluffs_caught > 1:
+			caught = " — caught you bluffing %d times" % mem.bluffs_caught
+		lines.append("%s: %d hands%s. Reads you as: %s." % [
+			persona, mem.hands_observed, caught, mem.read_descriptor()
+		])
+	reads_title.visible = true
+	reads_label.visible = true
+	reads_label.text = "\n".join(lines)
 
 func _roster_for(idx: int) -> String:
 	if idx < 0 or idx >= _ROSTERS.size():
