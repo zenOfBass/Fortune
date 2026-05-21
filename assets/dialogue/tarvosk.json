@@ -282,5 +282,27 @@
     "The game is yours. I have no speech. I had a speech prepared. It does not seem appropriate now.",
     "You played well. Those words hurt to say. They are true, which hurts more.",
     "Defeated. Properly, thoroughly, undeniably defeated. I will be in the corner, reevaluating my entire philosophy."
+  ],
+  "memory_bluff_caught": [
+    "Caught you. Did you really think I wouldn't notice you raising on nothing?",
+    "That hand? You raised with THAT? Bold. Foolish, but bold.",
+    "I felt that bluff three streets ago. You wear it like a hat.",
+    "Now I know what your bluff looks like. We will be revisiting this."
+  ],
+  "memory_fold_streak": [
+    "Fold, fold, fold. Are you actually playing, or just sitting?",
+    "I have seen rocks make more decisions than you tonight.",
+    "Another fold. I'm starting to think you don't want any of this.",
+    "If you fold once more I'll just keep raising and taking your antes."
+  ],
+  "memory_tight_player": [
+    "You only call when you have it. Very predictable. I will adjust.",
+    "A tight player. Easy to read. Easy to push.",
+    "I know your range now. It is narrow. Boring."
+  ],
+  "memory_aggressive_player": [
+    "You raise on everything. Eventually one of us calls.",
+    "All this aggression. Are you trying to impress the dealer?",
+    "You bet like a man with chips to lose. I'll happily relieve you of them."
   ]
 }

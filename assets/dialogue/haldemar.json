@@ -273,5 +273,25 @@
     "The game is yours. You earned it. That is not a compliment. It is an assessment. But it is a positive one.",
     "You played better than I did. I have said that to very few people. You are now one of them.",
     "Defeat. The data is conclusive. You were the superior player tonight. I will study the hands."
+  ],
+  "memory_bluff_caught": [
+    "You raised. The hand did not justify it. Noted.",
+    "A bluff. Caught. Logged.",
+    "Your aggression and your cards did not match. I have seen this from you before."
+  ],
+  "memory_fold_streak": [
+    "Four folds. The variance argument no longer holds.",
+    "You have folded the last several hands. The pattern is now data.",
+    "I am keeping count. You should know that."
+  ],
+  "memory_tight_player": [
+    "Disciplined. I respect it. I will not pay your raises without a hand.",
+    "You play tight. So do I. One of us will break first.",
+    "Your range is narrow. That makes you readable, but only barely."
+  ],
+  "memory_aggressive_player": [
+    "Your aggression is consistent. I am pricing it in.",
+    "You raise often. I am no longer paying that tax on faith.",
+    "Heavy traffic from your seat. I am setting traps."
   ]
 }

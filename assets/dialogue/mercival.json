@@ -271,5 +271,25 @@
     "That hand. THAT hand. I am temporarily out of enigmatic observations. Just... note that I am impressed.",
     "A hand like that does not appear by accident. Though accidents are sometimes the most honest things. I am rambling. That is new.",
     "I had something philosophical prepared. The hand has driven it from my mind. That almost never happens."
+  ],
+  "memory_bluff_caught": [
+    "The deck winked at me when you raised. Now I know why.",
+    "A bluff. Such a small lie. The cards still keep score.",
+    "I felt the shape of that one. The smell, too. Mostly the smell."
+  ],
+  "memory_fold_streak": [
+    "You are folding the future. Strange thing to do.",
+    "Your folds are stacking up. The deck is starting to notice.",
+    "I have been counting your folds. Not for any reason. Just to keep my hands busy."
+  ],
+  "memory_tight_player": [
+    "You wait. That is its own kind of move. I see it.",
+    "A patient one. The deck rewards patience. Until it doesn't.",
+    "You play like someone who has read the rules and is appalled by them."
+  ],
+  "memory_aggressive_player": [
+    "All this raising. Are you afraid of silence?",
+    "You bet like someone who has somewhere to be.",
+    "Your aggression has a rhythm. I am learning the bars."
   ]
 }

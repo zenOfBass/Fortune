@@ -24,8 +24,13 @@ const MIN_SAMPLES := 4   # below this, derived stats fall back to neutral defaul
 
 @export var current_fold_streak:   int = 0
 
+# Transient: set true for one round after a bluff is caught, cleared next call.
+# Not persisted — read by dialogue_manager to fire immediate reactions.
+var caught_bluff_this_round: bool = false
+
 
 func note_round_outcome(j: Dictionary, human_hand_type: float, human_won_showdown: bool, human_reached_showdown: bool) -> void:
+	caught_bluff_this_round = false
 	if not j.get("human_active", false):
 		return  # human wasn't in the round at all (eliminated, etc.)
 
@@ -53,6 +58,7 @@ func note_round_outcome(j: Dictionary, human_hand_type: float, human_won_showdow
 		# Bluff-caught heuristic: aggressive bet line + showed weak hand + didn't win.
 		if int(j.get("human_raises", 0)) >= 1 and human_hand_type < 3.0 and not human_won_showdown:
 			bluffs_caught += 1
+			caught_bluff_this_round = true
 
 
 # ---- Derived stats (return neutral defaults until MIN_SAMPLES reached) ----

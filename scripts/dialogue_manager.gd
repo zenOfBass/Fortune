@@ -217,6 +217,10 @@ func _update_round_stats(winner_indices: Array, hand_names: Array, split: bool) 
 
 func _fire_pattern_triggers_deferred() -> void:
 	await get_tree().create_timer(5.2).timeout
+	# Memory-driven reactions fire first — they're more specific (the AI is
+	# reacting to YOU, not to session averages) and capped at one per round
+	# so the table doesn't all chime in at once.
+	_fire_memory_triggers()
 	if _rounds_played < 3:
 		return
 	if _player_win_streak >= 2:
@@ -232,6 +236,43 @@ func _fire_pattern_triggers_deferred() -> void:
 		try_fire_any("player_aggressive_pattern", 0.45)
 	elif float(_player_folds) / _rounds_played >= 0.45:
 		try_fire_any("player_passive_pattern", 0.40)
+
+# Each AI consults its own OpponentMemory and may fire one observation about
+# the human. We pick a single AI per round so the table doesn't echo the same
+# read in three voices.
+func _fire_memory_triggers() -> void:
+	var candidates: Array[int] = []
+	for pidx in range(1, GameManager.players.size()):
+		var p: Player = GameManager.players[pidx]
+		if p.memory != null and p.chips > 0:
+			candidates.append(pidx)
+	candidates.shuffle()
+	for pidx in candidates:
+		if _try_fire_memory_for(pidx):
+			return
+
+func _try_fire_memory_for(pidx: int) -> bool:
+	var mem: OpponentMemory = GameManager.players[pidx].memory
+	# Order: most specific / freshest event first.
+	if mem.caught_bluff_this_round:
+		return _try_memory_line("memory_bluff_caught", pidx, 0.85)
+	if mem.current_fold_streak >= 4:
+		return _try_memory_line("memory_fold_streak", pidx, 0.55)
+	if mem.fold_to_raise_rate() > 0.7 and mem.hands_observed >= 6:
+		return _try_memory_line("memory_tight_player", pidx, 0.30)
+	if mem.aggression() > 0.55 and mem.hands_observed >= 6:
+		return _try_memory_line("memory_aggressive_player", pidx, 0.30)
+	return false
+
+func _try_memory_line(trigger_id: String, pidx: int, chance: float) -> bool:
+	# Only claim the per-round slot if the AI actually has lines for this trigger
+	# and isn't on cooldown. Otherwise let another AI try.
+	if _lines[pidx].get(trigger_id, []).is_empty():
+		return false
+	if _cooldowns[pidx].get(trigger_id, 0) > 0:
+		return false
+	try_fire(trigger_id, pidx, chance)
+	return true
 
 func _on_game_ended(final_chips: Array) -> void:
 	_exchange_running = false
