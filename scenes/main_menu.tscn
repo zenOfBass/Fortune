@@ -90,5 +90,9 @@ ignore_texture_size = true
 stretch_mode = 5
 
 [node name="StartButton" type="Button" parent="VBox"]
-text = "Start Game"
+text = "Quick Play"
+size_flags_horizontal = 3
+
+[node name="CareerButton" type="Button" parent="VBox"]
+text = "Career"
 size_flags_horizontal = 3

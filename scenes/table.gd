@@ -686,8 +686,12 @@ func _on_game_ended(final_chips: Array) -> void:
 		var pname := GameManager._pname(i)
 		log_label.append_text("%s: %d chips\n" % [pname, final_chips[i]])
 	log_label.scroll_to_paragraph(log_label.get_paragraph_count() - 1)
+	var return_to_career := RunManager.session_belongs_to_run()
+	if return_to_career:
+		RunManager.record_match_result(final_chips)
 	await get_tree().create_timer(10.0).timeout
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	var next_scene := "res://scenes/career_screen.tscn" if return_to_career else "res://scenes/main_menu.tscn"
+	get_tree().change_scene_to_file(next_scene)
 
 func _update_arcana_deck_display() -> void:
 	arcana_deck_label.text = str(_arcana_remaining)
@@ -857,4 +861,8 @@ func _on_resume_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
+	# Pausing out of a career match leaves the run intact — the player can
+	# resume it by clicking Career from the main menu. Detach so the eventual
+	# game_ended from this orphaned session doesn't get misread as a result.
+	RunManager.detach_session()
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
