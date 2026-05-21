@@ -146,7 +146,7 @@ func record_match_result(final_chips: Array) -> void:
 func launch_current_match() -> void:
 	if match_index >= _LADDER.size():
 		return
-	var cfg := _LADDER[match_index]
+	var cfg: Dictionary = _LADDER[match_index]
 	GameManager.setup_game(cfg["num_players"], cfg["starting_chips"], cfg["ante"])
 	_apply_ai_overrides(cfg["ai_overrides"])
 	restore_memories()
