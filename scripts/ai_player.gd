@@ -23,8 +23,12 @@ static func bet(pidx: int, current_bet: int, can_check: bool,
 	var fold_threshold  := profile.fold_threshold
 
 	if gm.active_players.size() == 2:
-		raise_threshold -= 1.0
-		fold_threshold  -= 1.0
+		# Heads-up: each player is more often in the pot, so loosen the AI's
+		# ranges — but not so much that they never fold. The old -1.0 push on
+		# fold_threshold drove it to -0.2 (effectively never fold), making
+		# bluffs impossible. -0.4 keeps folds rare but possible.
+		raise_threshold -= 0.6
+		fold_threshold  -= 0.4
 		var total_chips: int = gm.players.reduce(func(s, p): return s + p.chips, 0)
 		if total_chips > 0 and float(gm.players[pidx].chips) / total_chips > 0.6:
 			raise_threshold -= 0.3

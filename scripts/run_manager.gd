@@ -17,9 +17,11 @@ const SAVE_PATH := "user://run.cfg"
 # threshold deltas applied on top of the default AIProfile.
 const _LADDER: Array = [
 	{
-		"num_players": 2, "starting_chips": 100, "ante": 1,
+		"num_players": 2, "starting_chips": 140, "ante": 1,
 		"label": "The Tavern Game",
-		"ai_overrides": [{}],
+		# Tarvosk dials back here — Match 1 is the intro, not the gauntlet.
+		# The brutal version of him shows up in matches 4 and 5.
+		"ai_overrides": [{"raise_threshold": 0.4, "fold_threshold": 0.3}],
 	},
 	{
 		"num_players": 3, "starting_chips": 100, "ante": 2,

@@ -163,7 +163,8 @@ func _ready() -> void:
 	GameManager.game_ended.connect(_on_game_ended)
 	GameManager.game_log.connect(_on_game_log)
 	DialogueManager.dialogue_line.connect(_on_dialogue_line)
-	DialogueManager.tell_read.connect(func(): GameManager.game_log.emit("You read Tarvosk's tell."))
+	DialogueManager.tell_read.connect(_on_tell_read)
+	GameManager.display_sort_changed.connect(_on_display_sort_changed)
 
 	bet_panel.anchor_top = 1.0
 	bet_panel.anchor_bottom = 1.0
@@ -689,7 +690,9 @@ func _on_game_ended(final_chips: Array) -> void:
 	var return_to_career := RunManager.session_belongs_to_run()
 	if return_to_career:
 		RunManager.record_match_result(final_chips)
-	await get_tree().create_timer(10.0).timeout
+	# 16s fits ~3 game-end dialogue lines (~5s each) plus margin so the closing
+	# Tarvosk/Haldemar/Mercival line isn't cut off by the scene transition.
+	await get_tree().create_timer(16.0).timeout
 	var next_scene := "res://scenes/career_screen.tscn" if return_to_career else "res://scenes/main_menu.tscn"
 	get_tree().change_scene_to_file(next_scene)
 
@@ -866,3 +869,57 @@ func _on_main_menu_pressed() -> void:
 	# game_ended from this orphaned session doesn't get misread as a result.
 	RunManager.detach_session()
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _on_tell_read() -> void:
+	GameManager.game_log.emit("You read Tarvosk's tell.")
+
+# Strength/Emperor activated mid-round; rebuild the human's display order so
+# the sort matches the new rules. No flip SFX since cards aren't changing.
+func _on_display_sort_changed() -> void:
+	if not GameManager.active_players.has(GameManager.HUMAN_IDX):
+		return
+	var hand: Array = GameManager.players[GameManager.HUMAN_IDX].hand
+	if hand.is_empty():
+		return
+	var sort_order := HandEvaluator.sort_order_for_display(
+		hand,
+		GameManager.round_state.king_beats_ace,
+		GameManager.round_state.inverted_values
+	)
+	player_hand.set_hand(hand, true, sort_order)
+	var opts := GameManager.round_state.eval_options()
+	var score := HandEvaluator.score(hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
+	hand_rank_label.text = HandEvaluator.hand_type_name(score)
+
+# Autoload signals stay alive across scene changes. Method-bound connections
+# get auto-cleaned when this node is freed, but it's still safer to disconnect
+# explicitly — protects against future inline-lambda mistakes that would leak
+# (see the tell_read stacking bug fixed at the same time as this function).
+func _exit_tree() -> void:
+	var connections: Array = [
+		[GameManager.player_bet_changed,      _on_player_bet_changed],
+		[GameManager.player_raised,           _on_player_raised],
+		[GameManager.phase_changed,           _on_phase_changed],
+		[GameManager.player_hand_updated,     _on_player_hand_updated],
+		[GameManager.player_chips_changed,    _on_player_chips_changed],
+		[GameManager.player_folded,           _on_player_folded],
+		[GameManager.pot_changed,             _on_pot_changed],
+		[GameManager.arcana_revealed,         _on_arcana_revealed],
+		[GameManager.arcana_cancelled,        _on_arcana_cancelled],
+		[GameManager.last_round_announced,    _on_last_round_announced],
+		[GameManager.bet_input_needed,        _on_bet_input_needed],
+		[GameManager.discard_input_needed,    _on_discard_input_needed],
+		[GameManager.arcana_choice_needed,    _on_arcana_choice_needed],
+		[GameManager.cards_drawn,             _on_cards_drawn],
+		[GameManager.player_hand_revealed,    _on_player_hand_revealed],
+		[GameManager.round_ended,             _on_round_ended],
+		[GameManager.page_bonus,              _on_page_bonus],
+		[GameManager.game_ended,              _on_game_ended],
+		[GameManager.game_log,                _on_game_log],
+		[GameManager.display_sort_changed,    _on_display_sort_changed],
+		[DialogueManager.dialogue_line,       _on_dialogue_line],
+		[DialogueManager.tell_read,           _on_tell_read],
+	]
+	for c in connections:
+		if c[0].is_connected(c[1]):
+			c[0].disconnect(c[1])

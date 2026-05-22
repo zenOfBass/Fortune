@@ -5,6 +5,9 @@ extends Node
 signal phase_changed(phase_name: String)
 
 signal player_hand_updated(player_idx: int, hand: Array)
+# Emitted when round_state flags that affect display sort (inverted_values, king_beats_ace)
+# change mid-round. Table re-renders the human's hand without animation/SFX.
+signal display_sort_changed
 signal cards_drawn(player_idx: int, count: int)
 signal player_chips_changed(player_idx: int, chips: int)
 signal player_folded(player_idx: int)
@@ -63,6 +66,12 @@ var arcana_choice2: int = -1  # second scratch var for arcana needing two ints (
 var _human_journal: Dictionary = {}
 
 const HUMAN_IDX := 0  # player 0 is always the human
+
+func _ready() -> void:
+	# Godot 4 generally auto-seeds the global RNG on startup, but being explicit
+	# guards against any platform where it doesn't — and against the "got the
+	# same hand twice" feel-bad even if it's just confirmation bias.
+	randomize()
 
 # ---- Public API (called by the game setup scene) -----------------------------
 
@@ -621,7 +630,17 @@ func _draw_arcana(g: int) -> void:
 	round_state.arcana_id = id
 	await _arcana_effect_done
 	if g != _game_gen: return
+	# Snapshot sort-affecting flags; if Strength or Emperor flipped one on, the
+	# table needs to re-render the human's hand so the display order matches.
+	# The original set_hand call in _phase_deal fires before this point.
+	var sort_was_inverted := round_state.inverted_values
+	var sort_was_king_high := round_state.king_beats_ace
 	await _apply_arcana(id, g)
+	if g != _game_gen: return
+	if (round_state.inverted_values != sort_was_inverted \
+			or round_state.king_beats_ace != sort_was_king_high) \
+			and active_players.has(HUMAN_IDX):
+		display_sort_changed.emit()
 
 func _apply_arcana(id: int, g: int) -> void:
 	match id:

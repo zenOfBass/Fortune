@@ -55,8 +55,11 @@ func note_round_outcome(j: Dictionary, human_hand_type: float, human_won_showdow
 			showdown_wins += 1
 		else:
 			showdown_losses += 1
-		# Bluff-caught heuristic: aggressive bet line + showed weak hand + didn't win.
-		if int(j.get("human_raises", 0)) >= 1 and human_hand_type < 3.0 and not human_won_showdown:
+		# Bluff-caught heuristic: aggressive bet line + showed High Card or worse + didn't win.
+		# Hand-type constants from hand_evaluator.gd: HIGH_CARD=1, ONE_PAIR=2, TWO_PAIR=3.
+		# Raising and losing with a pair is a value bet that missed, not a bluff —
+		# only "<2.0" (High Card) counts as actually trying to steal the pot.
+		if int(j.get("human_raises", 0)) >= 1 and human_hand_type < 2.0 and not human_won_showdown:
 			bluffs_caught += 1
 			caught_bluff_this_round = true
 

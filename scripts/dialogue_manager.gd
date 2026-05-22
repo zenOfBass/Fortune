@@ -24,6 +24,12 @@ var _recent: Array = [{}, {}, {}, {}]
 var _exchange_cooldown: int = 0
 var _exchange_running: bool = false
 
+# Lines fired since the last _advance_round() — try_fire bails once this hits
+# _LINES_PER_ROUND_CAP. Mostly invisible at a full table; the real point is
+# heads-up, where one AI would otherwise monologue every single round.
+const _LINES_PER_ROUND_CAP := 2
+var _lines_fired_this_round: int = 0
+
 var _player_raises: int = 0
 var _player_folds: int = 0
 var _rounds_played: int = 0
@@ -97,6 +103,8 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		return
 	if _exchange_running:
 		return
+	if _lines_fired_this_round >= _LINES_PER_ROUND_CAP:
+		return
 	if randf() > chance:
 		return
 	if _cooldowns[speaker_idx].get(trigger_id, 0) > 0:
@@ -137,6 +145,7 @@ func try_fire(trigger_id: String, speaker_idx: int, chance: float = _BASE_CHANCE
 		ctx["hand_name_a"] = ("a " + hn) if hn in _HAND_NEEDS_ARTICLE else hn
 	var formatted := line.format(ctx) if not ctx.is_empty() else line
 	dialogue_line.emit(speaker_idx, GameManager._pname(speaker_idx), formatted)
+	_lines_fired_this_round += 1
 	if trigger_id == "tarvosk_bluffing":
 		_tarvosk_bluff_announced = true
 
@@ -277,6 +286,9 @@ func _try_memory_line(trigger_id: String, pidx: int, chance: float) -> bool:
 func _on_game_ended(final_chips: Array) -> void:
 	_exchange_running = false
 	_exchange_cooldown = 0
+	# Reset the per-round line cap so the game-over speech isn't throttled by
+	# whatever in-round dialogue already fired this hand.
+	_lines_fired_this_round = 0
 	if final_chips.is_empty():
 		_reset_stats()
 		return
@@ -310,3 +322,4 @@ func _advance_round() -> void:
 			_cooldowns[i][key] = max(0, _cooldowns[i][key] - 1)
 	_exchange_cooldown = max(0, _exchange_cooldown - 1)
 	_tarvosk_bluff_announced = false
+	_lines_fired_this_round = 0
