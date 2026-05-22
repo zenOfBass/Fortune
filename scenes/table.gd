@@ -491,9 +491,9 @@ func _on_last_round_announced() -> void:
 	DialogueManager.try_fire_exchange("last_round_announced")
 	DialogueManager.try_fire_any("last_round_announced", 1.0)
 
-func _on_bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int) -> void:
+func _on_bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int, opponents_have_chips: bool) -> void:
 	if player_idx == GameManager.HUMAN_IDX:
-		bet_panel.show_betting(current_bet, can_check, min_raise)
+		bet_panel.show_betting(current_bet, can_check, min_raise, opponents_have_chips)
 
 func _on_discard_input_needed(_player_idx: int) -> void:
 	draw_label.text = "Click cards to discard, then confirm (keep all = click none):"

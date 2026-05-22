@@ -32,7 +32,7 @@ func _ready() -> void:
 	min_button.pressed.connect(_reset_raise)
 	visible = false
 
-func show_betting(current_bet: int, can_check: bool, min_raise: int) -> void:
+func show_betting(current_bet: int, can_check: bool, min_raise: int, opponents_have_chips: bool = true) -> void:
 	var player_chips := GameManager.players[GameManager.HUMAN_IDX].chips
 	_min_raise = min_raise
 	_max_raise = player_chips
@@ -47,13 +47,16 @@ func show_betting(current_bet: int, can_check: bool, min_raise: int) -> void:
 	call_button.visible = not can_check
 	call_button.text = "Call (%d)" % current_bet
 
-	var can_raise := player_chips >= min_raise
+	# Raising above the current bet only matters if at least one opponent has
+	# chips to call with — otherwise the excess gets refunded as an unmatched
+	# overbet. Hide the raise controls entirely in that case.
+	var can_raise := player_chips >= min_raise and opponents_have_chips
 	raise_label.visible = can_raise
 	incr_row.visible = can_raise
 	raise_button.visible = can_raise
 
 	all_in_button.text = "All In (%d)" % player_chips
-	all_in_button.visible = player_chips > 0
+	all_in_button.visible = player_chips > 0 and opponents_have_chips
 
 	_update_raise_label()
 	visible = true

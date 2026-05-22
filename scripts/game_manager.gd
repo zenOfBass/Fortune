@@ -19,7 +19,7 @@ signal arcana_cancelled(cancelled_id: int)          # Hierophant blocked it
 signal last_round_announced()
 
 # Requests for human input — UI shows appropriate controls then calls submit_*
-signal bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int)
+signal bet_input_needed(player_idx: int, current_bet: int, can_check: bool, min_raise: int, opponents_have_chips: bool)
 signal discard_input_needed(player_idx: int)
 signal arcana_choice_needed(player_idx: int, arcana_id: int) # interactive arcana phase 4
 
@@ -264,7 +264,15 @@ func _phase_bet(g: int) -> void:
 		var amount: int = 0
 
 		if pidx == HUMAN_IDX:
-			bet_input_needed.emit(pidx, _current_bet, can_check, min_raise)
+			# Any other active player with chips left? If not, raising above the
+			# current bet just gets refunded as an unmatched overbet — the panel
+			# uses this to grey out Raise / All-In / increment buttons.
+			var opponents_have_chips := false
+			for other in active_players:
+				if other != HUMAN_IDX and players[other].chips > 0:
+					opponents_have_chips = true
+					break
+			bet_input_needed.emit(pidx, _current_bet, can_check, min_raise, opponents_have_chips)
 			var r = await _bet_ready
 			if g != _game_gen: return
 			action = r[0]; amount = r[1]
@@ -502,7 +510,10 @@ func _phase_showdown(g: int) -> void:
 		_award_pot(active_players)
 		_commit_journal(false, false, 0.0)
 		round_ended.emit([solo], [], false)
-		if players[solo].has_page:
+		# Page bonus only triggers in rounds where an arcana actually fired —
+		# otherwise Pages turn into a passive attrition tax. Tying the bonus to
+		# arcana rounds keeps Pages identified as arcana keys, not chip vacuums.
+		if players[solo].has_page and round_state.arcana_drawn:
 			var bonus_total := 0
 			for pidx in range(players.size()):
 				if pidx != solo and players[pidx].chips >= ante_amount:
@@ -588,9 +599,9 @@ func _phase_showdown(g: int) -> void:
 
 	round_ended.emit(winners, hand_names, split)
 
-	# Page bonus: winner with a Page card collects ante from every other player.
+	# Page bonus only fires in arcana rounds (see uncontested branch above).
 	for w in winners:
-		if players[w].has_page:
+		if players[w].has_page and round_state.arcana_drawn:
 			var bonus_total := 0
 			for pidx in range(players.size()):
 				if pidx != w and players[pidx].chips >= ante_amount:

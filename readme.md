@@ -24,7 +24,7 @@ Each round follows a standard five-card draw structure: ante in, get dealt five 
 
 **The Page** is a zero-value wildcard. It sits behind the 2 in normal play but wraps around the Ace on a straight (Page → Ace → 2 → 3 → 4). If the dealer is holding a Page when cards are dealt, it triggers the Major Arcana — drawing the top card from a separate tarot deck and applying its effect for the rest of the round.
 
-Winning a round while holding a Page also collects a bonus ante from every other player at the table, even those who folded.
+In rounds where an arcana fires, winning while holding a Page collects a bonus ante from every other player at the table, even those who folded. Rounds without an arcana have no Page bonus — Pages reward you for being in the action when the deck is doing something.
 
 ## The Major Arcana
 
