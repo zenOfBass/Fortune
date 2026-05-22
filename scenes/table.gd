@@ -306,14 +306,21 @@ func _on_phase_changed(phase_name: String) -> void:
 		ai1_area.modulate = Color.WHITE
 		ai2_area.modulate = Color.WHITE
 		ai3_area.modulate = Color.WHITE
-		if _current_arcana_id >= 0:
-			_fly_arcana_to_discard()
+		# Hierophant stays on the table between rounds until it cancels something;
+		# leave the card displayed so the player can see it's still pending.
+		# Once round_state.hierophant_active flips false (consumed), the next
+		# ANTE clears it normally.
+		if _current_arcana_id == 5 and GameManager.round_state.hierophant_active:
+			pass
 		else:
-			current_arcana.visible = false
-		current_arcana_thumb.texture = null
-		current_arcana_name.text = ""
-		current_arcana_desc.text = ""
-		current_arcana_desc.visible = false
+			if _current_arcana_id >= 0:
+				_fly_arcana_to_discard()
+			else:
+				current_arcana.visible = false
+			current_arcana_thumb.texture = null
+			current_arcana_name.text = ""
+			current_arcana_desc.text = ""
+			current_arcana_desc.visible = false
 
 func _on_cards_drawn(_player_idx: int, count: int) -> void:
 	_skip_flip = true
@@ -470,6 +477,14 @@ func _on_arcana_cancelled(cancelled_id: int) -> void:
 	var tex_path := MajorArcana.texture_path(cancelled_id)
 	var face_tex: Texture2D = load(tex_path) if ResourceLoader.exists(tex_path) else null
 	_fly_arcana_deck_to_discard(face_tex)
+	# Hierophant just consumed itself — fly it from the center to the discard
+	# so the player sees the cancel happen visually, not just in the log.
+	if _current_arcana_id == 5:
+		_fly_arcana_to_discard()
+		current_arcana_thumb.texture = null
+		current_arcana_name.text = ""
+		current_arcana_desc.text = ""
+		current_arcana_desc.visible = false
 
 func _on_last_round_announced() -> void:
 	last_round_label.visible = true
