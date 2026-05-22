@@ -481,6 +481,18 @@ func _phase_showdown(g: int) -> void:
 	phase_changed.emit("SHOWDOWN")
 	game_log.emit("--- Showdown (pot: %d) ---" % pot)
 
+	# Tower fired earlier this round? Destroy half the pot now, after it has
+	# had a chance to grow through betting. Applies before every award path
+	# (uncontested, Sun split, Lovers split, normal showdown) so the halving
+	# is consistent regardless of how the round resolves.
+	if round_state.tower_pending and pot > 0:
+		@warning_ignore("integer_division")
+		var lost := (pot + 1) / 2
+		pot = maxi(0, pot - lost)
+		pot_changed.emit(pot)
+		game_log.emit("The Tower strikes — %d chips lost to ruin! (pot: %d)" % [lost, pot])
+		round_state.tower_pending = false
+
 	if active_players.size() == 1:
 		var solo := active_players[0]
 		game_log.emit("%s %s %d uncontested." % [_pname(solo), "win" if solo == HUMAN_IDX else "wins", pot])
@@ -899,12 +911,11 @@ func _apply_arcana(id: int, g: int) -> void:
 			round_state.raise_must_double = true
 			game_log.emit("The Devil — raises must at least double the current bet.")
 
-		16: # The Tower — half the pot (rounded up) evaporates
-			@warning_ignore("integer_division")
-			var lost := (pot + 1) / 2
-			pot = int(max(0, pot - lost))
-			pot_changed.emit(pot)
-			game_log.emit("The Tower strikes — %d chips lost to ruin!" % lost)
+		16: # The Tower — half the pot (rounded up) is destroyed at showdown.
+			# Deferred from draw-time so the pot has had time to grow through
+			# betting; otherwise it'd usually destroy 1 chip and feel like nothing.
+			round_state.tower_pending = true
+			game_log.emit("The Tower looms — half the pot will crumble at showdown.")
 
 		19:
 			round_state.sun_end = true

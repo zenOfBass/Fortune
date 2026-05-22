@@ -12,6 +12,7 @@ var no_forced_min_bet  := false  # Justice  (#11): players may bet any amount; e
 var hanged_man_active  := false  # Hanged Man (#12): going all-in grants an extra drawn card
 var fool_active        := false  # Fool     (#0):  a wild-card flop is available to all players
 var six_card_hand      := false  # Empress  (#3):  each player has a sixth card this round
+var tower_pending      := false  # Tower    (#16): half the pot is destroyed at showdown, after betting has filled it
 
 # ---- Turn-ender flags (set by Death or Sun; checked in game_manager) ----
 

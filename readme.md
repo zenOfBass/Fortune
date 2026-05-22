@@ -48,7 +48,7 @@ One arcana can fire per round. Its effect lasts until the next ante phase. There
 | 13 | Death | Hands are revealed immediately. No draw phase, no second betting round. |
 | 14 | Temperance | Each player discards one card, then picks from three face-up flop cards to replace it. |
 | 15 | The Devil | Raises must at least double the current bet. |
-| 16 | The Tower | Half the pot (rounded up) is destroyed. Nobody gets it. |
+| 16 | The Tower | Looms over the round. At showdown, half the pot (rounded up) is destroyed before anyone collects. |
 | 17 | The Star | Each player may swap one card with the top of the deck, or pass. |
 | 18 | The Moon | Everyone draws a secret card they can't look at. Before showdown, they may swap it into their hand. |
 | 19 | The Sun | The pot splits equally among all active players. Leftovers are lost. |
