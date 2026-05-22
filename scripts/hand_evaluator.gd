@@ -117,32 +117,24 @@ static func _score_raw(raw: Array[int], suits: Array[int], king_beats_ace: bool,
 	return _pack(HIGH_CARD, sorted_cvals)
 
 
-# For each card position treated as wild, the wild takes the highest rank
-# (by comparison value under active modifiers) not already held in the other
-# four cards, plus whichever suit scores best. Returns the highest score found.
+# For each card position treated as wild, try every (rank, suit) combination
+# and take the highest score. The old "highest rank not already in the hand"
+# heuristic was correct for high-card-extending straights/flushes but broke
+# duplications — with three 6s and a wild, it picked Ace instead of a 6,
+# giving Three of a Kind instead of Four of a Kind.
 static func _best_wild_score(raw: Array[int], suits: Array[int], king_beats_ace: bool, inverted_values: bool) -> int:
 	var best: int = _score_raw(raw, suits, king_beats_ace, inverted_values)
-	var rank_order: Array[int] = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-	rank_order.sort_custom(func(a, b):
-		return _cmp(a, king_beats_ace, inverted_values) > _cmp(b, king_beats_ace, inverted_values))
+	var all_ranks: Array[int] = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 	for i in range(raw.size()):
-		var others: Dictionary = {}
-		for j in range(raw.size()):
-			if j != i:
-				others[raw[j]] = true
-		var wild_rank := -1
-		for r in rank_order:
-			if not others.has(r):
-				wild_rank = r
-				break
-		for s in range(4):
-			var test_raw := raw.duplicate()
-			var test_suits := suits.duplicate()
-			test_raw[i] = wild_rank
-			test_suits[i] = s
-			var candidate := _score_raw(test_raw, test_suits, king_beats_ace, inverted_values)
-			if candidate > best:
-				best = candidate
+		for r in all_ranks:
+			for s in range(4):
+				var test_raw := raw.duplicate()
+				var test_suits := suits.duplicate()
+				test_raw[i] = r
+				test_suits[i] = s
+				var candidate := _score_raw(test_raw, test_suits, king_beats_ace, inverted_values)
+				if candidate > best:
+					best = candidate
 	return best
 
 

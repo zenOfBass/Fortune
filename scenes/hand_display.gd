@@ -112,6 +112,27 @@ func replace_cards(new_hand: Array, discarded_indices: Array, deal_pos: Vector2,
 			display.deal_from(deal_pos, new_slot * 0.10, true)
 			new_slot += 1
 
+# Re-orders existing cards to match a new sort_order, without recreating
+# them. Used when arcana like Emperor or Strength change the display sort
+# mid-round — cards don't change, only their positions do, so reusing
+# set_hand would trigger a second deal animation that looks like a bug.
+func resort(hand: Array, sort_order: Array[int]) -> void:
+	if get_child_count() == 0 or sort_order.is_empty():
+		return
+	var positions := _slot_positions(hand.size())
+	var by_index: Dictionary = {}
+	for child in get_children():
+		if child is CardDisplayGD:
+			by_index[child.card_index] = child
+	for display_pos in hand.size():
+		var orig_idx: int = sort_order[display_pos]
+		if not by_index.has(orig_idx):
+			continue
+		var card_disp: CardDisplayGD = by_index[orig_idx]
+		var t: Tween = card_disp.create_tween()
+		t.tween_property(card_disp, "position", positions[display_pos], 0.25) \
+			.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+
 func flip_card_at_index(idx: int, card: Card) -> void:
 	for child in get_children():
 		if child is CardDisplayGD and child.card_index == idx:
@@ -162,7 +183,9 @@ func _add_moon_card() -> void:
 	_moon_card.custom_minimum_size = Vector2(_CARD_W, _CARD_H)
 	_moon_card.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_moon_card.expand_mode = TextureRect.EXPAND_KEEP_SIZE
-	_moon_card.position = Vector2(custom_minimum_size.x + _CARD_GAP, 0)
+	# 3× gap (not 1×) so the 8° rotation around the top-left pivot doesn't
+	# swing the bottom-left corner back over the last hand card.
+	_moon_card.position = Vector2(custom_minimum_size.x + _CARD_GAP * 3, 0)
 	_moon_card.rotation_degrees = 8.0
 	_moon_card.modulate = Color(0.7, 0.7, 1.0, 0.8)
 	add_child(_moon_card)

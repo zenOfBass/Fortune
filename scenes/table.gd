@@ -789,28 +789,46 @@ func _ai_area_for_speaker(speaker_idx: int) -> Control:
 		3: return ai3_area
 	return null
 
+# Where the given AI speaker is visually seated — mirrors the placement done
+# by _layout_ai_areas. Used by dialogue positioning so each bubble appears
+# near the AI who's speaking.
+func _seat_for_speaker(speaker_idx: int) -> String:
+	var n := GameManager.players.size()
+	match n:
+		2:
+			return "top"
+		3:
+			if speaker_idx == 1: return "left"
+			if speaker_idx == 2: return "right"
+		4:
+			if speaker_idx == 1: return "top"
+			if speaker_idx == 2: return "left"
+			if speaker_idx == 3: return "right"
+	return "top"
+
 func _reposition_dialogue(speaker_idx: int) -> void:
-	# get_global_rect() is unreliable for all three AI areas (layout rects extend
-	# past viewport edges), so position directly from speaker_idx + fixed fractions.
+	# Position by the speaker's seat (top/left/right), not by speaker_idx —
+	# in 3-player layouts Tarvosk (idx 1) sits on the LEFT, not the top, and
+	# Haldemar (idx 2) sits on the RIGHT, not the left.
 	var vp := get_viewport_rect().size
 	var box_h := 70.0
 	var box_w: float
 	var left: float
 	var top: float
-	match speaker_idx:
-		1:  # Tarvosk — top-center
+	match _seat_for_speaker(speaker_idx):
+		"top":
 			box_w = vp.x * 0.45
 			left = (vp.x - box_w) * 0.5
 			top = vp.y * 0.20
-		2:  # Haldemar — left
+		"left":
 			box_w = vp.x * 0.35
 			left = vp.x * 0.09
 			top = vp.y * 0.52
-		3:  # Mercival — right
+		"right":
 			box_w = vp.x * 0.35
 			left = vp.x * 0.62
 			top = vp.y * 0.45
-		_:  # fallback
+		_:
 			box_w = vp.x * 0.40
 			left = (vp.x - box_w) * 0.5
 			top = vp.y * 0.60
@@ -873,8 +891,9 @@ func _on_main_menu_pressed() -> void:
 func _on_tell_read() -> void:
 	GameManager.game_log.emit("You read Tarvosk's tell.")
 
-# Strength/Emperor activated mid-round; rebuild the human's display order so
-# the sort matches the new rules. No flip SFX since cards aren't changing.
+# Strength/Emperor activated mid-round; slide existing cards into the new
+# display order without recreating them, so the player doesn't see a second
+# deal animation play on top of the first.
 func _on_display_sort_changed() -> void:
 	if not GameManager.active_players.has(GameManager.HUMAN_IDX):
 		return
@@ -886,7 +905,7 @@ func _on_display_sort_changed() -> void:
 		GameManager.round_state.king_beats_ace,
 		GameManager.round_state.inverted_values
 	)
-	player_hand.set_hand(hand, true, sort_order)
+	player_hand.resort(hand, sort_order)
 	var opts := GameManager.round_state.eval_options()
 	var score := HandEvaluator.score(hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
 	hand_rank_label.text = HandEvaluator.hand_type_name(score)

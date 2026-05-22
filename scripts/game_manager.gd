@@ -131,9 +131,12 @@ func _run_round(g: int) -> void:
 	_reset_journal()
 	_human_journal["human_active"] = active_players.has(HUMAN_IDX)
 
+	# Rebuild from scratch when the deck is running low; otherwise the returned
+	# hands are still in there. Either way, shuffle every round — without it, the
+	# deck acts like a rotating queue and the same hands cycle back around.
 	if deck.size() < players.size() * 6:
 		deck.build()
-		deck.shuffle()
+	deck.shuffle()
 
 	pot = 0
 	round_num += 1
