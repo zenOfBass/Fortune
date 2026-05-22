@@ -16,6 +16,8 @@ signal pot_changed(new_amount: int)
 
 signal arcana_revealed(arcana_id: int, arcana_name: String)
 signal arcana_cancelled(cancelled_id: int)          # Hierophant blocked it
+# Emitted from arcana_effects.gd (The World) — analyzer is per-file, suppress.
+@warning_ignore("unused_signal")
 signal last_round_announced()
 
 # Requests for human input — UI shows appropriate controls then calls submit_*
