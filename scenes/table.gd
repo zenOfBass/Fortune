@@ -650,6 +650,10 @@ func _on_confirm_discard() -> void:
 
 func _on_round_ended(winner_indices: Array, hand_names: Array, split: bool) -> void:
 	_hide_all_overlays()
+	# Moon secrets only get hidden via the human's swap/keep submit. If the
+	# human folded before the swap phase (or the round short-circuited past
+	# their input via Death), the cards would linger into the next round.
+	_hide_moon_secrets()
 	bet_panel.hide_betting()
 	draw_panel.visible = false
 	player_hand.set_selectable(false)
