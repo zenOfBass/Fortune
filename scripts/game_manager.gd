@@ -118,7 +118,7 @@ func start_game() -> void:
 	while true:
 		await _run_round(g)
 		if g != _game_gen: return
-		if last_round or _only_one_solvent():
+		if _should_end_game():
 			break
 		await _round_advance_ready
 		if g != _game_gen: return
@@ -126,6 +126,19 @@ func start_game() -> void:
 	for p in players:
 		chips.append(p.chips)
 	game_ended.emit(chips)
+
+# Game-end check used by both start_game and resume_match. Career runs end
+# the moment the player busts — there's no spectating the AI fight, and it
+# closes the "save mid-bust → resume into a one-player-left round" edge case.
+# Quick Play keeps the original behavior: play out until only one solvent
+# player remains (or the World was drawn).
+func _should_end_game() -> bool:
+	if last_round or _only_one_solvent():
+		return true
+	if RunManager.session_belongs_to_run() and players[HUMAN_IDX].chips == 0:
+		game_log.emit("*** You're out — the run ends here. ***")
+		return true
+	return false
 
 # ---- Round loop --------------------------------------------------------------
 
@@ -940,8 +953,9 @@ func resume_match(state: MatchState) -> void:
 	# round normally.
 	await _continue_from_phase(g, state.phase)
 	if g != _game_gen: return
-	# Round finished — advance into the normal multi-round loop.
-	if last_round or _only_one_solvent():
+	# Round finished — advance into the normal multi-round loop, mirroring
+	# start_game's structure.
+	if _should_end_game():
 		var chips: Array = []
 		for p in players:
 			chips.append(p.chips)
@@ -952,7 +966,7 @@ func resume_match(state: MatchState) -> void:
 	while true:
 		await _run_round(g)
 		if g != _game_gen: return
-		if last_round or _only_one_solvent():
+		if _should_end_game():
 			break
 		await _round_advance_ready
 		if g != _game_gen: return
