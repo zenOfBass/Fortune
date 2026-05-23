@@ -96,6 +96,17 @@ func setup_game(num_players: int, starting_chips: int, ante: int, arcana_id: int
 	debug_arcana_id = arcana_id
 	last_round = false
 	players.clear()
+	# Stale state from a prior session that didn't reset on its own. The
+	# active_players one is load-bearing: _run_round iterates it before
+	# re-filtering, so a previous 4-player game's active_players would crash
+	# the first round of a fresh 2-player game with an out-of-bounds index.
+	active_players.clear()
+	dealer_idx = 0
+	pot = 0
+	arcana_choice = -1
+	arcana_choice2 = -1
+	_current_phase = ""
+	pending_resume_state = null
 	var ai_profiles := [AIProfile.aggressor(), AIProfile.rock(), AIProfile.ghost()]
 	for i in num_players:
 		var p := Player.new(starting_chips)
