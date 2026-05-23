@@ -55,3 +55,11 @@ func display_name() -> String:
 
 func texture_path() -> String:
 	return "res://assets/cards/minor/%s_of_%s.png" % [RANK_ASSET[rank], SUIT_ASSET[suit]]
+
+# ---- Serialization (for mid-match save state) -------------------------------
+
+func to_pair() -> Array:
+	return [int(suit), int(rank)]
+
+static func from_pair(p: Array) -> Card:
+	return Card.new(int(p[0]) as Suit, int(p[1]) as Rank)

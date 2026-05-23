@@ -165,6 +165,7 @@ func _ready() -> void:
 	DialogueManager.dialogue_line.connect(_on_dialogue_line)
 	DialogueManager.tell_read.connect(_on_tell_read)
 	GameManager.display_sort_changed.connect(_on_display_sort_changed)
+	GameManager.state_restored.connect(_on_state_restored)
 
 	bet_panel.anchor_top = 1.0
 	bet_panel.anchor_bottom = 1.0
@@ -197,7 +198,19 @@ func _ready() -> void:
 	arcana_discard_stack2.texture = back_tex
 	flying_arcana_card.pivot_offset = Vector2(40.0, 60.0)
 
-	GameManager.start_game()
+	# Two entry points: fresh setup_game ran in RunManager / main menu → call
+	# start_game. Or a mid-match save was loaded into pending_resume_state →
+	# call resume_match. Resume must run AFTER the signal connections above so
+	# state_restored has a listener; we also re-apply ladder AI overrides since
+	# resume_match rebuilds profiles from defaults.
+	if GameManager.pending_resume_state != null:
+		var state: MatchState = GameManager.pending_resume_state
+		GameManager.pending_resume_state = null
+		GameManager.resume_match(state)
+		if RunManager.session_belongs_to_run():
+			RunManager.apply_current_match_overrides()
+	else:
+		GameManager.start_game()
 	if GameManager.players.size() > 0:
 		_starting_chips = GameManager.players[0].chips
 
@@ -925,6 +938,82 @@ func _on_display_sort_changed() -> void:
 	var score := HandEvaluator.score(hand, opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
 	hand_rank_label.text = HandEvaluator.hand_type_name(score)
 
+# Mid-match resume: GameManager has finished its synchronous state restore
+# and is about to drive the saved phase. Rebuild every visual surface from
+# current GameManager state, with no animations or SFX. This is one pass —
+# we don't go through the individual signals (which would replay deal flips,
+# arcana reveal flights, etc., all wrong for a "you were already here" UX).
+func _on_state_restored() -> void:
+	var rs := GameManager.round_state
+	var opts := rs.eval_options()
+	var num_players := GameManager.players.size()
+
+	# Hands: human face-up with sort order, AIs face-down (Priestess reveal
+	# applied via _set_ai_hand's existing logic).
+	for pidx in num_players:
+		var hand: Array = GameManager.players[pidx].hand
+		match pidx:
+			0:
+				if hand.is_empty():
+					player_hand.set_hand([], true)
+				else:
+					var sort_order := HandEvaluator.sort_order_for_display(
+						hand, opts["king_beats_ace"], opts["inverted_values"])
+					player_hand.set_hand(hand, true, sort_order, Vector2.ZERO)
+					var score := HandEvaluator.score(hand,
+						opts["king_beats_ace"], opts["inverted_values"], opts["fool_active"])
+					hand_rank_label.text = HandEvaluator.hand_type_name(score)
+			1: _set_ai_hand(ai1_hand, pidx, hand)
+			2: _set_ai_hand(ai2_hand, pidx, hand)
+			3: _set_ai_hand(ai3_hand, pidx, hand)
+
+	# Chip labels for everyone.
+	for pidx in num_players:
+		_set_player_label(pidx, GameManager.players[pidx].chips)
+
+	# Pot, last-round banner.
+	pot_label.text = "Pot: %d" % GameManager.pot
+	last_round_label.visible = GameManager.last_round
+
+	# Folded dim on each area.
+	for pidx in num_players:
+		var dimmed: bool = GameManager.players[pidx].folded
+		var c := Color(0.4, 0.4, 0.4, 1.0) if dimmed else Color.WHITE
+		match pidx:
+			0: player_hand.modulate = c
+			1: ai1_area.modulate = c
+			2: ai2_area.modulate = c
+			3: ai3_area.modulate = c
+
+	# Active arcana display.
+	if rs.arcana_id >= 0:
+		_current_arcana_id = rs.arcana_id
+		var tex_path := MajorArcana.texture_path(rs.arcana_id)
+		var face_tex: Texture2D = load(tex_path) if ResourceLoader.exists(tex_path) else null
+		current_arcana_thumb.texture = face_tex
+		current_arcana_name.text = MajorArcana.arcana_name(rs.arcana_id)
+		current_arcana_desc.text = MajorArcana.get_desc(rs.arcana_id)
+		current_arcana_desc.visible = true
+		current_arcana.visible = true
+	else:
+		_current_arcana_id = -1
+		current_arcana.visible = false
+
+	# Arcana deck/discard counts derived from arcana_pos.
+	_arcana_remaining = max(0, 22 - GameManager.arcana_pos)
+	_arcana_discard_count = GameManager.arcana_pos
+	_update_arcana_deck_display()
+	_update_arcana_discard_display()
+
+	# Per-player bet contributed labels (used by the chip stacks UI).
+	_bet_contributed.clear()
+	for pidx in rs.bet_contributed.keys():
+		_bet_contributed[int(pidx)] = int(rs.bet_contributed[pidx])
+
+	# Phase label / hand-rank visibility match the saved phase.
+	_current_phase = GameManager._current_phase
+	hand_rank_label.modulate.a = 1.0 if _current_phase.begins_with("BET") else 0.0
+
 # Autoload signals stay alive across scene changes. Method-bound connections
 # get auto-cleaned when this node is freed, but it's still safer to disconnect
 # explicitly — protects against future inline-lambda mistakes that would leak
@@ -951,6 +1040,7 @@ func _exit_tree() -> void:
 		[GameManager.game_ended,              _on_game_ended],
 		[GameManager.game_log,                _on_game_log],
 		[GameManager.display_sort_changed,    _on_display_sort_changed],
+		[GameManager.state_restored,          _on_state_restored],
 		[DialogueManager.dialogue_line,       _on_dialogue_line],
 		[DialogueManager.tell_read,           _on_tell_read],
 	]

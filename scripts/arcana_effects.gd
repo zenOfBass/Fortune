@@ -25,20 +25,30 @@ static func apply(id: int, g: int) -> void:
 			gm.game_log.emit("Judgement — the dead may rise! Folded players may pay %d to re-enter." % gm.ante_amount)
 
 		14:  # Temperance — discard one card, pick from a 3-card face-up flop
-			gm.game_log.emit("Temperance — each player discards one card and picks from the flop.")
-			var flop: Array[Card] = []
-			for _i in 3:
-				if not gm.deck.is_empty():
-					flop.append(gm.deck.deal_one())
-			if flop.is_empty():
+			# Resume-aware: temperance_flop on RoundState is the source of truth
+			# (built fresh if empty, otherwise restored from the save). Players
+			# in temperance_completed are skipped — they already discarded+picked.
+			var fresh_temperance := gm.round_state.temperance_completed.is_empty() \
+					and gm.round_state.temperance_flop.is_empty()
+			if fresh_temperance:
+				gm.game_log.emit("Temperance — each player discards one card and picks from the flop.")
+				var fresh_flop: Array[Card] = []
+				for _i in 3:
+					if not gm.deck.is_empty():
+						fresh_flop.append(gm.deck.deal_one())
+				gm.round_state.temperance_flop = fresh_flop
+			var flop: Array = gm.round_state.temperance_flop
+			if flop.is_empty() and fresh_temperance:
 				gm.game_log.emit("Deck too empty for Temperance flop.")
 			else:
 				for pidx in gm.active_players:
+					if gm.round_state.temperance_completed.has(pidx):
+						continue
 					if flop.is_empty():
 						gm.game_log.emit("%s — no flop cards left, skipped." % gm._pname(pidx))
+						gm.round_state.temperance_completed.append(pidx)
 						continue
 					if pidx == gm.HUMAN_IDX:
-						gm.round_state.temperance_flop = flop
 						gm.arcana_choice_needed.emit(pidx, 14)
 						await gm._arcana_effect_done
 						if g != gm._game_gen: return
@@ -56,6 +66,8 @@ static func apply(id: int, g: int) -> void:
 							gm.game_log.emit("You discard and take from the flop.")
 						else:
 							gm.game_log.emit("You skip Temperance.")
+						gm.round_state.temperance_completed.append(pidx)
+						gm.save_match_checkpoint()
 					else:
 						await gm._ai_think()
 						if g != gm._game_gen: return
@@ -82,12 +94,19 @@ static func apply(id: int, g: int) -> void:
 							gm.game_log.emit("%s discards and takes from the flop." % gm._pname(pidx))
 						else:
 							gm.game_log.emit("%s passes on the Temperance flop." % gm._pname(pidx))
+						gm.round_state.temperance_completed.append(pidx)
 				if not flop.is_empty():
 					gm.deck.add_cards(flop)
+					gm.round_state.temperance_flop = []
 
 		18:  # The Moon — each player draws a secret card; may swap before showdown
-			gm.game_log.emit("The Moon — each player draws a secret card.")
+			# Resume-aware: moon_secret.has(pidx) means this player already drew
+			# their secret in a previous session — skip the deal AND the prompt.
+			if gm.round_state.moon_secret.is_empty():
+				gm.game_log.emit("The Moon — each player draws a secret card.")
 			for pidx in gm.active_players:
+				if gm.round_state.moon_secret.has(pidx):
+					continue
 				if gm.deck.is_empty():
 					gm.game_log.emit("%s — deck empty, skipped." % gm._pname(pidx))
 					continue
@@ -99,12 +118,18 @@ static func apply(id: int, g: int) -> void:
 					if g != gm._game_gen: return
 					gm.round_state.moon_reveal_done = true
 					gm.game_log.emit("You tuck a card away secretly.")
+					gm.save_match_checkpoint()
 				else:
 					gm.game_log.emit("%s draws a secret card." % gm._pname(pidx))
 
 		2:  # The High Priestess — each player reveals one card face-up for the round
-			gm.game_log.emit("The High Priestess — each player reveals one card.")
+			# Resume-aware: priestess_revealed.has(pidx) means this player already
+			# revealed in a previous session — skip.
+			if gm.round_state.priestess_revealed.is_empty():
+				gm.game_log.emit("The High Priestess — each player reveals one card.")
 			for pidx in gm.active_players:
+				if gm.round_state.priestess_revealed.has(pidx):
+					continue
 				if gm.players[pidx].hand.is_empty():
 					continue
 				if pidx == gm.HUMAN_IDX:
@@ -116,6 +141,7 @@ static func apply(id: int, g: int) -> void:
 						gm.round_state.priestess_revealed[pidx] = gm.players[pidx].hand[idx]
 						gm.player_hand_updated.emit(pidx, gm.players[pidx].hand)
 						gm.game_log.emit("You reveal the %s." % gm.players[pidx].hand[idx].display_name())
+					gm.save_match_checkpoint()
 				else:
 					await gm._ai_think()
 					if g != gm._game_gen: return
@@ -125,10 +151,15 @@ static func apply(id: int, g: int) -> void:
 					gm.game_log.emit("%s reveals a card." % gm._pname(pidx))
 
 		1:  # The Magician — each player draws one card; keep it if suit guess is correct
-			gm.game_log.emit("The Magician — guess your drawn card's suit to keep it!")
+			# Resume-aware: skip players in magician_completed; they already drew.
+			if gm.round_state.magician_completed.is_empty():
+				gm.game_log.emit("The Magician — guess your drawn card's suit to keep it!")
 			for pidx in gm.active_players:
+				if gm.round_state.magician_completed.has(pidx):
+					continue
 				if gm.deck.is_empty():
 					gm.game_log.emit("%s — deck empty, skipped." % gm._pname(pidx))
+					gm.round_state.magician_completed.append(pidx)
 					continue
 				var drawn: Card = gm.deck.deal_one()
 				if pidx == gm.HUMAN_IDX:
@@ -142,6 +173,8 @@ static func apply(id: int, g: int) -> void:
 					else:
 						gm.deck.add_cards([drawn])
 						gm.game_log.emit("Wrong — the card was the %s." % drawn.display_name())
+					gm.round_state.magician_completed.append(pidx)
+					gm.save_match_checkpoint()
 				else:
 					await gm._ai_think()
 					if g != gm._game_gen: return
@@ -152,10 +185,15 @@ static func apply(id: int, g: int) -> void:
 					else:
 						gm.deck.add_cards([drawn])
 						gm.game_log.emit("%s guesses wrong." % gm._pname(pidx))
+					gm.round_state.magician_completed.append(pidx)
 
 		17:  # The Star — in turn order, may swap one card with top of deck
-			gm.game_log.emit("The Star — each player may swap one card with the top of the deck.")
+			# Resume-aware: skip players in star_completed; they already chose.
+			if gm.round_state.star_completed.is_empty():
+				gm.game_log.emit("The Star — each player may swap one card with the top of the deck.")
 			for pidx in gm.active_players:
+				if gm.round_state.star_completed.has(pidx):
+					continue
 				if pidx == gm.HUMAN_IDX:
 					gm.arcana_choice_needed.emit(pidx, 17)
 					await gm._arcana_effect_done
@@ -171,6 +209,8 @@ static func apply(id: int, g: int) -> void:
 						gm.game_log.emit("You swap a card with the deck.")
 					else:
 						gm.game_log.emit("You pass.")
+					gm.round_state.star_completed.append(pidx)
+					gm.save_match_checkpoint()
 				else:
 					await gm._ai_think()
 					if g != gm._game_gen: return
@@ -186,33 +226,41 @@ static func apply(id: int, g: int) -> void:
 						gm.game_log.emit("%s swaps a card." % gm._pname(pidx))
 					else:
 						gm.game_log.emit("%s passes." % gm._pname(pidx))
+					gm.round_state.star_completed.append(pidx)
 
 		7:  # The Chariot — each player passes one card to the left
-			var chosen: Dictionary = {}
-			for pidx in gm.active_players:
-				if pidx == gm.HUMAN_IDX:
-					gm.arcana_choice_needed.emit(pidx, 7)
-					await gm._arcana_effect_done
-					if g != gm._game_gen: return
-					chosen[pidx] = gm.arcana_choice
-					gm.game_log.emit("You pass a card left.")
-				else:
-					await gm._ai_think()
-					if g != gm._game_gen: return
-					chosen[pidx] = AIPlayer.weakest_card_idx(pidx)
-					gm.game_log.emit("%s passes a card left." % gm._pname(pidx))
-			var passing: Dictionary = {}
-			for pidx in gm.active_players:
-				passing[pidx] = gm.players[pidx].hand[chosen[pidx]]
-			for pidx in gm.active_players:
-				gm.players[pidx].hand.erase(passing[pidx])
-			for i in gm.active_players.size():
-				var from_pidx: int = gm.active_players[i]
-				var to_pidx: int = gm.active_players[(i + 1) % gm.active_players.size()]
-				gm.players[to_pidx].receive_cards([passing[from_pidx]])
-			for pidx in gm.active_players:
-				gm.player_hand_updated.emit(pidx, gm.players[pidx].hand)
-			gm.game_log.emit("The Chariot — cards passed left!")
+			# Resume-aware: chariot_chosen accumulates pass-1 choices across saves;
+			# chariot_passed gates pass-2 so we don't re-move cards on resume.
+			if not gm.round_state.chariot_passed:
+				for pidx in gm.active_players:
+					if gm.round_state.chariot_chosen.has(pidx):
+						continue
+					if pidx == gm.HUMAN_IDX:
+						gm.arcana_choice_needed.emit(pidx, 7)
+						await gm._arcana_effect_done
+						if g != gm._game_gen: return
+						gm.round_state.chariot_chosen[pidx] = gm.arcana_choice
+						gm.game_log.emit("You pass a card left.")
+						gm.save_match_checkpoint()
+					else:
+						await gm._ai_think()
+						if g != gm._game_gen: return
+						gm.round_state.chariot_chosen[pidx] = AIPlayer.weakest_card_idx(pidx)
+						gm.game_log.emit("%s passes a card left." % gm._pname(pidx))
+				# Pass 2 — cards actually move. Synchronous, no awaits, single shot.
+				var passing: Dictionary = {}
+				for pidx in gm.active_players:
+					passing[pidx] = gm.players[pidx].hand[gm.round_state.chariot_chosen[pidx]]
+				for pidx in gm.active_players:
+					gm.players[pidx].hand.erase(passing[pidx])
+				for i in gm.active_players.size():
+					var from_pidx: int = gm.active_players[i]
+					var to_pidx: int = gm.active_players[(i + 1) % gm.active_players.size()]
+					gm.players[to_pidx].receive_cards([passing[from_pidx]])
+				for pidx in gm.active_players:
+					gm.player_hand_updated.emit(pidx, gm.players[pidx].hand)
+				gm.game_log.emit("The Chariot — cards passed left!")
+				gm.round_state.chariot_passed = true
 
 		3:  # The Empress — each player draws a 6th card
 			for pidx: int in gm.active_players:

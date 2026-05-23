@@ -10,6 +10,9 @@ extends Node
 signal run_state_changed
 
 const SAVE_PATH := "user://run.cfg"
+# Mid-match snapshot for Balatro-style resume. Lives in its own file so Quick
+# Play and other interactions with the run.cfg don't touch it.
+const MATCH_SAVE_PATH := "user://match_state.cfg"
 
 # ---- Match ladder definition -------------------------------------------------
 # Each entry: {num_players, starting_chips, ante, label, ai_overrides}.
@@ -100,6 +103,7 @@ func start_run() -> void:
 	run_completed = false
 	match_index = 0
 	opponent_memories.clear()
+	clear_match_state()
 	_save()
 	run_state_changed.emit()
 
@@ -110,6 +114,7 @@ func abandon_run() -> void:
 	match_index = 0
 	opponent_memories.clear()
 	_session_belongs_to_run = false
+	clear_match_state()
 	_clear_save()
 	run_state_changed.emit()
 
@@ -128,6 +133,8 @@ func record_match_result(final_chips: Array) -> void:
 		return
 	_session_belongs_to_run = false
 	snapshot_memories()
+	# Match completed — the mid-match save is now stale, regardless of outcome.
+	clear_match_state()
 	if final_chips.is_empty():
 		return
 	var human_chips: int = int(final_chips[GameManager.HUMAN_IDX])
@@ -144,15 +151,31 @@ func record_match_result(final_chips: Array) -> void:
 	run_state_changed.emit()
 
 # Called by main menu / career screen when starting the configured match.
-# Sets up GameManager, then restores any memory the AIs already have on you.
+# Fresh: configures GameManager and applies overrides/memories. Resume: parks
+# the saved MatchState on GameManager so table.gd._ready can drive the actual
+# restore after connecting its signals — that ordering guarantees the
+# state_restored signal has a listener by the time it fires.
 func launch_current_match() -> void:
 	if match_index >= _LADDER.size():
 		return
 	var cfg: Dictionary = _LADDER[match_index]
-	GameManager.setup_game(cfg["num_players"], cfg["starting_chips"], cfg["ante"])
-	_apply_ai_overrides(cfg["ai_overrides"])
-	restore_memories()
+	var ms := load_match_state()
+	if ms != null:
+		GameManager.pending_resume_state = ms
+	else:
+		GameManager.setup_game(cfg["num_players"], cfg["starting_chips"], cfg["ante"])
+		_apply_ai_overrides(cfg["ai_overrides"])
+		restore_memories()
 	_session_belongs_to_run = true
+
+# Called by table.gd._ready ONLY in the resume branch — after GameManager
+# reconstructs profiles from defaults via resume_match. _apply_ai_overrides
+# uses += deltas (non-idempotent), so the fresh path applies overrides inside
+# launch_current_match and this function is not called there.
+func apply_current_match_overrides() -> void:
+	if match_index >= _LADDER.size():
+		return
+	_apply_ai_overrides(_LADDER[match_index]["ai_overrides"])
 
 # ---- Memory snapshot / restore -----------------------------------------------
 
@@ -219,3 +242,32 @@ func _clear_save() -> void:
 		var dir := DirAccess.open("user://")
 		if dir != null:
 			dir.remove(SAVE_PATH.get_file())
+
+# ---- Mid-match state persistence -------------------------------------------
+
+func has_match_state() -> bool:
+	return FileAccess.file_exists(MATCH_SAVE_PATH)
+
+func save_match_state(state: MatchState) -> void:
+	if state == null:
+		return
+	var cfg := ConfigFile.new()
+	cfg.set_value("match", "data", state.to_dict())
+	cfg.save(MATCH_SAVE_PATH)
+
+func load_match_state() -> MatchState:
+	if not FileAccess.file_exists(MATCH_SAVE_PATH):
+		return null
+	var cfg := ConfigFile.new()
+	if cfg.load(MATCH_SAVE_PATH) != OK:
+		return null
+	var d: Dictionary = cfg.get_value("match", "data", {})
+	if d.is_empty():
+		return null
+	return MatchState.from_dict(d)
+
+func clear_match_state() -> void:
+	if FileAccess.file_exists(MATCH_SAVE_PATH):
+		var dir := DirAccess.open("user://")
+		if dir != null:
+			dir.remove(MATCH_SAVE_PATH.get_file())

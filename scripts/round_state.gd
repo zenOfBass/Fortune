@@ -36,6 +36,30 @@ var moon_reveal_done: bool = false       # true after human acknowledges phase-1
 var temperance_flop: Array = []          # current face-up flop cards for Temperance (#14)
 var judgement_active: bool = false       # Judgement (#20): folded players may re-enter before showdown
 
+# ---- Betting-loop state (promoted from _phase_bet locals so mid-bet saves
+# can restore the loop's exact position on resume) ----
+
+var bet_current: int = 0                 # _current_bet — highest committed this betting round
+var bet_contributed: Dictionary = {}     # player_idx -> chips contributed this betting round
+var bet_acted: Dictionary = {}           # player_idx -> true once they've taken any action
+var bet_player_raises: Dictionary = {}   # player_idx -> raises this phase (vs profile.raise_cap)
+var bet_raise_count: int = 0             # total raises this phase (vs the hard cap of 6)
+var bet_queue: Array[int] = []           # remaining players to act, in seat order
+var bet_in_progress: bool = false        # true between entering _phase_bet and finishing it
+
+# ---- Per-player progress trackers for resume ----
+# Each phase that loops across players records who's already done their thing,
+# so resuming mid-phase can skip them rather than re-prompting.
+
+var draw_completed:        Array[int] = []  # _phase_draw — players who've discarded+redrawn
+var moon_swap_completed:   Array[int] = []  # _phase_moon_swap — players who've resolved their secret
+var judgement_decided:     Array[int] = []  # _phase_judgement_reentry — folded players who've chosen
+var temperance_completed:  Array[int] = []  # arcana Temperance — players done with discard+pick
+var magician_completed:    Array[int] = []  # arcana Magician — players done with the suit guess
+var star_completed:        Array[int] = []  # arcana Star — players done with swap-or-pass
+var chariot_chosen:        Dictionary = {}  # arcana Chariot pass 1 — pidx -> hand index to pass
+var chariot_passed:        bool = false     # arcana Chariot pass 2 done — cards actually moved
+
 # ---- Convenience ----
 
 func eval_options() -> Dictionary:

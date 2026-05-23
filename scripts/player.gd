@@ -47,3 +47,18 @@ func clear_for_new_round() -> void:
 
 func _refresh_has_page() -> void:
 	has_page = hand.any(func(c: Card) -> bool: return c.rank == Card.Rank.PAGE)
+
+# ---- Serialization (for mid-match save state) -------------------------------
+
+func hand_to_pairs() -> Array:
+	var out: Array = []
+	for c: Card in hand:
+		out.append(c.to_pair())
+	return out
+
+# Bypasses the sort in receive_cards — the saved order is the displayed order.
+func set_hand_from_pairs(pairs: Array) -> void:
+	hand.clear()
+	for p in pairs:
+		hand.append(Card.from_pair(p as Array))
+	_refresh_has_page()

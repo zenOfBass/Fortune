@@ -63,7 +63,12 @@ func _refresh() -> void:
 		RunManager.current_match_number(), total, RunManager.current_match_label()]
 	opponents_label.text = "Opponents: " + _roster_for(RunManager.match_index)
 	status_label.text = ""
-	primary_button.text = "Continue" if RunManager.run_active else "Begin Run"
+	if RunManager.has_match_state():
+		primary_button.text = "Resume Match"
+	elif RunManager.run_active:
+		primary_button.text = "Continue"
+	else:
+		primary_button.text = "Begin Run"
 	abandon_button.visible = RunManager.run_active
 	_refresh_reads()
 
